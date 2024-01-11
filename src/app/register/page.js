@@ -184,14 +184,14 @@ function Register(props) {
       <div className={"form flex flex-col gap-7 mt-8 mb-8 self-center"}>
         <form onSubmit={onPlanSelectionNext}>
           <h3>Select Plan</h3>
-          <div class="pricing-card">
-            <div class="card-header">
-              <div class="card-btn-parent">
+          <div className="pricing-card">
+            <div className="card-header">
+              <div className="card-btn-parent">
                 {SubscriptionPlans.map((item, index) => {
                   return (
                     <button
                       key={index}
-                      class={selectedPlan.id == item.id ? "active" : undefined}
+                      className={selectedPlan.id == item.id ? "active" : undefined}
                       onClick={(e) => {
                         e.preventDefault();
                         setSelectedPlan(item)
@@ -201,26 +201,26 @@ function Register(props) {
                     </button>
                   );
                 })}
-                <div class="overlay"></div>
+                <div className="overlay"></div>
               </div>
             </div>
-            <div class="card-body">
+            <div className="card-body">
               {SubscriptionPlans.map((item, index) => {
                 return (
-                  <div key={index} id="card-basic-plan" class={selectedPlan.id == item.id ? "active" : undefined}>
-                    <div class="card-plans">
-                      <span class="plan-tag">{item.name}</span>
-                      <div class="card-sub-plan">
-                        <h3 class="plan-title">{item.price}</h3>
-                        <span class="plan-duration"> / {item.duration}</span>
+                  <div key={index} id="card-basic-plan" className={selectedPlan.id == item.id ? "active" : undefined}>
+                    <div className="card-plans">
+                      <span className="plan-tag">{item.name}</span>
+                      <div className="card-sub-plan">
+                        <h3 className="plan-title">{item.price}</h3>
+                        <span className="plan-duration"> / {item.duration}</span>
                       </div>
                     </div>
-                    <div class="card-content">
+                    <div className="card-content">
                       <p>{item.description}</p>
-                      <div class="card-lists">
+                      <div className="card-lists">
                         {item.benefits.map((item, index) => {
                           return (
-                            <div class="card-list">
+                            <div key={index} className="card-list">
                               <img src="https://rvs-pricing-card.vercel.app/tick.svg" alt="" />
                               <div>
                                 {item.text}
@@ -382,8 +382,8 @@ function Register(props) {
     <div className="main-body absolute inset-0 flex row justify-content-lg-center justify-content-md-center">
 
       <div className="login-page">
-        <div class="lg:flex mr-[10%]">
-          <div class="flex flex-col mt-[25px] text-primary-content text-center items-center">
+        <div className="lg:flex mr-[10%]">
+          <div className="flex flex-col mt-[25px] text-primary-content text-center items-center">
             <div>
               <Image
                 src="/assets/logo-512-84985a75.png"
@@ -395,10 +395,10 @@ function Register(props) {
               />
             </div>
             <div className='mt-[18px] ml-[20px]'>
-              <p class="lg:text-[28px] font-black text-[25px] mx-auto">
+              <p className="lg:text-[28px] font-black text-[25px] mx-auto">
                 Join The Real World
               </p>
-              <p class="lg:text-[22px] text-[21px] mx-auto mt-[11px]">
+              <p className="lg:text-[22px] text-[21px] mx-auto mt-[11px]">
                 ESCAPE THE MATRIX
               </p>
             </div>

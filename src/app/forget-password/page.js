@@ -15,23 +15,15 @@ function ForgetPassword(props) {
   const dispatch = useDispatch();
 
   const [emailAddress, setEmailAddress] = useState('');
-  const [password, setPassword] = useState('');
 
   const onLoginClick = () => {
-    alert("Successfully logged in");
-    // login({
-    //   emailAddress,
-    //   password,
-    // })
-    //   .then((user) => {
-    //     Router.push("/documents");
-    //     loginOnClient(user);
-    //   })
-    //   .catch((error) => {
-    //     pong.danger(formatGraphqlError(error));
-    //   });
+
   };
 
+  if (props.user.isLoggedIn) {
+    router.push('/');
+    return null;
+  }
 
   return (
     <div className="main-body absolute inset-0 flex row justify-content-lg-center justify-content-md-center">

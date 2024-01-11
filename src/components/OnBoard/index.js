@@ -21,7 +21,7 @@ export default function OnBoard(props) {
             </div>
             <div className="mt-5 w-full max-w-[400px] p-8">
                 <Link href="/register">
-                    <button className="btn btn-primary side-button">I don't have an account</button>
+                    <button className="btn btn-primary side-button">I don&apos;t have an account</button>
                 </Link>
                 <Link href="/login">
                     <div className="d-grid">

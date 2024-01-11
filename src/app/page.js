@@ -6,7 +6,6 @@ import { connect } from '@/components/ConnectStore/connect';
 
 function Home(props) {
 
-  console.log("props?.user?.isLoggedIn: ", props);
   if (props?.user?.isLoggedIn) {
     return (
       <HomePage {...props} />
