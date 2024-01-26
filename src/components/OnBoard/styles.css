@@ -7,26 +7,39 @@
     font-family: "Poppins", sans-serif;
 }
 
-.main-body {
+.main-body-vm34v {
     background-color: #0c1b33;
     height: 100vh;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
     background: url('/assets/matrix-bg-bw-a53c6ae5.jpg');
     background-size: cover;
     background-position: center;
 }
 
-.logo {
-    /* height: 15rem;
-    width: 15rem; */
-    display: flex;
-    margin-top: 30%;
+.logo-cka34v {
+    margin-bottom: 20px;
 }
 
-.side-button {
+.content_r3rmgd {
+    width: 68%;
+    max-width: 360px;
+    height: 100vh;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.side-button-v92mc2 {
     outline: 0;
     width: 100%;
     border: 0;
     margin-top: 10px;
+    background: rgba(200, 200, 200, 0.4);
     border-radius: 7px;
     padding: 15px;
     color: #dedede;
@@ -37,14 +50,15 @@
     cursor: pointer;
 }
 
-.side-button:hover,
-.side-button:active,
-.side-button:focus {
+.side-button-v92mc2:hover,
+.side-button-v92mc2:active,
+.side-button-v92mc2:focus {
     background: rgba(200, 200, 200, 0.4);
     color: #ffffff;
+    font-size: 16px;
 }
 
-.main-button {
+.main-button-32mci3 {
     outline: 0;
     background: #b78727;
     width: 100%;
@@ -60,10 +74,11 @@
     cursor: pointer;
 }
 
-.main-button:hover,
-.main-button:active,
-.main-button:focus {
+.main-button-32mci3:hover,
+.main-button-32mci3:active,
+.main-button-32mci3:focus {
     background: #b78727;
     color: #dedede;
     box-shadow: 0 0 10px 0 #b78727;
+    font-size: 16px;
 }

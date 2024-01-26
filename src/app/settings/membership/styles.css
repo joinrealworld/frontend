@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,500;0,600;0,700;1,100;1,200;1,300&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+.profile-image-8qnzcmbw {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.avatar-93nasj {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.user-details-23mas {
+    margin-left: 20px;
+}
+
+.username-312c02qena,
+.tag-kla3mca2 {
+    display: block;
+    font-weight: 300;
+    font-size: 13px;
+}
+
+.username-312c02qena {
+    color: #ededed;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.tag-kla3mca2 {
+    color: #c5bfbf;
+    font-size: 14px;
+    letter-spacing: 0.7px;
+    font-weight: 300;
+}
+
+.account-info-9c7as {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.info-title-mczw72b {
+    margin-bottom: 4px;
+    color: #ededed;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.info-desc-mczw72b {
+    margin-bottom: 4px;
+    color: #ededed;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.info-cards-9anc2j {
+    display: flex;
+    width: 100%;
+    margin-top: 10px;
+    flex-direction: column;
+}
+
+.info-card-9cajyk {
+    display: flex;
+    width: 100%;
+    gap: 3px;
+    padding: 12px;
+    text-align: left;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.info-lable-7cban2d {
+    color: #787878;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.info-value-ma82ba {
+    color: #ededed;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.card-number-ma82ba {
+    color: #ededed;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.card-expiry-ma82ba {
+    color: #ededed;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.card-logo-3mcal2 {
+    height: 30px;
+    width: auto;
+    display: flex;
+}
+
+.card-manage-ma82ba {
+    margin-right: 10px;
+    cursor: pointer;
+
+    p {
+        color: #ededed;
+        font-weight: 500;
+        margin-bottom: 0px !important;
+        text-decoration: underline;
+        font-size: 18px;
+    }
+}
+
+.card-input-3mac82n {
+    outline: 0;
+    background: #dedede;
+    border-radius: 7px;
+    width: 100%;
+    border: 0;
+    margin: 10px 0;
+    color: #232323;
+    padding: 15px;
+    font-size: 15px;
+}
+
+.card-input-3mac82n:focus {
+    box-shadow: 0 0 10px 0 #ededed;
+}
+
+.modal-header-mcan3 {
+    background-color: #343434;
+}
+
+.modal-mcan3 {
+    background-color: #343434;
+}
+
+.main-button-23fa2wd {
+    outline: 0;
+    background: #b78727;
+    width: 100%;
+    border: 0;
+    margin-top: 30px;
+    border-radius: 7px;
+    padding: 15px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 15px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.4s ease-in-out;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.main-button-23fa2wd:hover,
+.main-button-23fa2wd:active,
+.main-button-23fa2wd:focus {
+    background: #b78727;
+    color: #dedede;
+    box-shadow: 0 0 10px 0 #b78727;
+    font-size: 16px;
+}
+
+.input-hint {
+    font-size: 12px;
+    color: #EC5800;
+    margin-bottom: 5px;
+    text-align: left;
+    text-decoration: none;
+}

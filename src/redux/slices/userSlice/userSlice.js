@@ -4,6 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     user: null,
     authToken: null,
+    refreshToken: null,
     isLoggedIn: false,
     errorLoggedIn: null
 }
@@ -16,10 +17,16 @@ export const userSlice = createSlice({
         userLogin: (state, action) => {
             state.isLoggedIn = true;
             state.user = action.payload.user;
+            state.authToken = action.payload.authToken;
+            state.refreshToken = action.payload.refreshToken;
+            state.errorLoggedIn = null;
         },
         userLogout: (state, action) => {
             state.isLoggedIn = false;
             state.user = null;
+            state.authToken = null;
+            state.refreshToken = null;
+            state.errorLoggedIn = null;
         },
     },
     // The `extraReducers` field lets the slice handle actions defined elsewhere,

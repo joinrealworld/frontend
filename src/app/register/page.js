@@ -1,18 +1,16 @@
 "use client";
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link';
-import { MoveLeft } from 'lucide-react';
-import validator from "validator";
+import { MoveLeft, CheckCircle2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import './styles.css';
-import ValidatedForm from "../../components/ValidatedForm";
-import { connect } from '@/components/ConnectStore/connect';
-import { apiURL } from '@/constant/global';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-
+import ValidatedForm from "@/components/ValidatedForm";
+import connect from '@/components/ConnectStore/connect';
+import { appName } from "@/constant/global";
 
 const SubscriptionPlans = [
   {
@@ -61,6 +59,12 @@ function Register(props) {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  useEffect(() => {
+    if (props.user.isLoggedIn) {
+      router.push('/');
+    }
+  }, []);
+
   const [emailAddress, setEmailAddress] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -81,18 +85,12 @@ function Register(props) {
   };
 
   const onCardInfoNext = async () => {
-    alert("Register successfully!");
-    // setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length))
+    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length))
   };
-
-  if (props.user.isLoggedIn) {
-    router.push('/');
-    return null;
-  }
 
   const renderPersonalInfo = () => {
     return (
-      <div className={"form flex flex-col gap-7 mt-8 mb-8 self-center"}>
+      <div className={"form-139nc3"}>
         <ValidatedForm
           rules={{
             emailAddress: {
@@ -115,18 +113,18 @@ function Register(props) {
               required: "First name is required!"
             },
             lastName: {
-              required: "First name is required!"
+              required: "Last name is required!"
             },
           }}
           onSubmit={onPersonalInfoNext}
         >
           <form >
-            <h3>Personal Information</h3>
+            <h3 className='form-title-130mcad'>Personal Information</h3>
             <div>
               <input
                 type="text"
                 name="emailAddress"
-                className="form-control"
+                className="form-control-3mac82n"
                 placeholder="Email Address"
                 value={emailAddress}
                 autoComplete="off"
@@ -139,7 +137,7 @@ function Register(props) {
               <input
                 type="text"
                 name="firstName"
-                className="form-control"
+                className="form-control-3mac82n"
                 placeholder="First Name"
                 autoComplete="off"
                 value={firstName}
@@ -152,7 +150,7 @@ function Register(props) {
               <input
                 type="text"
                 name="lastName"
-                className="form-control"
+                className="form-control-3mac82n"
                 placeholder="Last Name"
                 autoComplete="off"
                 value={lastName}
@@ -162,15 +160,13 @@ function Register(props) {
               />
             </div>
 
-            <div className="d-grid mt-[20px]">
-              <button className="main-button btn btn-primary" type="submit">
-                Next
-              </button>
-            </div>
-            <div className='back-action'>
-              <MoveLeft color="#b78727" size={23} style={{ marginBottom: 3.5 }} />
+            <button className="main-button-mac31cas" type="submit">
+              Next
+            </button>
+            <div className='back-action-31ca22'>
+              <MoveLeft color="#b78727" size={23} />
               <Link href="/login">
-                <p className="back">Go To Login</p>
+                <span className="back-2fk29a">Go To Login</span>
               </Link>
             </div>
           </form>
@@ -181,12 +177,12 @@ function Register(props) {
 
   const renderPlans = () => {
     return (
-      <div className={"form flex flex-col gap-7 mt-8 mb-8 self-center"}>
+      <div className={"form-139nc3"}>
         <form onSubmit={onPlanSelectionNext}>
-          <h3>Select Plan</h3>
-          <div className="pricing-card">
-            <div className="card-header">
-              <div className="card-btn-parent">
+          <h3 className='form-title-130mcad'>Select Plan</h3>
+          <div className="pricing-card-da2fma">
+            <div className="card-header-ea21caw">
+              <div className="card-btn-parent-1mqidn">
                 {SubscriptionPlans.map((item, index) => {
                   return (
                     <button
@@ -204,25 +200,25 @@ function Register(props) {
                 <div className="overlay"></div>
               </div>
             </div>
-            <div className="card-body">
+            <div className="card-body-mzc29q">
               {SubscriptionPlans.map((item, index) => {
                 return (
-                  <div key={index} id="card-basic-plan" className={selectedPlan.id == item.id ? "active" : undefined}>
-                    <div className="card-plans">
-                      <span className="plan-tag">{item.name}</span>
-                      <div className="card-sub-plan">
-                        <h3 className="plan-title">{item.price}</h3>
-                        <span className="plan-duration"> / {item.duration}</span>
+                  <div key={index} id={item.id} className={selectedPlan.id == item.id ? "active" : undefined}>
+                    <div className="card-plans-cnq27as">
+                      <span className="plan-tag-23an1cz">{item.name}</span>
+                      <div className="card-sub-plan-mcai2bc">
+                        <h3 className="plan-title-nc17ab">{item.price}</h3>
+                        <h6 className="plan-duration-mc81bd"> / {item.duration}</h6>
                       </div>
                     </div>
-                    <div className="card-content">
+                    <div className="card-content-va32da">
                       <p>{item.description}</p>
-                      <div className="card-lists">
+                      <div className="card-lists-cn127s">
                         {item.benefits.map((item, index) => {
                           return (
-                            <div key={index} className="card-list">
-                              <img src="https://rvs-pricing-card.vercel.app/tick.svg" alt="" />
-                              <div>
+                            <div key={index} className="card-list-3emao8n">
+                              <CheckCircle2 className='check-mark-a3pzcm' color="#50C878" size={16} />
+                              <div className='benefits-ma8b2'>
                                 {item.text}
                               </div>
                             </div>
@@ -236,13 +232,12 @@ function Register(props) {
             </div>
           </div>
 
-          <div className="d-grid mt-[20px]">
-            <button className="main-button btn btn-primary" type="submit">Select</button>
-          </div>
-          <div className='back-action'>
-            <MoveLeft color="#b78727" size={23} style={{ marginBottom: 3.5 }} />
+          <button className="main-button-mac31cas" type="submit">Select</button>
+
+          <div className='back-action-31ca22'>
+            <MoveLeft color="#b78727" size={23} />
             <div onClick={() => setSelectedStep(Math.max((selectedStep - 1), 1))}>
-              <p className="back">Back</p>
+              <span className="back-2fk29a">Back</span>
             </div>
           </div>
         </form>
@@ -253,7 +248,7 @@ function Register(props) {
 
   const renderCardInfo = () => {
     return (
-      <div className={"form flex flex-col gap-7 mt-8 mb-8 self-center"}>
+      <div className={"form-139nc3"}>
         <ValidatedForm
           rules={{
             cardNumber: {
@@ -294,13 +289,13 @@ function Register(props) {
           onSubmit={onCardInfoNext}
         >
           <form >
-            <h3>Enter Credit Card</h3>
+            <h3 className='form-title-130mcad'>Enter Credit Card</h3>
             <div>
               <input
                 type="text"
                 name="cardNumber"
                 maxLength={16}
-                className="form-control"
+                className="form-control-3mac82n"
                 placeholder="Card Number"
                 value={cardNumber}
                 autoComplete="off"
@@ -314,7 +309,7 @@ function Register(props) {
                 type="tel"
                 name="expiryDate"
                 maxLength={5}
-                className="form-control"
+                className="form-control-3mac82n"
                 placeholder="Expiration Date (MM/YY)"
                 autoComplete="off"
                 value={expiryDate}
@@ -328,7 +323,7 @@ function Register(props) {
                 type="tel"
                 name="cvv"
                 maxLength={3}
-                className="form-control"
+                className="form-control-3mac82n"
                 placeholder="CVV"
                 autoComplete="off"
                 value={cvv}
@@ -341,7 +336,7 @@ function Register(props) {
               <input
                 type="text"
                 name="billingAddress"
-                className="form-control"
+                className="form-control-3mac82n"
                 placeholder="Billing Address"
                 autoComplete="off"
                 value={billingAddress}
@@ -351,15 +346,13 @@ function Register(props) {
               />
             </div>
 
-            <div className="d-grid mt-[20px]">
-              <button className="main-button btn btn-primary" type="submit">
-                Submit
-              </button>
-            </div>
-            <div className='back-action'>
-              <MoveLeft color="#b78727" size={23} style={{ marginBottom: 3.5 }} />
+            <button className="main-button-mac31cas" type="submit">
+              Submit
+            </button>
+            <div className='back-action-31ca22'>
+              <MoveLeft color="#b78727" size={23} />
               <div onClick={() => setSelectedStep(Math.max((selectedStep - 1), 1))}>
-                <p className="back">Back</p>
+                <span className="back-2fk29a">Back</span>
               </div>
             </div>
           </form>
@@ -379,34 +372,33 @@ function Register(props) {
   }
 
   return (
-    <div className="main-body absolute inset-0 flex row justify-content-lg-center justify-content-md-center">
-
-      <div className="login-page">
-        <div className="lg:flex mr-[10%]">
-          <div className="flex flex-col mt-[25px] text-primary-content text-center items-center">
-            <div>
+    <div className="main-body-8cnajw absolute inset-0 flex row justify-content-lg-center justify-content-md-center">
+      <div className="content-km38nca">
+        <div className="left-side-023mca">
+          <div className="left-content-83rnzx flex flex-col text-primary-content items-center">
+            <div className='logo-image-nac93c'>
               <Image
                 src="/assets/logo-512-84985a75.png"
                 alt="Logo"
-                className='logo'
-                width={200}
-                height={200}
+                className='logo-8485a75'
+                width={226}
+                height={226}
                 priority
               />
             </div>
-            <div className='mt-[18px] ml-[20px]'>
-              <p className="lg:text-[28px] font-black text-[25px] mx-auto">
-                Join The Real World
-              </p>
-              <p className="lg:text-[22px] text-[21px] mx-auto mt-[11px]">
+            <div>
+              <h2 className="title-m3ic4n lg:text-[28px] font-black text-[25px] mx-auto">
+                {appName}
+              </h2>
+              <h5 className="sub-title-m3ic4n lg:text-[22px] text-[21px] mx-auto mt-2">
                 ESCAPE THE MATRIX
-              </p>
+              </h5>
             </div>
           </div>
         </div>
-
-        {renderContent()}
-
+        <div className='right-side-cbs782c'>
+          {renderContent()}
+        </div>
       </div>
     </div>
   );

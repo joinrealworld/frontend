@@ -3,6 +3,7 @@
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persister, store } from '@/redux';
+import { NextUIProvider } from '@nextui-org/react';
 
 export const StoreProvider = (props) => {
   return (
@@ -17,5 +18,13 @@ export const PersistGateProvider = ({ children }) => {
     <PersistGate loading={null} persistor={persister}>
       {children}
     </PersistGate>
+  );
+}
+
+export const NextUIProviderWrap = ({ children }) => {
+  return (
+    <NextUIProvider>
+      {children}
+    </NextUIProvider>
   );
 }

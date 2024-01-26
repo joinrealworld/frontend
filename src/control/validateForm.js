@@ -179,7 +179,6 @@ class ValidateForm {
 
     if (hasInvalidValidations) {
       fieldInput.classList.add("error");
-      fieldInput.focus();
     }
 
     if (!hasInvalidValidations) {

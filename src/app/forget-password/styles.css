@@ -7,7 +7,7 @@
     font-family: "Poppins", sans-serif;
 }
 
-h3 {
+.form-title-2kncasz {
     color: #ededed;
     font-size: 22px;
     font-weight: 500;
@@ -15,28 +15,22 @@ h3 {
     margin-bottom: 10px;
 }
 
-.main-body {
+.main-body-pa23cs {
     background-color: #0c1b33;
-
-    /* background-image: url('/assets/black-bg-2.jpeg'); */
     height: 100vh;
-    /* background: url(https://images.pexels.com/photos/176851/pexels-photo-176851.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb); */
     background: url('/assets/matrix-bg-bw-a53c6ae5.jpg');
     background-size: cover;
     background-position: center;
 }
 
-.login-page {
-    /* height: 100vh; */
-    /* height: 100%; */
+.fp-page-cam21as {
     width: 100%;
-    /* background-image: url('/assets/black-bg-2.jpeg'); */
     align-items: center;
     display: flex;
     justify-content: center;
 }
 
-.form {
+.form-cam24uu {
     position: relative;
     filter: drop-shadow(0 0 2px #000000);
     border-radius: 7px;
@@ -48,15 +42,7 @@ h3 {
     box-shadow: 1px 1px 8px 0 #dedede;
 }
 
-.form img {
-    position: absolute;
-    height: 20px;
-    bottom: 205px;
-    right: 60px;
-    cursor: pointer;
-}
-
-.form p {
+.input-hint {
     font-size: 12px;
     color: #EC5800;
     margin-bottom: 5px;
@@ -64,29 +50,23 @@ h3 {
     text-decoration: none;
 }
 
-.form input {
+.form-control-ba83as8 {
     outline: 0;
     background: #dedede;
     border-radius: 7px;
     width: 100%;
     border: 0;
-    margin: 15px 0;
+    margin: 10px 0;
     color: #232323;
     padding: 15px;
     font-size: 15px;
 }
 
-.form input:focus {
+.form-control-ba83as8:focus {
     box-shadow: 0 0 10px 0 #ededed;
 }
 
-span {
-    color: red;
-    margin: 10px 0;
-    font-size: 14px;
-}
-
-.form button {
+.main-button-o3n2dc {
     outline: 0;
     background: #b78727;
     width: 100%;
@@ -102,44 +82,35 @@ span {
     cursor: pointer;
 }
 
-.form button:hover,
-.form button:active,
-.form button:focus {
+.main-button-o3n2dc:hover,
+.main-button-o3n2dc:active,
+.main-button-o3n2dc:focus {
     background: #b78727;
     color: #dedede;
     box-shadow: 0 0 10px 0 #b78727;
 }
 
-.message {
-    margin-bottom: 20px;
-    text-align: right;
-
-}
-
-.form .message {
-    font-size: 13px;
-    color: #b78727;
-    text-align: right;
-    align-self: flex-end;
-    text-decoration: none;
-}
-
-.back-action {
+.back-action-k823nc {
     flex-direction: row;
     justify-content: center;
     align-items: center !important;
     display: flex;
-    margin-right: 30px;
     margin-top: 20px;
+    text-decoration: none;
+    margin-right: 30px;
+    cursor: pointer;
 }
 
-.back {
+.back-msji783 {
     margin-left: 8px;
     text-align: center !important;
-}
-
-.form .back {
     font-size: 15px;
     color: #b78727;
     text-decoration: none;
+}
+
+@media screen and (max-width: 400px) {
+    .form-cam24uu {
+        width: 90%;
+    }
 }

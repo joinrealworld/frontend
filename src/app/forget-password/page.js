@@ -1,34 +1,36 @@
 "use client";
 
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
 import { MoveLeft } from 'lucide-react';
 import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 import './styles.css';
-import { connect } from '@/components/ConnectStore/connect';
 import ValidatedForm from "../../components/ValidatedForm";
-
+import connect from '@/components/ConnectStore/connect';
 
 function ForgetPassword(props) {
 
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const [emailAddress, setEmailAddress] = useState('');
 
-  const onLoginClick = () => {
+  const onResetPasswordClick = () => {
 
   };
 
-  if (props.user.isLoggedIn) {
-    router.push('/');
-    return null;
-  }
+  useEffect(() => {
+    if (props.user.isLoggedIn) {
+      router.push('/');
+    }
+  }, []);
 
   return (
-    <div className="main-body absolute inset-0 flex row justify-content-lg-center justify-content-md-center">
-      <div className="login-page">
-        <div className="form">
+    <div className="main-body-pa23cs absolute inset-0 flex row justify-content-lg-center justify-content-md-center">
+      <div className="fp-page-cam21as">
+        <div className="form-cam24uu">
           <ValidatedForm
             rules={{
               emailAddress: {
@@ -42,15 +44,15 @@ function ForgetPassword(props) {
                 email: "Invalid Email address",
               },
             }}
-            onSubmit={() => onLoginClick()}
+            onSubmit={onResetPasswordClick}
           >
             <form >
-              <h3>Reset your password</h3>
+              <h3 className='form-title-2kncasz'>Reset your password</h3>
               <div>
                 <input
                   type="text"
                   name="emailAddress"
-                  className="form-control"
+                  className="form-control-ba83as8"
                   placeholder="Email Address"
                   value={emailAddress}
                   id="email"
@@ -61,14 +63,12 @@ function ForgetPassword(props) {
                 />
               </div>
 
-              <div className="d-grid">
-                <button className="btn btn-primary" type="submit">Send Reset Password Email</button>
-              </div>
+              <button className="main-button-o3n2dc" type="submit">Send Reset Password Email</button>
 
-              <div className='back-action'>
-                <MoveLeft color="#b78727" size={23} style={{ marginBottom: 3.5 }} />
+              <div className='back-action-k823nc'>
+                <MoveLeft color="#b78727" size={23} style={{ marginTop: -16 }} />
                 <Link href="/login">
-                  <p className="back">Back To Login</p>
+                  <p className="back-msji783">Back To Login</p>
                 </Link>
               </div>
             </form>

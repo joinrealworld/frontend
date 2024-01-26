@@ -1,4 +1,4 @@
-import { connect as connectRedux } from 'react-redux';
+import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import { bindActionCreators } from 'redux';
 
@@ -19,6 +19,8 @@ const mapDispatchToProps = (dispatch) => {
     return { actions: bindActionCreators(creators, dispatch), dispatch }
 }
 
-export const connect = (Component) => {
-    return connectRedux(mapStateToProps, mapDispatchToProps)(Component);
+const connectRedux = (Component) => {
+    return connect(mapStateToProps, mapDispatchToProps)(Component);
 };
+
+export default connectRedux;
