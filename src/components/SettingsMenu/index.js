@@ -1,5 +1,4 @@
-import React from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { UserIcon, ArrowLeft, Aperture, Edit, TargetIcon, LogOutIcon, LockIcon, AwardIcon, LifeBuoyIcon, X, } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -7,6 +6,7 @@ import $ from "jquery";
 
 import './styles.css';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { apiURL } from '@/constant/global';
 
 // zzz
 export const SettingsMenuOptions = [
@@ -24,8 +24,14 @@ function SettingsMenu(props) {
     const router = useRouter();
     const path = usePathname();
 
+    const [isBtnLoading, setIsBtnLoading] = useState(false);
+
     const logoutPopup = useDisclosure({
         id: 'logout-popup',
+    });
+
+    const allDeviceLogoutPopup = useDisclosure({
+        id: 'all-device-logout-popup',
     });
 
     const onLogoutClick = (e) => {
@@ -33,9 +39,45 @@ function SettingsMenu(props) {
         logoutPopup.onOpen();
     };
 
-    const onLogoutProcess = () => {
-        dispatch(props.actions.userLogout());
-        router.replace('/');
+    const onLogoutProcess = async () => {
+        setIsBtnLoading(true);
+        try {
+            await fetch(apiURL + 'api/v1/user/logout', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + props.user.authToken
+                }
+            });
+        } catch (error) {
+
+        } finally {
+            dispatch(props.actions.userLogout());
+            router.replace('/');
+        }
+    }
+
+    const onAllLogoutClick = (e) => {
+        e.preventDefault();
+        allDeviceLogoutPopup.onOpen();
+    };
+
+    const onAllLogoutProcess = async () => {
+        setIsBtnLoading(true);
+        try {
+            await fetch(apiURL + 'api/v1/user/all_logout', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + props.user.authToken
+                }
+            });
+        } catch (error) {
+
+        } finally {
+            dispatch(props.actions.userLogout());
+            router.replace('/');
+        }
     }
 
     const onBack = (e) => {
@@ -84,29 +126,73 @@ function SettingsMenu(props) {
                         Logout
                     </span>
                 </div>
-                <div className='menu-name-2mczn3'>
+                <div className='menu-name-2mczn3' onClick={onAllLogoutClick}>
                     <LockIcon color='#ededed' size={22} style={{ marginRight: 12 }} />
                     <span>
                         Logout All Devices
                     </span>
                 </div>
             </div>
-            <Modal id="logout-popup" isOpen={logoutPopup.isOpen} onOpenChange={logoutPopup.onOpenChange}>
+            <Modal
+                id="logout-popup"
+                isOpen={logoutPopup.isOpen}
+                backdrop="opaque"
+                radius="md"
+                onOpenChange={logoutPopup.onOpenChange}
+                classNames={{
+                    body: "py-6 modal-mcan3",
+                    header: "modal-header-mcan3 border-b-[1px] border-[#292f46]",
+                    footer: "modal-header-mcan3 border-b-[1px] border-[#292f46]",
+                }}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader>Logout</ModalHeader>
+                            <ModalHeader className='text-white'>Logout</ModalHeader>
                             <ModalBody style={{ marginTop: -10 }}>
-                                <p>
+                                <span className='text-white'>
                                     Are you sure you want to logout of this device?
-                                </p>
+                                </span>
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="default" variant="light" onPress={onClose}>
+                                <Button className='text-white' color="default" variant="light" onPress={onClose}>
                                     CANCEL
                                 </Button>
-                                <Button color='primary' onPress={onLogoutProcess}>
+                                <Button isLoading={isBtnLoading} onPress={onLogoutProcess}>
                                     LOGOUT
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            <Modal
+                id="all-device-logout-popup"
+                isOpen={allDeviceLogoutPopup.isOpen}
+                backdrop="opaque"
+                radius="md"
+                onOpenChange={allDeviceLogoutPopup.onOpenChange}
+                classNames={{
+                    body: "py-6 modal-mcan3",
+                    header: "modal-header-mcan3 border-b-[1px] border-[#292f46]",
+                    footer: "modal-header-mcan3 border-b-[1px] border-[#292f46]",
+                }}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className='text-white'>Logout All Devices</ModalHeader>
+                            <ModalBody style={{ marginTop: -10 }}>
+                                <span className='text-white'>
+                                    Are you sure you want to logout of all signed in devices?
+                                </span>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button className='text-white' color="default" variant="light" onPress={onClose}>
+                                    CANCEL
+                                </Button>
+                                <Button isLoading={isBtnLoading} onPress={onAllLogoutProcess}>
+                                    LOGOUT ALL DEVICES
                                 </Button>
                             </ModalFooter>
                         </>

@@ -17,8 +17,8 @@ function Login(props) {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const [emailAddress, setEmailAddress] = useState('hp@gmail.com');
-  const [password, setPassword] = useState("qidpuj-nuhqev-9zovFa");
+  const [emailAddress, setEmailAddress] = useState('');
+  const [password, setPassword] = useState("");
 
   const onLoginClick = async () => {
     try {
