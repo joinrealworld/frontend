@@ -20,7 +20,7 @@ export default function OnBoard(props) {
                     />
                     <h3 className="mt-3 text-center font-bold text-white">JOIN THE WORLD</h3>
                 </div>
-                <div style={{ width: '100%' }}>
+                <div style={{ width: '100%', marginTop: 20 }}>
                     <Link href="/register">
                         <button className="side-button-v92mc2">I don&apos;t have an account</button>
                     </Link>

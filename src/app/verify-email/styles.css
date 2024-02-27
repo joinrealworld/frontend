@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,400;0,500;0,600;0,700;1,100;1,200;1,300&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+.form-title-2kncasz {
+    color: #ededed;
+    font-size: 22px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 10px;
+    margin-top: 15px;
+}
+
+.main-body-pa23csda {
+    background-color: #0c1b33;
+    height: 100vh;
+    background: url('/assets/matrix-bg-bw-a53c6ae5.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.fp-page-cam21as {
+    width: 100%;
+    height: auto;
+    padding-top: 10vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media screen and (max-width: 400px) {
+    .form-cam24uu {
+        width: 90%;
+    }
+}

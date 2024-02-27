@@ -42,7 +42,7 @@
 .left-menu-mca32cw {
     display: flex;
     width: 25%;
-    padding-top: 3%;
+    padding-top: 4%;
     padding-left: 2%;
     padding-right: 4%;
     flex-direction: column;
@@ -73,15 +73,15 @@
 
 .menu-active-2mczn3 {
     display: flex;
-    width: fit-content;
-    margin-bottom: 12px;
-    padding-top: 12px;
+    width: '100%';
+    margin-bottom: 5px;
     flex-direction: row;
     align-items: center;
-    padding-bottom: 12px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     transition: ease-in 0.3s;
     background-color: #b78727;
-    border-radius: 30px;
+    border-radius: 10px;
     padding-left: 20px;
     cursor: pointer;
     padding-right: 20px;
@@ -97,16 +97,17 @@
 
 .menu-name-2mczn3 {
     display: flex;
+    width: '100%';
     flex-direction: row;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     align-items: center;
     transition: ease-out 0.3s;
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     cursor: pointer;
-    border-radius: 30px;
+    border-radius: 10px;
 
     span {
         color: #ededed;
@@ -119,14 +120,14 @@
 
 .menu-name-2mczn3:hover {
     color: #ededed;
+    width: '100%';
     font-weight: 500;
     font-size: 17px;
-    width: fit-content;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     transition: ease-in 0.3s;
     background-color: #b78727;
-    border-radius: 30px;
+    border-radius: 10px;
 }
 
 .back-icon-n82nz {
@@ -148,33 +149,29 @@
     display: none;
 }
 
-@media screen and (max-width: 850px) {
-    .left-menu-mca32cw {}
+@media screen and (max-width: 800px) {
 
-    .left-menu-mca32cw:hover {}
+    #menu-icon {
+        display: flex;
+    }
 
-    @media screen and (max-width: 800px) {
+    #setting-menu {
+        /* display: none; */
+        width: 100%;
+        height: 100vh;
+        position: fixed;
+        z-index: 900;
+    }
 
-        #menu-icon {
-            display: flex;
-        }
+    .close-icon-n82nz {
+        display: flex !important;
+    }
 
-        .left-menu-mca32cw {
-            width: 100%;
-            height: 100vh;
-            position: fixed;
-            z-index: 900;
-        }
-
-        .close-icon-n82nz {
-            display: flex !important;
-        }
-
-        #setting-menu.visible {
-            display: flex;
-            width: 100%;
-            position: fixed;
-            right: -100%;
-        }
+    #setting-menu.visible {
+        display: flex !important;
+        width: 100% !important;
+        height: 100vh !important;
+        position: fixed !important;
+        right: -100% !important;
     }
 }

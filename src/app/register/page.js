@@ -387,9 +387,9 @@ function Register(props) {
               />
             </div>
             <div>
-              <h2 className="title-m3ic4n lg:text-[28px] font-black text-[25px] mx-auto">
+              <p className="title-m3ic4n lg:text-[28px] font-black text-[25px] mx-auto">
                 {appName}
-              </h2>
+              </p>
               <h5 className="sub-title-m3ic4n lg:text-[22px] text-[21px] mx-auto mt-2">
                 ESCAPE THE MATRIX
               </h5>

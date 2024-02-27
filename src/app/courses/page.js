@@ -29,6 +29,7 @@ function Courses(props) {
     const [selectedTab, setSelectedTab] = useState(Tabs[0]);
     const [channels, setChannels] = useState([]);
     const [favChannels, setFavChannels] = useState([]);
+    const [inprogressChannels, setInprogressChannels] = useState([]);
     const [isFetch, setIsFetch] = useState(false);
 
     const router = useRouter();
@@ -38,9 +39,40 @@ function Courses(props) {
         if (!props.user.isLoggedIn) {
             router.push('/login');
         } else {
-            getCategoryData();
+            console.log(Number(props.searchParams?.tab));
+            console.log(tabValues.categories);
+            if (props.searchParams?.tab && Number(props.searchParams?.tab) > 0) {
+                console.log("callled...");
+                setSelectedTab(Tabs.find(d => d.Value == Number(props.searchParams?.tab)));
+                if (Number(props.searchParams?.tab) == tabValues.categories) {
+                    getCategoryData();
+                }
+                else if (Number(props.searchParams?.tab) == tabValues.favorites) {
+                    getFavoriteData();
+                }
+                else if (Number(props.searchParams?.tab) == tabValues.inProgress) {
+                    getInProgressData();
+                }
+            } else {
+                router.push('?tab=' + tabValues.categories);
+            }
         }
     }, []);
+
+    useEffect(() => {
+        if (props.searchParams?.tab && Number(props.searchParams?.tab) > 0 && Number(props.searchParams?.tab) != selectedTab?.Value) {
+            setSelectedTab(Tabs.find(d => d.Value == Number(props.searchParams?.tab)));
+            if (Number(props.searchParams?.tab) == tabValues.categories) {
+                getCategoryData();
+            }
+            else if (Number(props.searchParams?.tab) == tabValues.favorites) {
+                getFavoriteData();
+            }
+            else if (Number(props.searchParams?.tab) == tabValues.inProgress) {
+                getInProgressData();
+            }
+        }
+    }, [props.searchParams?.tab]);
 
     const getCategoryData = async () => {
         const response = await fetch(apiURL + 'api/v1/channel/fetch/category', {
@@ -50,13 +82,67 @@ function Courses(props) {
                 'Authorization': 'Bearer ' + props.user.authToken
             }
         });
+        console.log(response);
         if (response.status >= 200 && response.status < 300) {
             const rsp = await response.json();
-            if (rsp.payload && rsp.payload?.length > 0) {
+            console.log(rsp);
+            if (rsp.payload && typeof rsp.payload == 'object') {
                 setChannels(rsp.payload);
                 setIsFetch(true);
-                // // zzz
-                // setFavChannels(rsp.payload.filter(c => c.is_favorite));
+            } else {
+                toast("Error while fetching data!");
+            }
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                toast("Error while fetching data!");
+            }
+        }
+    }
+
+    const getFavoriteData = async () => {
+        const response = await fetch(apiURL + 'api/v1/channel/fetch/favourite/courses', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        console.log(response);
+        if (response.status >= 200 && response.status < 300) {
+            const rsp = await response.json();
+            console.log(rsp);
+            if (rsp.payload && typeof rsp.payload == 'object') {
+                setFavChannels(rsp.payload);
+                setIsFetch(true);
+            } else {
+                toast("Error while fetching data!");
+            }
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                toast("Error while fetching data!");
+            }
+        }
+    }
+
+    const getInProgressData = async () => {
+        const response = await fetch(apiURL + 'api/v1/channel/fetch/inprogress/courses', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        console.log(response);
+        if (response.status >= 200 && response.status < 300) {
+            const rsp = await response.json();
+            console.log(rsp);
+            if (rsp.payload && typeof rsp.payload == 'object') {
+                setInprogressChannels(rsp.payload);
+                setIsFetch(true);
             } else {
                 toast("Error while fetching data!");
             }
@@ -74,11 +160,12 @@ function Courses(props) {
     }
 
     const onSelectTab = (tab) => {
-        setSelectedTab(tab);
+        setIsFetch(false);
+        router.push('?tab=' + tab?.Value);
     }
 
     const onSelectCategory = (category) => {
-        router.push('/courses/' + category.id);
+        router.push('/courses/' + category.uuid);
     }
 
     const renderChannelContent = () => {
@@ -106,26 +193,67 @@ function Courses(props) {
             }
         }
         else if (selectedTab.Value == tabValues.inProgress) {
-            return (
-                <div className="w-full">
-                    <h3 className='text-center text-white fs-5 mt-5'>Working in progress!</h3>
-                </div>
-            );
+            if (inprogressChannels.length > 0) {
+                return inprogressChannels.map((item, index) => {
+                    return (
+                        <div key={index} className="col" onClick={(e) => onSelectCategory(item)}>
+                            <div className="card-9ama2f card">
+                                <img src={item.category_pic} className="card-img-9ama2f card-img-top" alt="..." />
+                                <div className="card-body-9ama2f card-body">
+                                    <h5 className="card-name-9ama2f card-title">{item.name}</h5>
+                                    <p className="card-description-9ama2f card-text">{item.description}</p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                });
+            } else {
+                return (
+                    <div className="w-full">
+                        <h3 className='text-center text-white fs-5 mt-5'>No in-progress categories!</h3>
+                    </div>
+                );
+            }
         }
         else if (selectedTab.Value == tabValues.favorites) {
-            return (
-                <div className="w-full">
-                    <h3 className='text-center text-white fs-5 mt-5'>Working in progress!</h3>
-                </div>
-            );
+            if (favChannels.length > 0) {
+                return favChannels.map((item, index) => {
+                    return (
+                        <div key={index} className="col" onClick={(e) => onSelectCategory(item)}>
+                            <div className="card-9ama2f card">
+                                <img src={item.category_pic} className="card-img-9ama2f card-img-top" alt="..." />
+                                <div className="card-body-9ama2f card-body">
+                                    <h5 className="card-name-9ama2f card-title">{item.name}</h5>
+                                    <p className="card-description-9ama2f card-text">{item.description}</p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                });
+            } else {
+                return (
+                    <div className="w-full">
+                        <h3 className='text-center text-white fs-5 mt-5'>No favorite categories!</h3>
+                    </div>
+                );
+            }
         }
     }
 
     const onRefreshData = (e) => {
         setIsFetch(false);
         setChannels([]);
-
-        getCategoryData();
+        setFavChannels([]);
+        setInprogressChannels([]);
+        if (selectedTab?.Value == tabValues.categories) {
+            getCategoryData();
+        }
+        else if (selectedTab?.Value == tabValues.favorites) {
+            getFavoriteData();
+        }
+        else if (selectedTab?.Value == tabValues.inProgress) {
+            getInProgressData();
+        }
     }
 
     return (

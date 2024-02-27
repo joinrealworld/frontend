@@ -3,22 +3,50 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
 import { MoveLeft } from 'lucide-react';
-import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
 import './styles.css';
 import ValidatedForm from "../../components/ValidatedForm";
 import connect from '@/components/ConnectStore/connect';
+import { apiURL, handleAPIError } from '@/constant/global';
+import BusyLoading from '@/components/BusyLoading';
+import { toast } from 'react-toastify';
 
 function ForgetPassword(props) {
 
-  const dispatch = useDispatch();
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onResetPasswordClick = () => {
-
+  const onResetPasswordClick = async () => {
+    try {
+      const response = await fetch(apiURL + 'api/v1/user/forgot_password?email=' + emailAddress, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(response);
+      if (response.status >= 200 && response.status < 300) {
+        const rsp = await response.json();
+        if (rsp.payload) {
+          router.replace('/login');
+          toast("Forgot Password Email sent your email address.");
+          setIsLoading(false);
+        } else {
+          handleAPIError(rsp);
+          setIsLoading(false);
+        }
+      } else {
+        const rsp = await response.json();
+        handleAPIError(rsp);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      toast("Something went wrong!");
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -75,6 +103,7 @@ function ForgetPassword(props) {
           </ValidatedForm>
         </div>
       </div>
+      <BusyLoading isLoading={isLoading} />
     </div>
   );
 }

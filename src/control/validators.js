@@ -9,6 +9,9 @@ export default {
   email: (rule, value = "") => {
     return rule === true ? validator.isEmail(value) : !validator.isEmail(value);
   },
+  notSameUsername: (rule, value = "") => {
+    return rule !== value;
+  },
   equals: (rule, value = "") => {
     return validator.equals(value, rule);
   },

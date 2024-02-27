@@ -7,7 +7,7 @@
     font-family: "Poppins", sans-serif;
 }
 
-.form-title-sm2fca {
+.form-title-2kncasz {
     color: #ededed;
     font-size: 22px;
     font-weight: 500;
@@ -15,7 +15,7 @@
     margin-bottom: 10px;
 }
 
-.main-body-lan229 {
+.main-body-pa23cs {
     background-color: #0c1b33;
     height: 100vh;
     background: url('/assets/matrix-bg-bw-a53c6ae5.jpg');
@@ -23,33 +23,23 @@
     background-position: center;
 }
 
-.login-page-mcaiwd {
+.fp-page-cam21as {
     width: 100%;
-    height: 100vh;
     align-items: center;
     display: flex;
     justify-content: center;
 }
 
-.form-mc72bk {
+.form-cam24uu {
     position: relative;
     filter: drop-shadow(0 0 2px #000000);
     border-radius: 7px;
     width: 380px;
-    height: auto;
     background-color: rgba(142, 121, 62, 0.8);
     background-color: #b78727;
     background-color: #121212;
     padding: 40px;
     box-shadow: 1px 1px 8px 0 #dedede;
-}
-
-.form-mc72bk img {
-    position: absolute;
-    height: 20px;
-    bottom: 205px;
-    right: 60px;
-    cursor: pointer;
 }
 
 .input-hint {
@@ -60,7 +50,7 @@
     text-decoration: none;
 }
 
-.form-control-q3csd {
+.form-control-45a2bz {
     outline: 0;
     background: #dedede;
     border-radius: 7px;
@@ -72,11 +62,11 @@
     font-size: 15px;
 }
 
-.form-control-q3csd:focus {
+.form-control-45a2bz:focus {
     box-shadow: 0 0 10px 0 #ededed;
 }
 
-.main-button-mc2342 {
+.main-button-o3n2dc {
     outline: 0;
     background: #b78727;
     width: 100%;
@@ -92,25 +82,15 @@
     cursor: pointer;
 }
 
-.main-button-mc2342:hover,
-.main-button-mc2342:active,
-.main-button-mc2342:focus {
+.main-button-o3n2dc:hover,
+.main-button-o3n2dc:active,
+.main-button-o3n2dc:focus {
     background: #b78727;
     color: #dedede;
     box-shadow: 0 0 10px 0 #b78727;
-    font-size: 16px;
 }
 
-.fp-link-23mcma {
-    margin-bottom: 20px !important;
-    text-align: right !important;
-    font-size: 12px !important;
-    color: #b78727 !important;
-    text-align: right !important;
-    cursor: pointer;
-}
-
-.back-action-ms32sa {
+.back-action-k823nc {
     flex-direction: row;
     justify-content: center;
     align-items: center !important;
@@ -121,7 +101,7 @@
     cursor: pointer;
 }
 
-.back-jak29a {
+.back-msji783 {
     margin-left: 8px;
     text-align: center !important;
     font-size: 15px;
@@ -129,34 +109,8 @@
     text-decoration: none;
 }
 
-.modal-mcan3w {
-    background-color: #343434;
-}
-
-.modal-header-mcan3w {
-    background-color: #343434;
-}
-
-.form-control-23ad24 {
-    outline: 0;
-    background: #dedede;
-    border-radius: 7px;
-    width: 100%;
-    border: 0;
-    margin: 10px 0;
-    color: #232323;
-    padding: 15px;
-    font-size: 15px;
-}
-
-.form-control-23ad24:focus {
-    box-shadow: 0 0 10px 0 #ededed;
-}
-
-
-@media screen and (max-width: 550px) {
-    .form-mc72bk {
-        width: 80%;
-        padding: 40px 28px;
+@media screen and (max-width: 400px) {
+    .form-cam24uu {
+        width: 90%;
     }
 }

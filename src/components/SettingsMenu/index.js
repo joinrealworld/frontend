@@ -97,7 +97,7 @@ function SettingsMenu(props) {
 
     return (
         <div className='left-menu-mca32cw' id="setting-menu">
-            <div style={{ padding: 20, flexDirection: 'row', display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginBottom: 15 }}>
+            <div style={{ paddingLeft: 20, flexDirection: 'row', display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginBottom: 15 }}>
                 <div className='backq-icon-n82nz' style={{ cursor: 'pointer' }} onClick={onBack}>
                     <ArrowLeft color='#ededed' size={22} style={{ marginRight: 12 }} />
                 </div>

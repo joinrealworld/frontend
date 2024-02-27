@@ -109,8 +109,9 @@
     text-decoration: none;
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 550px) {
     .form-cam24uu {
-        width: 90%;
+        width: 80%;
+        padding: 40px 28px;
     }
 }

@@ -175,12 +175,12 @@
     font-weight: 300;
 }
 
-.account-info-kyyh2bw {
+.account-info-23qq2e {
     display: flex;
     flex-direction: column;
 }
 
-.info-title-mczw72b {
+.info-title-23qq2e {
     margin-bottom: 4px;
     color: #ededed;
     font-weight: 500;
@@ -203,13 +203,13 @@
     font-size: 14px;
 }
 
-.info-cards-i73cas {
+.info-cards-23qq2e {
     display: flex;
     width: 100%;
     flex-direction: column;
 }
 
-.info-card-9caj46 {
+.info-card-23qq2e {
     display: flex;
     width: 100%;
     gap: 3px;
@@ -249,13 +249,13 @@
     position: absolute;
 }
 
-.main-button-7ajb312 {
+.main-button-23qq2e {
     outline: 0;
     background: #b78727;
     width: fit-content;
     min-width: 120px;
     border: 0;
-    margin-top: 12px;
+    margin-top: 30px;
     border-radius: 7px;
     padding: 15px;
     color: #fff;
@@ -267,9 +267,9 @@
     cursor: pointer;
 }
 
-.main-button-7ajb312:hover,
-.main-button-7ajb312:active,
-.main-button-7ajb312:focus {
+.main-button-23qq2e:hover,
+.main-button-23qq2e:active,
+.main-button-23qq2e:focus {
     background: #b78727;
     color: #dedede;
     box-shadow: 0 0 10px 0 #b78727;
@@ -303,7 +303,7 @@
     font-size: 16px;
 }
 
-.user-input-3mac82n {
+.user-input-23qq2e {
     outline: 0;
     background: #dedede;
     border-radius: 7px;
@@ -315,6 +315,6 @@
     font-size: 15px;
 }
 
-.user-input-3mac82n:focus {
+.user-input-23qq2e:focus {
     box-shadow: 0 0 10px 0 #ededed;
 }
