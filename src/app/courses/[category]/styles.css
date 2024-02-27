@@ -25,7 +25,7 @@
 .header-3m32aaw {
     height: 10vh;
     width: 100%;
-    background-color: #1E2124;
+    background-color: var(--primary-color);
     display: flex;
     position: fixed;
     top: 0px;
@@ -47,7 +47,7 @@
     position: fixed;
     top: 10%;
     overflow: hidden;
-    background-color: #2E3136;
+    background-color: var(--third-color);
 }
 
 .category-img-9ama2f {
@@ -58,7 +58,7 @@
 }
 
 .nav-category-zc62n {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 500;
     font-size: 16px !important;
 }
@@ -71,7 +71,7 @@
     overflow-x: hidden;
     flex-direction: column;
     padding: 2.5%;
-
+    background-color: var(--third-color);
 }
 
 .right-content-83mzvcj3 {
@@ -82,7 +82,7 @@
     overflow-x: hidden;
     flex-direction: column;
     user-select: none;
-    background-color: #36393E;
+    background-color: var(--sixth-color);
 }
 
 .course-item-27aca92 {
@@ -92,7 +92,7 @@
 }
 
 .course-name-9qncq6 {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 500;
     letter-spacing: 0.5px;
     font-size: 15px !important;
@@ -100,7 +100,7 @@
 }
 
 .course-description-9qncq6 {
-    color: #c5bfbf !important;
+    color: var(--fifth-color) !important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     margin-top: 6px;
@@ -121,7 +121,7 @@
 }
 
 .course-item-header-acnk3 {
-    background-color: #36393E;
+    background-color: var(--sixth-color);
     padding: 13px 18px;
     display: flex;
     margin-bottom: 12px;
@@ -136,22 +136,22 @@
 
 .course-item-header-acnk3.active {
     width: 100%;
-    background-color: #232428;
+    background-color: var(--seventh-color);
 }
 
 .course-progress-983bzs {
-    background-color: #b78727;
+    background-color: var(--secondary-color);
 }
 
 .course-label-nja72b {
-    color: #c5bfbf !important;
+    color: var(--fifth-color) !important;
     font-size: 11px !important;
     letter-spacing: 0.7px;
     font-weight: 300;
 }
 
 .course-value-nja72b {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     font-weight: 600;
@@ -159,7 +159,7 @@
 }
 
 .course-desc-divider-nja72b {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     font-weight: 300;
@@ -171,7 +171,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    background-color: #2E3136;
+    background-color: var(--third-color);
     margin-bottom: 30px;
     padding: 0px 10px;
 }
@@ -181,19 +181,12 @@
 }
 
 .module-title-cznj3ad {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 400;
     letter-spacing: 0.3px;
     font-size: 13px !important;
     line-height: 26px;
 }
-
-
-
-
-
-
-
 
 .lesson-item-27aca92 {
     height: 100px;
@@ -201,7 +194,7 @@
 }
 
 .lesson-name-9qncq6 {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 400;
     letter-spacing: 0.3px;
     font-size: 13px !important;
@@ -209,7 +202,7 @@
 }
 
 .lesson-description-9qncq6 {
-    color: #c5bfbf !important;
+    color: var(--fifth-color) !important;
     font-size: 11px !important;
     letter-spacing: 0.4px;
     margin-top: 3px;
@@ -229,7 +222,7 @@
 }
 
 .lesson-item-header-acnk3 {
-    background-color: #36393E;
+    background-color: var(--sixth-color);
     padding: 12px 16px;
     display: flex;
     margin-bottom: 7px;
@@ -244,22 +237,22 @@
 
 .lesson-item-header-acnk3.active {
     width: 100%;
-    background-color: #232428;
+    background-color: var(--seventh-color);
 }
 
 .lesson-progress-983bzs {
-    background-color: #b78727;
+    background-color: var(--secondary-color);
 }
 
 .lesson-label-nja72b {
-    color: #c5bfbf !important;
+    color: var(--fifth-color) !important;
     font-size: 11px !important;
     letter-spacing: 0.7px;
     font-weight: 300;
 }
 
 .lesson-value-nja72b {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     font-weight: 600;
@@ -267,7 +260,7 @@
 }
 
 .lesson-desc-divider-nja72b {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     font-weight: 300;
@@ -279,29 +272,23 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    background-color: #2E3136;
+    background-color: var(--third-color);
     border-width: 1px;
-    border-color: #1E2124;
+    border-color: var(--primary-color);
     margin-bottom: 12px;
     padding: 12px;
 }
 
-
-
-
-
-
-
 .lesson-header-23maaa {
     padding: 16px 20px;
     width: auto;
-    background: #2E3136;
+    background: var(--third-color);
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     border-bottom-width: 1px;
-    border-bottom-color: #2E3136;
+    border-bottom-color: var(--third-color);
     position: relative;
 }
 
@@ -310,7 +297,7 @@
     font-size: 16px;
     letter-spacing: 0.05rem;
     text-align: center;
-    color: #ededed;
+    color: var(--fourth-color);
     width: 75%;
     content: "#";
     margin-right: 2px;
@@ -327,10 +314,11 @@
     overflow-x: hidden;
     align-items: center;
     flex-direction: column;
+    /* background-color: var(--third-color); */
 }
 
 .lesson-video-description-mcajn2 {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-size: 16px !important;
     letter-spacing: 0.7px;
     font-weight: 300;
@@ -341,7 +329,7 @@
 
 .next-button-mdkad {
     margin-top: 20px;
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-size: 15px !important;
     letter-spacing: 0.7px;
     font-weight: 300;
@@ -385,7 +373,7 @@
 }
 
 .title-cnaw34 {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-size: 17px !important;
     letter-spacing: 0.7px;
     width: 70%;
@@ -438,7 +426,7 @@
 
         .lesson-header-23maaa {
             height: 11vh;
-            background-color: #1E2124;
+            background-color: var(--primary-color);
         }
 
         .content-92a233a {
@@ -494,24 +482,24 @@
 
 .tab-bar-button-zsmk73 {
     span {
-        color: #ededed !important;
+        color: var(--fourth-color) !important;
         font-weight: 500;
         text-align: center;
         font-size: 15px !important;
     }
 
     span:hover {
-        color: #b78727 !important;
+        color: var(--secondary-color) !important;
     }
 
     .active {
-        color: #b78727 !important;
+        color: var(--secondary-color) !important;
     }
 }
 
 .bottom-line-38cah {
     width: 12rem;
-    background-color: #b78727 !important;
+    background-color: var(--secondary-color) !important;
     height: 3px;
     margin-top: 3px;
     text-align: center;
@@ -529,13 +517,13 @@
 }
 
 .user-name-9qncq6 {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 600;
     font-size: 16px !important;
 }
 
 .user-description-9qncq6 {
-    color: #c5bfbf !important;
+    color: var(--fifth-color)!important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     margin-top: 2px;
@@ -557,7 +545,7 @@
 .card-9ama2f {
     height: 21.5rem !important;
     padding: 5px !important;
-    background-color: #1E2124 !important;
+    background-color: var(--primary-color) !important;
     cursor: pointer;
 }
 
@@ -566,7 +554,7 @@
 }
 
 .card-name-9ama2f {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 600;
     font-size: 14px !important;
     line-height: 1.5em;

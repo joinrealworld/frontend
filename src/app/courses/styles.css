@@ -25,7 +25,7 @@
 .header-m32aaw {
     height: 10vh;
     width: 100%;
-    background-color: #1E2124;
+    background-color: var(--primary-color);
     display: flex;
     position: fixed;
     padding-top: 12px;
@@ -47,11 +47,11 @@
     overflow-y: scroll;
     overflow-x: hidden;
     padding: 2.5% 5% 5% 5%;
-    background-color: #2E3136;
+    background-color: var(--third-color);
 }
 
 .title-mzj3dam {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 500;
     letter-spacing: 1px;
     text-align: center;
@@ -69,24 +69,24 @@
 
 .tab-bar-button-zsmk73 {
     span {
-        color: #ededed !important;
+        color: var(--fourth-color) !important;
         font-weight: 500;
         text-align: center;
         font-size: 15px !important;
     }
 
     span:hover {
-        color: #b78727 !important;
+        color: var(--secondary-color) !important;
     }
 
     .active {
-        color: #b78727 !important;
+        color: var(--secondary-color) !important;
     }
 }
 
 .bottom-line-38cah {
     width: 88%;
-    background-color: #b78727 !important;
+    background-color: var(--secondary-color) !important;
     height: 3px;
     margin-top: 3px;
     text-align: center;
@@ -98,19 +98,19 @@
 
 .divider-38cah {
     width: 100%;
-    background-color: #797979 !important;
+    background-color: var(--fourth-color) !important;
     height: 1px !important;
     margin-bottom: 5%;
 }
 
 .user-name-9qncq6 {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 600;
     font-size: 16px !important;
 }
 
 .user-description-9qncq6 {
-    color: #c5bfbf !important;
+    color: var(--fifth-color) !important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     margin-top: 2px;
@@ -123,6 +123,7 @@
 
 .user-name-info-mc2nw {
     margin-left: 7px;
+    color: var(--fourth-color);
 }
 
 .cards-row-82ncaj23 {
@@ -132,7 +133,7 @@
 .card-9ama2f {
     height: 18rem !important;
     padding: 5px !important;
-    background-color: #1E2124 !important;
+    background-color: var(--primary-color) !important;
     cursor: pointer;
 }
 
@@ -141,7 +142,7 @@
 }
 
 .card-name-9ama2f {
-    color: #ededed !important;
+    color: var(--fourth-color) !important;
     font-weight: 600;
     font-size: 16px !important;
     line-height: 1.5em;
@@ -156,7 +157,7 @@
 }
 
 .card-description-9ama2f {
-    color: #797979 !important;
+    color: var(--fourth-color) !important;
     font-size: 14px !important;
     height: 3em;
     width: auto;
@@ -172,6 +173,15 @@
 
 .card-img-9ama2f {
     height: 65%;
+}
+.light{
+    color: var(--fourth-color);
+}
+.refresh{
+    color: var(--fourth-color);
+}
+.dark{
+    color: black !important;
 }
 
 @media screen and (max-width: 500px) {

@@ -14,7 +14,7 @@
     height: 100vh;
     flex-direction: row;
     overflow-x: hidden;
-    background-color: #2E3136;
+    background-color: var(--third-color);
 
     ::-webkit-scrollbar {
         width: 3px;
@@ -47,7 +47,7 @@
     padding-right: 4%;
     flex-direction: column;
     position: relative;
-    background-color: #1E2124;
+    background-color: var(--primary-color);
 }
 
 .menu-9zscn2 {
@@ -65,7 +65,7 @@
 }
 
 .title-3oanz3a {
-    color: #ededed;
+    color: var(--fourth-color);
     padding-bottom: 8%;
     font-weight: 500;
     padding-left: 20px;
@@ -77,20 +77,20 @@
     padding-top: 12px;
     padding-bottom: 12px;
     transition: ease-in 0.3s;
-    background-color: #36393E;
+    background-color: var(--sixth-color);
     border-radius: 30px;
     padding-left: 20px;
 
     p {
         font-size: 17px;
         font-weight: 500;
-        color: #ededed;
+        color: var(--fourth-color);
         margin-bottom: 0px !important;
     }
 }
 
 .menu-name-2mczn3 p {
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 400;
     font-size: 16px;
     display: flex;
@@ -104,13 +104,13 @@
 }
 
 .menu-name-2mczn3 p:hover {
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 500;
     font-size: 17px;
     padding-top: 12px;
     padding-bottom: 12px;
     transition: ease-in 0.3s;
-    background-color: #36383e;
+    background-color: var(--sixth-color);
     border-radius: 30px;
 } */
 
@@ -124,10 +124,11 @@
     padding-bottom: 4%;
     overflow-y: auto;
     overflow-x: hidden;
+    background-color: var(--third-color);
 }
 
 .content-3mcnaj3zcs {
-    background-color: #232428;
+    background-color: var(--seventh-color);
     height: auto;
     padding: 3% 3%;
     width: 90%;
@@ -199,7 +200,7 @@ img.server-qma22ax:hover {
 .wrapper-3kah-n {
     transition: 0.3s;
     background-color: #313338;
-    color: #ededed;
+    color: var(--fourth-color);
     border-radius: 50%;
     margin-bottom: 10px;
     margin-top: 10px;
@@ -257,12 +258,12 @@ img.server-qma22ax:hover {
 
 .channel-1mca2:hover {
     color: #c3c3c3;
-    background: #36383e;
+    background: var(--sixth-color);
 }
 
 .channel-1mca2:focus {
-    color: #ededed;
-    background: #36383e;
+    color: var(--fourth-color);
+    background: var(--sixth-color);
 }
 
 svg.icon-2W8DHg {
@@ -313,11 +314,11 @@ details.category {
     gap: 5px;
     color: #80848e;
     padding: 10px 18px;
-    background-color: #36393E;
+    background-color: var(--sixth-color);
     border-radius: 5px;
     font-size: 13px;
     font-weight: 300;
-    color: #ededed;
+    color: var(--fourth-color);
     line-height: 22px;
     cursor: pointer;
     margin: 1% 5%;
@@ -346,11 +347,11 @@ summary:focus>svg {
 
 .selected-e21ax {
     border-width: 2px;
-    border-color: #ededed;
+    border-color: var(--fourth-color);
 }
 
 .server-qma22ax {
-    background-color: #2E3136;
+    background-color: var(--third-color);
     background-repeat: no-repeat;
     cursor: pointer;
     opacity: 1 !important;
@@ -401,7 +402,7 @@ summary:focus>svg {
             bottom: -35px;
             left: 3px;
             padding-bottom: 10px;
-            border-bottom: 2px solid lighten(#1E2124, 5%);
+            border-bottom: 2px solid lighten(var(--primary-color), 5%);
         }
     }
 
@@ -418,7 +419,7 @@ summary:focus>svg {
 
     &.active {
         border-radius: 15px;
-        background-color: #2E3136;
+        background-color: var(--third-color);
     }
 
     &.unread::before {
@@ -448,7 +449,7 @@ summary:focus>svg {
     display: flex;
     height: 10%;
     align-items: center;
-    background: #232428;
+    background: var(--seventh-color);
     padding: 12px 10px;
 }
 
@@ -491,8 +492,8 @@ summary:focus>svg {
 
 img.status {
     position: absolute;
-    background: #232428;
-    border: 2px solid #232428;
+    background: var(--seventh-color);
+    border: 2px solid var(--seventh-color);
     width: 7%;
     height: auto;
     bottom: 7px;
@@ -518,19 +519,19 @@ main {
 .username-312c02qena,
 .tag-kla3mca2 {
     display: block;
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 300;
     font-size: 13px;
 }
 
 .username-312c02qena {
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 900;
     font-size: 15px;
 }
 
 .tag-kla3mca2 {
-    color: rgba(#FFF, 0.45);
+    color: var(--eighth-color);
     font-size: 0.7rem;
 }
 
@@ -553,7 +554,7 @@ main {
     font-weight: bold;
     font-size: 16px;
     letter-spacing: 0.05rem;
-    color: #ededed;
+    color: var(--fourth-color);
     content: "#";
     margin-right: 2px;
     font-weight: 500;

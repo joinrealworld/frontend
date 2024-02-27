@@ -129,7 +129,7 @@ function Profile(props) {
                                     <form >
                                         <div style={{ position: 'relative', flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
                                             <div style={{ width: '100%' }}>
-                                                <span style={{ color: 'gray', fontSize: 12 }}>First Name</span>
+                                                <span style={{ color: 'var(--eighth-color)', fontSize: 12 }}>First Name</span>
                                                 <input
                                                     type="text"
                                                     name="firstName"
@@ -144,7 +144,7 @@ function Profile(props) {
                                             </div>
                                             <div style={{ width: '8%' }} />
                                             <div style={{ width: '100%' }}>
-                                                <span style={{ color: 'gray', fontSize: 12 }}>Last Name</span>
+                                                <span style={{ color: 'var(--eighth-color)', fontSize: 12 }}>Last Name</span>
                                                 <input
                                                     type="text"
                                                     name="lastName"
@@ -159,7 +159,7 @@ function Profile(props) {
                                             </div>
                                         </div>
                                         <div style={{ marginTop: 20, width: '100%' }}>
-                                            <span style={{ color: 'gray', fontSize: 12 }}>Bio</span>
+                                            <span style={{ color: 'var(--eighth-color)', fontSize: 12 }}>Bio</span>
                                             <textarea
                                                 type="text"
                                                 name="bio"

@@ -5,6 +5,9 @@ import "@/app/styles.css";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { X } from 'lucide-react';
+import "./globals.css";
+import ThemeContext from "@/themes/ThemeContext";
+import StoreColor from "@/themes/StoreColor";
 
 export const metadata = {
   title: appName
@@ -22,8 +25,11 @@ export default function RootLayout({ children }) {
         </head>
         <body>
           <PersistGateProvider>
-            <NextUIProviderWrap >
-              <main>{children}</main>
+            <NextUIProviderWrap>
+              <ThemeContext>
+                <main>{children}</main>
+                <StoreColor />
+              </ThemeContext>
             </NextUIProviderWrap>
           </PersistGateProvider>
 
@@ -49,9 +55,8 @@ export default function RootLayout({ children }) {
           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" async integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossOrigin="anonymous"></script>
 
           <script src="https://player.vimeo.com/api/player.js" async></script>
-
         </body>
       </html>
     </StoreProvider>
-  )
+  );
 }
