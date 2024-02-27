@@ -34,13 +34,13 @@
 }
 
 .username-312c02qena {
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 500;
     font-size: 18px;
 }
 
 .tag-kla3mca2 {
-    color: #c5bfbf;
+    color: var(--fifth-color);
     font-size: 14px;
     letter-spacing: 0.7px;
     font-weight: 300;
@@ -54,14 +54,14 @@
 
 .info-title-mczw72b {
     margin-bottom: 4px;
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 500;
     font-size: 18px;
 }
 
 .info-desc-mczw72b {
     margin-bottom: 4px;
-    color: #ededed;
+    color: var(--fourth-color);
     letter-spacing: 0.5px;
     font-weight: 300;
     font-size: 14px;
@@ -86,25 +86,25 @@
 }
 
 .info-lable-7cban2d {
-    color: #787878;
+    color: var(--eighth-color);
     font-weight: 500;
     font-size: 13px;
 }
 
 .info-value-ma82ba {
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 500;
     font-size: 18px;
 }
 
 .card-number-ma82ba {
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 700;
     font-size: 18px;
 }
 
 .card-expiry-ma82ba {
-    color: #ededed;
+    color: var(--fourth-color);
     font-weight: 500;
     font-size: 18px;
 }
@@ -120,7 +120,7 @@
     cursor: pointer;
 
     p {
-        color: #ededed;
+        color: var(--fourth-color);
         font-weight: 500;
         margin-bottom: 0px !important;
         text-decoration: underline;
@@ -141,7 +141,7 @@
 }
 
 .card-input-3mac82n:focus {
-    box-shadow: 0 0 10px 0 #ededed;
+    box-shadow: 0 0 10px 0 var(--fourth-color);
 }
 
 .modal-header-mcan3 {

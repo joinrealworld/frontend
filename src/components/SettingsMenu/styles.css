@@ -14,7 +14,7 @@
     height: 100vh;
     flex-direction: row;
     overflow-x: hidden;
-    background-color: #2E3136;
+    background-color: var(--third-color);
 
     ::-webkit-scrollbar {
         width: 3px;
@@ -47,7 +47,7 @@
     padding-right: 4%;
     flex-direction: column;
     position: relative;
-    background-color: #1E2124;
+    background-color: var(--primary-color);
 }
 
 .menu-9zscn2 {
@@ -65,7 +65,7 @@
 }
 
 .title-3oanz3a {
-    color: #ededed;
+    color: var(--fourth-color);
     padding-bottom: 8%;
     font-weight: 500;
     padding-left: 20px;
@@ -89,7 +89,7 @@
     span {
         font-size: 17px;
         font-weight: 500;
-        color: #ededed;
+        color: var(--fourth-color);
         background-color: transparent !important;
         margin-bottom: 0px !important;
     }
@@ -110,7 +110,7 @@
     border-radius: 10px;
 
     span {
-        color: #ededed;
+        color: var(--fourth-color);
         font-weight: 400;
         font-size: 16px;
         margin-bottom: 0px !important;
@@ -119,7 +119,7 @@
 }
 
 .menu-name-2mczn3:hover {
-    color: #ededed;
+    color: var(--fourth-color);
     width: '100%';
     font-weight: 500;
     font-size: 17px;
