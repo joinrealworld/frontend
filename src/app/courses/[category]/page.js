@@ -735,7 +735,7 @@ function CoursesByCategory(props) {
       } else {
         return (
           <div style={{ padding: 30, paddingTop: 100, display: 'flex', justifyContent: 'center', height: '100%', }}>
-            <h4 className="text-white">No courses available!</h4>
+            <h4 style={{ color: 'var(--fourth-color)' }}>No courses available!</h4>
           </div>
         );
       }

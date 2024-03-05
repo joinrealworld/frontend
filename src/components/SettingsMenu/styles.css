@@ -57,8 +57,9 @@
 }
 
 .menu-footer-9zscn2 {
-    width: 94%;
+    width: 74%;
     display: flex;
+    justify-self: flex-end;
     position: absolute;
     bottom: 2%;
     flex-direction: column;
@@ -236,6 +237,15 @@
 
     .close-icon-n82nz {
         display: flex !important;
+    }
+
+    .menu-footer-9zscn2 {
+        width: 90%;
+        display: flex;
+        justify-self: flex-end;
+        position: absolute;
+        bottom: 2%;
+        flex-direction: column;
     }
 
     #setting-menu.visible {

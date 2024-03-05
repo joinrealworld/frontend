@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { ChevronRightIcon, MoonIcon, RefreshCcw, SunIcon } from 'lucide-react';
-import { Accordion, AccordionItem, Avatar, User } from '@nextui-org/react';
+import { ChevronRightIcon, MoonIcon, RefreshCcw, SunIcon, Trash2Icon } from 'lucide-react';
+import { Accordion, AccordionItem, Avatar, Progress, User } from '@nextui-org/react';
 
 import './styles.css';
 import connect from '@/components/ConnectStore/connect';
 import Loading from "@/components/Loading";
-import { apiURL } from '@/constant/global';
+import { apiURL, handleAPIError } from '@/constant/global';
 import { darkTheme } from "@/themes/darkTheme";
 import { lightTheme } from "@/themes/lightTheme";
 
@@ -178,6 +178,39 @@ function Courses(props) {
     router.push('/courses/' + category.uuid);
   }
 
+  const onRemoveFav = async (event, item) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const response = await fetch(apiURL + 'api/v1/channel/change/favourite/course', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        course_id: item?.uuid, // selected course uuid
+      })
+    });
+    const rsp = await response.json();
+    console.log("rsp --------------------------------");
+    console.log(response);
+    console.log(rsp);
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload) {
+        getFavoriteData(false);
+        toast('Course removed from Favorites!');
+      } else {
+        handleAPIError(rsp);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+      }
+    }
+  }
+
   const renderChannelContent = () => {
     if (selectedTab?.Value == tabValues.categories) {
       if (!isFetchChannels) {
@@ -190,7 +223,7 @@ function Courses(props) {
       if (channels.length == 0) {
         return (
           <div className="w-full">
-            <h3 className='text-center text-white fs-5 mt-5'>No categories found!</h3>
+            <h3 style={{ color: 'var(--fourth-color)' }} className='text-center fs-5 mt-5'>No categories found!</h3>
           </div>
         );
       }
@@ -223,66 +256,52 @@ function Courses(props) {
           </div>
         );
       }
-      return inprogressChannels.map((item, index) => {
-        return (
-          <Accordion selectionMode="multiple" variant="splitted" >
-            {inprogressChannels.map((item, index) => {
-              return (
-                <AccordionItem
-                  className='accordion-93asnc'
-                  classNames={{
-                    title: 'light'
-                  }}
-                  key={index}
-                  aria-label={item?.category?.name}
-                  startContent={
-                    <Avatar
+      return (
+        <Accordion selectionMode="none" variant="splitted" >
+          {inprogressChannels.map((item, index) => {
+            return (
+              <AccordionItem
+                className='accordion-93asnc'
+                classNames={{
+                  title: 'light'
+                }}
+                onClick={(e) => {
+                  router.push('/courses/' + item?.uuid + '?cid=' + item?.uuid)
+                }}
+                key={index}
+                aria-label={item?.name}
+                startContent={
+                  <Avatar
+                    radius="md"
+                    size='lg'
+                    src={item?.pic}
+                  />
+                }
+                indicator={<ChevronRightIcon size='26' color='var(--fourth-color)' />}
+                title={item?.name}
+                subtitle={
+                  <div>
+                    <Progress
+                      size="sm"
                       radius="sm"
-                      size='lg'
-                      src={item?.category?.category_pic}
+                      aria-label="Loading..."
+                      value={item?.completed}
+                      style={{ marginTop: 4, marginBottom: 4 }}
+                      classNames={{
+                        indicator: "course-progress-32mksfe"
+                      }}
+                      color="success"
                     />
-                  }
-                  indicator={<ChevronRightIcon size='26' color='var(--fourth-color)' />}
-                  subtitle={item?.category?.description}
-                  title={item?.category?.name}
-                >
-                  {item.courses && item.courses.length > 0 ?
-                    item.courses.map((course, courseIndex) => {
-                      console.log("course?.pic", course?.pic);
-                      return (
-                        <div
-                          key={courseIndex}
-                          style={{ cursor: 'pointer', marginLeft: 20, marginRight: 20, flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}
-                          onClick={(e) => router.push('/courses/' + item?.category?.uuid + '?cid=' + course?.uuid)}
-                        >
-                          <User
-                            name={course?.name}
-                            description={course?.lessons + ' lessons | ' + course?.completed + '% completed'}
-                            classNames={{
-                              wrapper: 'ml-2',
-                              description: 'mt-1',
-                              name: 'light'
-                            }}
-                            slot='name'
-                            avatarProps={{
-                              src: course?.pic,
-                              radius: 'sm'
-                            }}
-                          />
-                          <ChevronRightIcon size='20' color='var(--fourth-color)' />
-                        </div>
-                      );
-                    })
-                    :
-                    null
-                  }
-                </AccordionItem>
-              );
-            })
-            }
-          </Accordion>
-        );
-      });
+                    <span>{item?.completed + "% completed"}</span>
+                  </div>
+                }
+              >
+              </AccordionItem>
+            );
+          })
+          }
+        </Accordion>
+      );
     }
     else if (selectedTab?.Value == tabValues.favorites) {
       if (!isFetchFavChannels) {
@@ -295,7 +314,7 @@ function Courses(props) {
       if (favChannels.length == 0) {
         return (
           <div className="w-full">
-            <h3 className='text-center text-white fs-5 mt-5'>No favorite categories!</h3>
+            <h3 style={{ color: 'var(--fourth-color)' }} className='text-center fs-5 mt-5'>No favorite categories!</h3>
           </div>
         );
       }
@@ -344,7 +363,10 @@ function Courses(props) {
                             radius: 'sm'
                           }}
                         />
-                        <ChevronRightIcon size='20' color='var(--fourth-color)' />
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                          <Trash2Icon size={17} color='var(--fourth-color)' style={{ marginRight: 10 }} onClick={(e) => onRemoveFav(e, course)} />
+                          <ChevronRightIcon size={20} color='var(--fourth-color)' />
+                        </div>
                       </div>
                     );
                   })
@@ -369,12 +391,12 @@ function Courses(props) {
     else if (selectedTab?.Value == tabValues.favorites) {
       setIsFetchFavChannels(false);
       setFavChannels([]);
-      getFavoriteData();
+      getFavoriteData(false);
     }
     else if (selectedTab?.Value == tabValues.inProgress) {
       setIsFetchInProgressChannels(false);
       setInprogressChannels([]);
-      getInProgressData();
+      getInProgressData(false);
     }
   }
 

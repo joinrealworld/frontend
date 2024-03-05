@@ -26,26 +26,6 @@
     margin-left: 20px;
 }
 
-.username-312c02qena,
-.tag-kla3mca2 {
-    display: block;
-    font-weight: 300;
-    font-size: 13px;
-}
-
-.username-312c02qena {
-    color: var(--fourth-color);
-    font-weight: 500;
-    font-size: 18px;
-}
-
-.tag-kla3mca2 {
-    color: var(--fifth-color);
-    font-size: 14px;
-    letter-spacing: 0.7px;
-    font-weight: 300;
-}
-
 .account-info-9c7as {
     display: flex;
     flex-direction: column;

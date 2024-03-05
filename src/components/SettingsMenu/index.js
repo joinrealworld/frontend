@@ -104,8 +104,10 @@ function SettingsMenu(props) {
   }
 
   const onToggleMenu = () => {
-    $('#setting-menu').toggleClass("invisible");
-    $('#setting-menu').toggleClass("visible");
+    if (window.innerWidth < 800) {
+      $('#setting-menu').toggleClass("invisible");
+      $('#setting-menu').toggleClass("visible");
+    }
   }
 
   const onNavigateMenu = (item) => {

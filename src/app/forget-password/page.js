@@ -34,7 +34,7 @@ function ForgetPassword(props) {
         const rsp = await response.json();
         if (rsp.payload) {
           router.replace('/login');
-          toast("Forgot Password Email sent your email address.");
+          toast("Reset Password mail sent your email address.");
         } else {
           handleAPIError(rsp);
         }
