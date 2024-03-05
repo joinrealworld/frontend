@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import connect from '@/components/ConnectStore/connect';
 import { useRouter } from 'next/navigation';
-import { User, Progress, Button, Image } from "@nextui-org/react";
+import { User, Progress, Button, RadioGroup, useRadio, cn, VisuallyHidden, Spinner } from "@nextui-org/react";
 import Link from "next/link";
 import $ from "jquery";
-
-import './styles.css';
-import { ArrowLeft, ChevronRight, ChevronRightIcon, HeartIcon, } from 'lucide-react';
-import Loading from "@/components/Loading";
-import { apiURL } from "@/constant/global";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, } from 'lucide-react';
+
+import './styles.css';
+import connect from '@/components/ConnectStore/connect';
+import Loading from "@/components/Loading";
+import { apiURL, handleAPIError } from "@/constant/global";
 
 const Sections = {
   video: 'video',
@@ -29,10 +29,16 @@ function CoursesByCategory(props) {
   const [isCourseDataFetch, setIsCourseDataFetch] = useState(false);
   const [isQuizFetch, setIsQuizFetch] = useState(false);
   const [currentQuiz, setCurrentQuiz] = useState([]);
+  const [selectedQuizAnswer, setSelectedQuizAnswer] = useState([]);
+  const [selectedQuizAnswerError, setSelectedQuizAnswerError] = useState(null);
   const [courses, setCourses] = useState([]);
+  const [originalCourses, setOriginalCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
-  // const [selectedLesson, setSelectedLesson] = useState(null);
+  const [searchText, setSearchText] = useState('');
+
+  const [isNextLoading, setIsNextLoading] = useState(false);
+  const [isPreviousLoading, setIsPreviousLoading] = useState(false);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -57,6 +63,7 @@ function CoursesByCategory(props) {
 
   useEffect(() => {
     if (props?.searchParams?.lid && props?.searchParams?.lid != selectedLesson?.uuid) {
+      console.log("calle......");
       let lesson = props?.searchParams?.lid ? selectedCourse?.data?.find(c => c.uuid === props?.searchParams?.lid) : selectedCourse?.data?.[0];
       if (lesson?.section == Sections.quiz) {
         getQuizFromId(selectedCourse?.uuid, lesson?.quiz_id, () => {
@@ -83,11 +90,10 @@ function CoursesByCategory(props) {
         const rsp = await response.json();
         if (rsp?.payload && typeof rsp?.payload == 'object') {
           setCourses(rsp.payload);
+          setOriginalCourses(rsp.payload);
           setIsCoursesFetch(true);
-          if (props?.searchParams?.cid && rsp.payload.some(c => (c.id + "") === (props?.searchParams?.cid + ""))) {
-            getCourseDataById(props?.searchParams?.cid);
-          } else {
-            router.push('?cid=' + rsp.payload?.[0]?.uuid);
+          if (!props?.searchParams?.cid) {
+            router.replace('?cid=' + rsp.payload?.[0]?.uuid);
           }
         } else {
           toast("Error while fetching data!");
@@ -102,7 +108,7 @@ function CoursesByCategory(props) {
     }
   }
 
-  const getCourseDataById = async (courseId) => {
+  const getCourseDataById = async (courseId, isNavigateToLesson = true) => {
     const response = await fetch(apiURL + 'api/v1/channel/fetch/course/' + courseId + "/data", {
       method: 'GET',
       headers: {
@@ -115,16 +121,25 @@ function CoursesByCategory(props) {
       if (rsp.payload && rsp.payload?.uuid) {
         setSelectedCourse(rsp.payload);
         setIsCourseDataFetch(true);
-        let lesson = props?.searchParams?.lid ? rsp.payload?.data?.find(c => c.uuid === props?.searchParams?.lid) : rsp.payload?.data?.[0];
-        if (lesson?.section == Sections.quiz) {
-          getQuizFromId(rsp.payload?.uuid, lesson?.quiz_id, () => {
-            setSelectedLesson(lesson);
-          });
-        } else {
-          setCurrentQuiz(null);
-          setIsQuizFetch(false);
-          setSelectedLesson(lesson);
+
+        if (isNavigateToLesson) {
+          let paramLesson = rsp.payload?.data?.find(c => c.uuid === props?.searchParams?.lid);
+          let lesson = props?.searchParams?.lid && paramLesson && paramLesson?.uuid ? paramLesson : rsp.payload?.data?.[0];
+          if (!selectedLesson) {
+            if (lesson?.section == Sections.quiz) {
+              getQuizFromId(rsp.payload?.uuid, lesson?.quiz_id, () => {
+                setSelectedLesson(lesson);
+              });
+            } else {
+              setCurrentQuiz(null);
+              setIsQuizFetch(false);
+              setSelectedLesson(lesson);
+            }
+          } else {
+            router.replace('?cid=' + courseId + '&lid=' + lesson?.uuid);
+          }
         }
+
       } else {
         toast("Error while fetching data!");
       }
@@ -144,10 +159,9 @@ function CoursesByCategory(props) {
   }, [props.params.category]);
 
   const onSelectCourse = (item) => {
-    setIsCourseDataFetch(false);
     if (item.uuid !== selectedCourse?.uuid) {
-      let lesson = selectedCourse?.data?.[0];
-      router.push('?cid=' + item.uuid + "&lid=" + lesson?.uuid);
+      setIsCourseDataFetch(false);
+      router.push('?cid=' + item.uuid);
     }
     $('#course-sidebar').toggleClass("visible");
     $('#course-content').toggleClass("visible");
@@ -167,7 +181,7 @@ function CoursesByCategory(props) {
     $('.header-3m32aaw').toggleClass("visible");
   }
 
-  const onToggleFavorite = () => {
+  const onToggleFavorite = async () => {
     var selectedCourseTemp = { ...selectedCourse };
     selectedCourseTemp.is_favorite = !selectedCourse?.is_favorite;
     setSelectedCourse(selectedCourseTemp);
@@ -178,28 +192,147 @@ function CoursesByCategory(props) {
       courseData[index].is_favorite = courses[index].is_favorite
       setCourses(courseData);
     }
-  }
-
-  const onNextStep = (e) => {
-    let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
-    let newIndex = Math.min(selectedLessonIndex + 1, selectedCourse?.data?.length);
-    let newLesson = selectedCourse?.data?.[newIndex];
-    if (selectedCourse && selectedCourse?.uuid) {
-      router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
+    const response = await fetch(apiURL + 'api/v1/channel/change/favourite/course', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        course_id: selectedCourse?.uuid, // selected course uuid
+      })
+    });
+    const rsp = await response.json();
+    console.log("rsp --------------------------------");
+    console.log(response);
+    console.log(rsp);
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload) {
+        if (selectedCourseTemp.is_favorite) {
+          toast(selectedCourse?.name + ' course added as a Favorites!');
+        } else {
+          toast(selectedCourse?.name + ' course removed from Favorites!');
+        }
+      } else {
+        handleAPIError(rsp);
+      }
     } else {
-      router.push('?lid=' + newLesson?.uuid);
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+      }
     }
   }
 
-  const onPreStep = (e) => {
+  const onNextStep = async (e) => {
+
+    if (selectedLesson?.section == Sections.quiz) {
+      if (selectedQuizAnswer.length == 0 || selectedQuizAnswer.length != currentQuiz.length) {
+        setSelectedQuizAnswerError('Select any one answer!');
+        return;
+      } else {
+        setSelectedQuizAnswer([]);
+        setSelectedQuizAnswerError(null);
+      }
+    }
+
+    setIsNextLoading(true);
+    const response = await fetch(apiURL + 'api/v1/channel/mark/complete/course', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        course_id: selectedCourse?.uuid, // selected course uuid
+        content_id: selectedLesson?.uuid,  // selected course's content uuid
+      })
+    });
+    const rsp = await response.json();
+    console.log("rsp --------------------------------");
+    console.log(response);
+    console.log(rsp);
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload) {
+        let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
+        let newIndex = Math.min(selectedLessonIndex + 1, selectedCourse?.data?.length);
+        let newLesson = selectedCourse?.data?.[newIndex];
+        if (selectedCourse && selectedCourse?.uuid) {
+          router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
+        } else {
+          if (originalCourses?.length > 0) {
+            router.push('?cid=' + originalCourses?.[0]?.uuid);
+          }
+        }
+        setIsNextLoading(false);
+        getCourseDataById(selectedCourse?.uuid, false);
+      } else {
+        handleAPIError(rsp);
+        setIsNextLoading(false);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+        setIsNextLoading(false);
+      }
+    }
+  }
+
+  const onPreStep = async (e) => {
     let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
     let newIndex = Math.max(selectedLessonIndex - 1, 0);
     let newLesson = selectedCourse?.data?.[newIndex];
     if (selectedCourse && selectedCourse?.uuid) {
       router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
     } else {
-      router.push('?lid=' + newLesson?.uuid);
+      if (originalCourses?.length > 0) {
+        router.push('?cid=' + originalCourses?.[0]?.uuid);
+      }
     }
+    // setIsPreviousLoading(true);
+    // const response = await fetch(apiURL + 'api/v1/channel/mark/complete/course', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer ' + props.user.authToken
+    //   },
+    //   body: JSON.stringify({
+    //     course_id: selectedCourse?.uuid, // selected course uuid
+    //     content_id: selectedLesson?.uuid,  // selected course's content uuid
+    //   })
+    // });
+    // const rsp = await response.json();
+    // console.log("rsp --------------------------------");
+    // console.log(response);
+    // console.log(rsp);
+    // if (response.status >= 200 && response.status < 300) {
+    //   if (rsp.payload) {
+    //     let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
+    //     let newIndex = Math.max(selectedLessonIndex - 1, 0);
+    //     let newLesson = selectedCourse?.data?.[newIndex];
+    //     if (selectedCourse && selectedCourse?.uuid) {
+    //       router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
+    //     } else {
+    //       if (courses?.length > 0) {
+    //         router.push('?cid=' + courses?.[0]?.uuid);
+    //       }
+    //     }
+    //     setIsPreviousLoading(false);
+    //   } else {
+    //     handleAPIError(rsp);
+    //     setIsPreviousLoading(false);
+    //   }
+    // } else {
+    // if (response.status == 401) {
+    //   dispatch(props.actions.userLogout());
+    // } else {
+    //   handleAPIError(rsp);
+    //   setIsPreviousLoading(false);
+    // }
+    // }
   }
 
   const getQuizFromId = async (courseId, quizId, onSuccess = () => { }) => {
@@ -307,7 +440,7 @@ function CoursesByCategory(props) {
             >
             </iframe>
           </div>
-          <span dangerouslySetInnerHTML={{ __html: currentMessage?.content }} className="lesson-video-description-mcajn2">
+          <span dangerouslySetInnerHTML={{ __html: currentMessage?.content }} className="lesson-description-mcajn2">
           </span>
         </>
       )
@@ -315,7 +448,7 @@ function CoursesByCategory(props) {
     else if ((currentMessage.section == Sections.summary || currentMessage.section == Sections.general) && currentMessage?.content) {
       return (
         <>
-          <span className="lesson-video-description-mcajn2">
+          <span className="lesson-description-mcajn2">
             {currentMessage?.content}
           </span>
         </>
@@ -341,16 +474,34 @@ function CoursesByCategory(props) {
           {currentQuiz.map((quiz, i) => {
             return (
               <>
-                <span key={i} className="lesson-video-description-mcajn2">
-                  {quiz?.question}
+                <span key={i} className="lesson-description-mcajn2">
+                  {i + 1}. {quiz?.question}
                 </span>
-                {Object.keys(quiz.options).map((option, qi) => {
-                  return (
-                    <span key={qi} className="lesson-video-description-mcajn2">
-                      {option} : {Object.values(quiz.options)[qi]}
-                    </span>
-                  )
-                })}
+                <RadioGroup
+                  style={{ marginTop: 20, marginBottom: 20, width: '100%', alignItems: 'center' }}
+                  onChange={(e) => {
+                    let selectedQuizAnswers = [...selectedQuizAnswer];
+                    let index = selectedQuizAnswers.findIndex(c => c?.question == quiz?.question);
+                    console.log(selectedQuizAnswers);
+                    console.log(index);
+                    if (index > -1) {
+                      selectedQuizAnswers[index] = { ...quiz, selectedAnswer: e.target.value };
+                      setSelectedQuizAnswer([...selectedQuizAnswers]);
+                    } else {
+                      setSelectedQuizAnswer([...selectedQuizAnswers, { ...quiz, selectedAnswer: e.target.value }]);
+                    }
+
+                    setSelectedQuizAnswerError(null);
+                  }}>
+                  {Object.keys(quiz.options).map((option, qi) => {
+                    return (
+                      <CustomRadio key={qi} value={option} question={quiz?.question} correctAns={quiz.answer}>
+                        <span className="quiz-option-mcajn2"><b>{option.toUpperCase()}:</b> {Object.values(quiz.options)[qi]}</span>
+                      </CustomRadio>
+                    )
+                  })}
+                </RadioGroup>
+                {selectedQuizAnswerError && !selectedQuizAnswer.some(c => c?.question == quiz?.question) ? <span className="option-error-ncka2nx">{selectedQuizAnswerError}</span> : null}
               </>
             );
           })}
@@ -360,15 +511,105 @@ function CoursesByCategory(props) {
     }
   }
 
+  const CustomRadio = (props) => {
+    const {
+      Component,
+      children,
+      isSelected,
+      description,
+      getBaseProps,
+      getWrapperProps,
+      getInputProps,
+      getLabelProps,
+      getLabelWrapperProps,
+      getControlProps,
+    } = useRadio(props);
+
+    return (
+      <Component
+        {...getBaseProps()}
+        className={cn(
+          "group inline-flex items-center hover:opacity-70 active:opacity-50 justify-between tap-highlight-transparent",
+          "cursor-pointer border-1 border-default rounded-lg gap-1",
+          "data-[selected=true]:border-primary",
+        )}
+        style={{ width: 'auto', maxWidth: '100%', minWidth: 200, borderRadius: 20, padding: '8.5px 18px', }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <VisuallyHidden>
+            <input {...getInputProps()} />
+          </VisuallyHidden>
+          <span {...getWrapperProps()}>
+            <span {...getControlProps()} />
+          </span>
+          <div {...getLabelWrapperProps()}>
+            {children && <span {...getLabelProps()}>{children}</span>}
+          </div>
+        </div>
+        <div style={{ width: 30, justifyContent: 'flex-end', display: 'flex' }}>
+          {selectedQuizAnswer?.length > 0 && selectedQuizAnswer?.find(x => x.question == props.question)?.selectedAnswer == props.value ?
+            selectedQuizAnswer?.find(x => x.question == props.question)?.selectedAnswer == props.correctAns ?
+              <CheckIcon color="#24c223" size={20} />
+              :
+              <XIcon color="#EC5800" size={20} />
+            :
+            // <XIcon color="#EC5800" size={20} />
+            null
+          }
+        </div>
+      </Component>
+    );
+  };
+
+  const goToNextCourse = (e) => {
+    let index = Math.min(originalCourses.findIndex(c => c.uuid == selectedCourse?.uuid) + 1, originalCourses?.length);
+    router.push('?cid=' + originalCourses?.[index]?.uuid);
+  }
+
   const renderCourseContent = () => {
     if (isCourseDataFetch) {
       if (selectedCourse) {
 
         let currentMessage = { ...selectedLesson };
-        // currentMessage?.content = currentMessage?.content.replace(/\*\*(.*?)\*\*/g, `<b>$1</b>`);
-        // // Replace \n with <br>
-        // currentMessage?.content = currentMessage?.content.replace(/\n/g, `<br />`);
 
+        // console.log("currentMessage--------------------------------");
+        // console.log(currentMessage);
+        // console.log(Number(selectedCourse?.completed).toFixed(0));
+
+        // currentMessage.content = currentMessage?.content.replace(/\*\*(.*?)\*\*/g, `<b>$1</b>`);
+        // // Replace \n with <br>
+        // currentMessage.content = currentMessage?.content.replace(/\n/g, `<br />`);
+
+        if (Math.round(selectedCourse?.completed).toString() == '100') {
+          return (
+            <>
+              <div className="lesson-header-23maaa">
+                <ArrowLeft
+                  id="sidebar-btn-nack3"
+                  style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
+                  onClick={onOpenSideMenu}
+                />
+                {selectedCourse &&
+                  <>
+                    <h2 className="lesson-title-1mcasa">{selectedCourse?.name}</h2>
+                    <HeartIcon
+                      fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
+                      style={{ position: "absolute", right: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
+                      onClick={(e) => onToggleFavorite()}
+                    />
+                  </>
+                }
+              </div>
+              <div style={{ padding: 30, paddingTop: 60, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', }}>
+                <h5 style={{ color: "var(--fourth-color)" }}>Successfully 100% completed!</h5>
+                <Button color="default" variant="ghost" className="next-button-mdkad" onClick={goToNextCourse}>
+                  <span className="next-button-text-mdkad">Go To Next</span>
+                </Button>
+              </div>
+
+            </>
+          );
+        }
         return (
           <>
             <div className="lesson-header-23maaa">
@@ -381,7 +622,7 @@ function CoursesByCategory(props) {
               <HeartIcon
                 fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
                 style={{ position: "absolute", right: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
-                onClick={(e) => onToggleFavorite()} // zzz
+                onClick={(e) => onToggleFavorite()}
               />
             </div>
             <div className="lesson-content-mdak32">
@@ -391,7 +632,7 @@ function CoursesByCategory(props) {
               <div style={{ display: 'flex', width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
 
                 {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 &&
-                  <Button color="default" variant="ghost" className="next-button-mdkad" onClick={onPreStep}>
+                  <Button color="default" isLoading={isPreviousLoading} variant="ghost" className="next-button-mdkad" onClick={onPreStep}>
                     <span className="next-button-text-mdkad">Previous</span>
                   </Button>
                 }
@@ -400,7 +641,7 @@ function CoursesByCategory(props) {
                   <div style={{ width: '10%' }} />
                 }
 
-                <Button color="default" variant="ghost" className="next-button-mdkad" onClick={onNextStep}>
+                <Button spinner={<Spinner color='current' size='sm' />} color="default" isLoading={isNextLoading} variant="ghost" className="next-button-mdkad" onClick={onNextStep}>
                   <span className="next-button-text-mdkad">Next</span>
                 </Button>
               </div>
@@ -423,13 +664,13 @@ function CoursesByCategory(props) {
                   <HeartIcon
                     fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
                     style={{ position: "absolute", right: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
-                    onClick={(e) => onToggleFavorite()} // zzz
+                    onClick={(e) => onToggleFavorite()}
                   />
                 </>
               }
             </div>
             <div style={{ padding: 30, paddingTop: 100, display: 'flex', justifyContent: 'center', height: '100%', }}>
-              <h4 className="text-white">No course content available!</h4>
+              <h5 className="var(--fourth-color)">No course content available!</h5>
             </div>
           </>
         );
@@ -452,7 +693,7 @@ function CoursesByCategory(props) {
                 <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                   <User
                     name={course.name}
-                    description={course.completed + "% completed"}
+                    description={(isSelected ? selectedCourse?.completed : course.completed) + "% completed"}
                     avatarProps={{
                       src: course.course_pic ? (apiURL + course.course_pic) : ''
                     }}
@@ -466,36 +707,28 @@ function CoursesByCategory(props) {
                   />
 
                   <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
-                  {/* {isSelected ?
-                                            <ChevronDownIcon color="white" />
-                                            :
-                                            <ChevronRightIcon color="white" />
-                                        } */}
+
                 </div>
                 <Progress
                   size="sm"
                   radius="sm"
                   aria-label="Loading..."
-                  value={course.completed}
+                  value={isSelected ? selectedCourse?.completed : course.completed}
                   style={{ marginTop: 12 }}
                   classNames={{
                     indicator: "course-progress-983bzs",
                   }}
                   color="success"
                 />
-                <div style={{ flexDirection: 'row', marginTop: 5, alignItems: 'center', display: 'flex', alignSelf: 'flex-start' }}>
-                  <span className="course-value-nja72b">{course.data?.filter(x => x.section == 'video')?.length}</span>
-                  <span className="course-label-nja72b">Video</span>
-                  <span className="course-desc-divider-nja72b">|</span>
-                  <span className="course-value-nja72b">{course.data?.filter(x => x.section == 'quiz')?.length}</span>
-                  <span className="course-label-nja72b">Questions</span>
+                <div style={{ flexDirection: 'row', marginTop: 8, alignItems: 'center', display: 'flex', alignSelf: 'flex-start' }}>
+                  {/* <span className="course-value-nja72b">{(course.completed * course.lessons) / 100} / {course.lessons}</span> */}
+                  <span className="course-value-nja72b">{course.lessons}</span>
+                  <span className="course-label-nja72b">Lessons</span>
+                  {/* <span className="course-desc-divider-nja72b">|</span>
+                  <span className="course-value-nja72b">{selectedCourse.data?.filter(x => x.section == 'video')?.length}</span>
+                  <span className="course-label-nja72b">Videos</span> */}
                 </div>
               </div>
-              {/* {isSelected &&
-                                    <div className="course-lessons-38cjwd">
-                                        {renderModules(courses)}
-                                    </div>
-                                } */}
             </div>
           );
         });
@@ -512,34 +745,35 @@ function CoursesByCategory(props) {
       );
     }
   }
-  console.log("selectedCourse?.course_pic");
-  console.log(selectedCourse);
+  // console.log("selectedCourse?.course_pic");
+  // console.log(selectedCourse);
+  // console.log(selectedLesson);
   return (
     <div className='container-93ca2aw'>
       <div className='header-3m32aaw'>
         <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-          <Link href={'/courses'} className="back-icon-nw3rf">
+          <Link href={'/courses?tab=1'} className="back-icon-nw3rf">
             <ArrowLeft style={{ color: "var(--fourth-color)" }} />
           </Link>
           <div className="course-navigation-cnaw34">
-            <Link href={'/courses'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 20 }}>
-              <img
+            <Link href={'/courses?tab=1'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 20 }}>
+              {/* <img
                 src={"https://img.freepik.com/free-vector/online-certification-illustration_23-2148575636.jpg?size=626&ext=jpg"}
                 className="category-img-9ama2f"
                 alt="..."
-              />
+              /> */}
               <span className="nav-category-zc62n">Cryptocurrency Investing Learning Center</span>
             </Link>
             {selectedCourse &&
               <>
-                <ChevronRight size={15} style={{ marginLeft: 10, color: "var(--fourth-color)" }} />
+                <ChevronRight size={20} style={{ marginLeft: 20, marginRight: 10, color: "var(--fourth-color)" }} />
                 <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', cursor: 'pointer', marginLeft: 12 }}>
-                  <Image
+                  {/* <Image
                     src={selectedCourse?.pic ? (apiURL + selectedCourse?.pic) : null}
                     className="category-img-9ama2f"
                     alt="..."
                     width={24}
-                  />
+                  /> */}
                   <span className="nav-category-zc62n">{selectedCourse?.name}</span>
                 </div>
               </>
@@ -552,6 +786,36 @@ function CoursesByCategory(props) {
       <div className='content-92a233a'>
 
         <div className='left-menu-6k2zzc' id="course-sidebar">
+
+          <div className="search-course-o38ca3">
+            <input
+              type="text"
+              name="search"
+              className="search-input-7ajb312"
+              placeholder="Search course..."
+              value={searchText}
+              autoComplete="off"
+              onChange={(event) => {
+                let searchTextValue = event.target.value.trim().toLowerCase();
+                setSearchText(searchTextValue);
+                const filteredCourses = searchTextValue
+                  ? originalCourses.filter(asset => {
+                    return asset?.name?.toLowerCase().indexOf(searchTextValue) > -1;
+                  })
+                  : originalCourses;
+                setCourses(filteredCourses);
+              }}
+            />
+            <XIcon
+              color="var(--fifth-color)"
+              size={20}
+              style={{ cursor: 'pointer', position: 'absolute', top: 22, right: 10 }}
+              onClick={(e) => {
+                setSearchText('');
+                setCourses(originalCourses);
+              }}
+            />
+          </div>
 
           {renderCourseList()}
 

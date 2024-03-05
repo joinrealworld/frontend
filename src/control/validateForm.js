@@ -98,7 +98,6 @@ class ValidateForm {
         event.preventDefault();
 
         const isValid = this.validate();
-        console.log("called,,,,,,", isValid);
 
         if (isValid) {
           this.onSubmit();

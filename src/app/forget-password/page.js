@@ -3,14 +3,14 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
 import { MoveLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { Button, Spinner } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 
 import './styles.css';
-import ValidatedForm from "../../components/ValidatedForm";
+import ValidatedForm from "@/components/ValidatedForm";
 import connect from '@/components/ConnectStore/connect';
 import { apiURL, handleAPIError } from '@/constant/global';
-import BusyLoading from '@/components/BusyLoading';
-import { toast } from 'react-toastify';
 
 function ForgetPassword(props) {
 
@@ -21,6 +21,8 @@ function ForgetPassword(props) {
 
   const onResetPasswordClick = async () => {
     try {
+
+      setIsLoading(true);
       const response = await fetch(apiURL + 'api/v1/user/forgot_password?email=' + emailAddress, {
         method: 'GET',
         headers: {
@@ -33,11 +35,10 @@ function ForgetPassword(props) {
         if (rsp.payload) {
           router.replace('/login');
           toast("Forgot Password Email sent your email address.");
-          setIsLoading(false);
         } else {
           handleAPIError(rsp);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } else {
         const rsp = await response.json();
         handleAPIError(rsp);
@@ -91,7 +92,9 @@ function ForgetPassword(props) {
                 />
               </div>
 
-              <button className="main-button-o3n2dc" type="submit">Send Reset Password Email</button>
+              <Button className="main-button-o3n2dc" isLoading={isLoading} fullWidth radius='sm' size='lg' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
+                Send Reset Password Email
+              </Button>
 
               <div className='back-action-k823nc'>
                 <MoveLeft color="#b78727" size={23} style={{ marginTop: -16 }} />
@@ -103,7 +106,6 @@ function ForgetPassword(props) {
           </ValidatedForm>
         </div>
       </div>
-      <BusyLoading isLoading={isLoading} />
     </div>
   );
 }

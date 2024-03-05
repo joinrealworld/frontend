@@ -1,17 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link';
-import { MoveLeft, Verified } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { CircularProgress } from '@nextui-org/react';
+import Image from 'next/image';
 
 import './styles.css';
-import ValidatedForm from "../../components/ValidatedForm";
 import connect from '@/components/ConnectStore/connect';
 import { apiURL } from '@/constant/global';
-import { toast } from 'react-toastify';
-import Image from 'next/image';
-import { CircularProgress } from '@nextui-org/react';
 
 function VerifyEmail(props) {
 
@@ -22,7 +18,7 @@ function VerifyEmail(props) {
 
   useEffect(() => {
     if (!get('o') || !get('e')) {
-      setResult("Invalid URL Request!!!");
+      setResult("Invalid URL Request!");
     } else {
       onVerifyEmail();
     }
@@ -52,19 +48,19 @@ function VerifyEmail(props) {
 
         } else {
           if (rsp.message && typeof rsp.message === 'string') {
-            setResult("Invalid URL Request!!!");
+            setResult("Invalid URL Request!");
             setIsFetch(true);
           } else {
-            setResult("Invalid URL Request!!!");
+            setResult("Invalid URL Request!");
             setIsFetch(true);
           }
         }
       } else {
-        setResult("Invalid URL Request!!!");
+        setResult("Invalid URL Request!");
         setIsFetch(true);
       }
     } catch (error) {
-      setResult("Invalid URL Request!!!");
+      setResult("Invalid URL Request!");
       setIsFetch(true);
     }
   };

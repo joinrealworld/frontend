@@ -145,11 +145,11 @@
 }
 
 .modal-header-mcan3 {
-    background-color: #343434;
+    background-color: var(--seventh-color);
 }
 
 .modal-mcan3 {
-    background-color: #343434;
+    background-color: var(--seventh-color);
 }
 
 .main-button-23fa2wd {

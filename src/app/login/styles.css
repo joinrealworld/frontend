@@ -60,6 +60,10 @@
     text-decoration: none;
 }
 
+.modal-title-2nda2 {
+    color: #ededed;
+}
+
 .form-control-q3csd {
     outline: 0;
     background: #dedede;
@@ -98,6 +102,30 @@
     background: #b78727;
     color: #dedede;
     box-shadow: 0 0 10px 0 #b78727;
+    font-size: 16px;
+}
+
+.side-button-mc2342 {
+    outline: 0;
+    width: fit-content;
+    min-width: 120px;
+    border: 0;
+    margin-top: 12px;
+    border-radius: 7px;
+    padding: 15px;
+    color: #ededed;
+    font-weight: 500;
+    font-size: 15px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.4s ease-in-out;
+    cursor: pointer;
+}
+
+.side-button-mc2342:hover,
+.side-button-mc2342:active,
+.side-button-mc2342:focus {
+    background: #232323;
+    color: #ededed;
     font-size: 16px;
 }
 

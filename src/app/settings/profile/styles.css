@@ -12,7 +12,7 @@
     border-color: #b78727;
     background-position: center;
     background-repeat: no-repeat;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     height: 150px;
     width: 100%;
@@ -232,24 +232,15 @@
     font-size: 18px;
 }
 
-.modal-mcan3 {
-    background-color: #343434;
-}
-
-.modal-header-mcan3 {
-    background-color: #343434;
-}
-
 .input-hint {
     font-size: 12px;
     color: #EC5800;
     margin-bottom: 5px;
     text-align: left;
     text-decoration: none;
-    position: absolute;
 }
 
-.main-button-7ajb312 {
+.main-button-4ajb312 {
     outline: 0;
     background: #b78727;
     width: fit-content;
@@ -261,15 +252,14 @@
     color: #fff;
     font-weight: 500;
     font-size: 15px;
-    margin-bottom: 20px;
     -webkit-transition: all 0.3 ease;
     transition: all 0.4s ease-in-out;
     cursor: pointer;
 }
 
-.main-button-7ajb312:hover,
-.main-button-7ajb312:active,
-.main-button-7ajb312:focus {
+.main-button-4ajb312:hover,
+.main-button-4ajb312:active,
+.main-button-4ajb312:focus {
     background: #b78727;
     color: #dedede;
     box-shadow: 0 0 10px 0 #b78727;
@@ -285,7 +275,7 @@
     margin-top: 12px;
     border-radius: 7px;
     padding: 15px;
-    color: #fff;
+    color: var(--fourth-color);
     font-weight: 500;
     font-size: 15px;
     margin-bottom: 20px;
@@ -316,5 +306,5 @@
 }
 
 .user-input-3mac82n:focus {
-    box-shadow: 0 0 10px 0 var(--fourth-color);
+    box-shadow: 0 0 10px 0 var(--seventh-color);
 }

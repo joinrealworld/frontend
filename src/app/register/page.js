@@ -6,11 +6,13 @@ import { MoveLeft, CheckCircle2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { Button, Spinner } from '@nextui-org/react';
 
 import './styles.css';
 import ValidatedForm from "@/components/ValidatedForm";
 import connect from '@/components/ConnectStore/connect';
-import { appName } from "@/constant/global";
+import { appName, handleAPIError } from "@/constant/global";
 
 const SubscriptionPlans = [
   {
@@ -68,6 +70,8 @@ function Register(props) {
   const [emailAddress, setEmailAddress] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCVV] = useState('');
@@ -75,18 +79,55 @@ function Register(props) {
 
   const [selectedPlan, setSelectedPlan] = useState(SubscriptionPlans[0]);
   const [selectedStep, setSelectedStep] = useState(Steps.personalInfo);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onPersonalInfoNext = async () => {
-    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length))
+    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length));
   };
 
   const onPlanSelectionNext = async () => {
-    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length))
+    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length));
   };
 
   const onCardInfoNext = async () => {
-    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length))
+    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length));
+    onRegister();
   };
+
+  const onRegister = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(apiURL + 'api/v1/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "first_name": firstName,
+          "last_name": lastName,
+          "email": emailAddress,
+          "password": password
+        })
+      });
+      const rsp = await response.json();
+      if (response.status >= 200 && response.status < 300) {
+        console.log("rsp: ", rsp);
+        if (rsp.payload) {
+          toast("Register successfully! Please verify your Email to login.");
+          router.replace('/login');
+        } else {
+          handleAPIError(rsp);
+          setIsLoading(false);
+        }
+      } else {
+        handleAPIError(rsp);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      toast("Something went wrong!");
+      setIsLoading(false);
+    }
+  }
 
   const renderPersonalInfo = () => {
     return (
@@ -103,6 +144,14 @@ function Register(props) {
             lastName: {
               required: true,
             },
+            password: {
+              required: true,
+              minLength: 8,
+            },
+            confirmPassword: {
+              required: true,
+              matches: password
+            },
           }}
           messages={{
             emailAddress: {
@@ -114,6 +163,14 @@ function Register(props) {
             },
             lastName: {
               required: "Last name is required!"
+            },
+            password: {
+              required: "Password is required!",
+              minLength: "Minimum 8 digit is required!",
+            },
+            confirmPassword: {
+              required: "Confirm Password is required!",
+              matches: "Confirm Password is not matched!",
             },
           }}
           onSubmit={onPersonalInfoNext}
@@ -159,10 +216,37 @@ function Register(props) {
                 }
               />
             </div>
+            <div>
+              <input
+                type="password"
+                name="password"
+                className="form-control-3mac82n"
+                placeholder="Password"
+                autoComplete="off"
+                value={password}
+                onChange={(event) =>
+                  setPassword(event.target.value)
+                }
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                name="confirmPassword"
+                className="form-control-3mac82n"
+                placeholder="Confirm Password"
+                autoComplete="off"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(event.target.value)
+                }
+              />
+            </div>
 
             <button className="main-button-mac31cas" type="submit">
               Next
             </button>
+
             <div className='back-action-31ca22'>
               <MoveLeft color="#b78727" size={23} />
               <Link href="/login">
@@ -346,9 +430,10 @@ function Register(props) {
               />
             </div>
 
-            <button className="main-button-mac31cas" type="submit">
+            <Button className="main-button-mac31cas" isLoading={isLoading} fullWidth radius='sm' size='lg' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
               Submit
-            </button>
+            </Button>
+
             <div className='back-action-31ca22'>
               <MoveLeft color="#b78727" size={23} />
               <div onClick={() => setSelectedStep(Math.max((selectedStep - 1), 1))}>
@@ -400,6 +485,7 @@ function Register(props) {
           {renderContent()}
         </div>
       </div>
+
     </div>
   );
 }

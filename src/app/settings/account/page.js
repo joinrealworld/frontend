@@ -2,24 +2,22 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link';
-import { AtSign, KeyIcon, Edit3Icon, MenuIcon, LockIcon } from 'lucide-react';
+import { AtSign, KeyIcon, Edit3Icon, MenuIcon, LockIcon, InfoIcon, MailIcon, ChevronRightIcon, BinaryIcon } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import $ from 'jquery';
 import Image from 'next/image';
-import { Modal, ModalBody, ModalContent, ModalHeader, Switch, useDisclosure } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, useDisclosure } from '@nextui-org/react';
+import { toast } from 'react-toastify';
 
 import './../styles.css';
 import './styles.css';
 import SettingsMenu from "@/components/SettingsMenu";
 import connect from '@/components/ConnectStore/connect';
 import ValidatedForm from '@/components/ValidatedForm';
-import { apiURL } from '@/constant/global';
-import { toast } from 'react-toastify';
-import Loading from '@/components/Loading';
+import { apiURL, handleAPIError } from '@/constant/global';
 
 function Account(props) {
-
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -30,7 +28,26 @@ function Account(props) {
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [is2FAEnabled, setIs2FAEnabled] = useState(user?.is_two_factor_enabled); // zzz
+  const [isLoadingUpdatePassword, setIsLoadingUpdatePassword] = useState(false);
+  const [isLoadingUpdateUsername, setIsLoadingUpdateUsername] = useState(false);
+
+  const [isLoadingDisableFA, setIsLoadingDisableFA] = useState(false);
+  const [isLoadingConfirmEmail2FA, setIsLoadingConfirmEmail2FA] = useState(false);
+  const [isLoadingConfirmCode2FA, setIsLoadingConfirmCode2FA] = useState(false);
+  const [code, setCode] = useState('');
+
+  const changeUserNameModel = useDisclosure({
+    id: 'change-username',
+  });
+  const changePasswordModel = useDisclosure({
+    id: 'change-password',
+  });
+  const askCodeModel = useDisclosure({
+    id: 'ask-code',
+  });
+  const askEmailOTPModel = useDisclosure({
+    id: 'ask-email-otp',
+  });
 
   useEffect(() => {
     if (!props.user.isLoggedIn) {
@@ -66,18 +83,16 @@ function Account(props) {
         }
       }
     } else {
-      toast("Something went wrong!");
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        toast("Something went wrong!");
+      }
     }
   }
 
-  const changeUserNameModel = useDisclosure({
-    id: 'change-username',
-  });
-  const changePasswordModel = useDisclosure({
-    id: 'change-password',
-  });
-
   const onChangeUsernameClick = () => {
+    setIsLoadingUpdateUsername(true);
     changeUsername(props.user.authToken);
   }
 
@@ -93,26 +108,34 @@ function Account(props) {
         username: username
       })
     });
+    const rsp = await response.json();
     if (response.status >= 200 && response.status < 300) {
-      const rsp = await response.json();
-      console.log("rsp.payload --------------------------------");
-      console.log(rsp.payload);
       if (rsp.payload) {
         toast("Username changed successfully!");
         getProfile(authToken);
+        setUsername('');
+        changeUserNameModel.onClose();
+        setIsLoadingUpdateUsername(false);
       } else {
-        if (rsp.message && typeof rsp.message === 'string') {
-          toast(rsp.message);
-        } else {
-          toast("Something went wrong!");
-        }
+        handleAPIError(rsp);
+        setIsLoadingUpdateUsername(false);
       }
     } else {
-      toast("Something went wrong!");
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        if (rsp.status == -1 && rsp.payload && (rsp.payload + "").includes('duplicate key value violates unique constraint')) {
+          toast("Username already taken!");
+        } else {
+          handleAPIError(rsp);
+        }
+        setIsLoadingUpdateUsername(false);
+      }
     }
   }
 
   const onChangePasswordClick = () => {
+    setIsLoadingUpdatePassword(true);
     changePassword(props.user.authToken);
   }
 
@@ -130,26 +153,284 @@ function Account(props) {
     });
     console.log("response --------------------------------");
     console.log(response);
+    const rsp = await response.json();
+    console.log("rsp.payload --------------------------------");
+    console.log(JSON.stringify(rsp));
     if (response.status >= 200 && response.status < 300) {
-      const rsp = await response.json();
-      console.log("rsp.payload --------------------------------");
-      console.log(rsp.payload);
       if (rsp.payload) {
         toast("Password changed successfully!");
+        changePasswordModel.onClose();
+        setNewPassword('');
+        setPassword('');
+        setConfirmPassword('');
+        setIsLoadingUpdatePassword(false);
       } else {
-        if (rsp.message && typeof rsp.message === 'string') {
-          toast(rsp.message);
-        } else {
-          toast("Something went wrong!");
-        }
+        handleAPIError(rsp);
+        setIsLoadingUpdatePassword(false);
       }
     } else {
-      toast("Something went wrong!");
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        if (response.status == 400 && rsp.payload) {
+          console.log(rsp.payload ?? rsp.payload?.new_password?.[0] ?? rsp.payload?.old_password?.[0] ?? "Something went wrong!");
+          if (typeof rsp.payload == 'object') {
+            toast(rsp.payload?.new_password?.[0] ?? rsp.payload?.old_password?.[0] ?? "Something went wrong!");
+          }
+          else if (typeof rsp.payload == 'string') {
+            toast(rsp.payload ?? "Something went wrong!");
+          }
+          else {
+            handleAPIError(rsp);
+          }
+        } else {
+          handleAPIError(rsp);
+        }
+        setIsLoadingUpdatePassword(false);
+      }
     }
   }
 
   const onToggleMenu = (e) => {
+    $('#setting-menu').toggleClass("invisible");
     $('#setting-menu').toggleClass("visible");
+  }
+
+  const disableTwoFA = async () => {
+
+    setIsLoadingDisableFA(true);
+
+    const response = await fetch(apiURL + 'api/v1/user/change/authentication', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        authentication: 0, // 1 for email authentication
+        authentication_type: user?.fa_type,
+        // authentication_code: code // pass null for email authentication
+      })
+    });
+    const rsp = await response.json();
+    console.log("rsp --------------------------------");
+    console.log(response);
+    console.log(rsp);
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload) {
+        toast("Two-Factor Authentication is OFF!");
+        setUser({ ...user, fa: false });
+        getProfile(props.user.authToken);
+        setIsLoadingDisableFA(false);
+      } else {
+        handleAPIError(rsp);
+        setIsLoadingDisableFA(false);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+        setIsLoadingDisableFA(false);
+      }
+    }
+  }
+
+  const enableEmailAuth = (e) => {
+    askEmailOTPModel.onOpen();
+  }
+
+  const enableCodeAuth = (e) => {
+    askCodeModel.onOpen();
+  }
+
+  const onConfirmCodeClick = async () => {
+    setIsLoadingConfirmCode2FA(true);
+    const response = await fetch(apiURL + 'api/v1/user/change/authentication', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        authentication: 1, // 1 for enable authentication
+        authentication_type: 'code',
+        authentication_code: code
+      })
+    });
+    const rsp = await response.json();
+    console.log("rsp --------------------------------");
+    console.log(response);
+    console.log(rsp);
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload) {
+        toast("Secret code authentication is ON!");
+        setUser({ ...user, fa: true, fa_type: 'code' });
+        getProfile(props.user.authToken);
+        setIsLoadingConfirmCode2FA(false);
+        askCodeModel.onClose();
+      } else {
+        handleAPIError(rsp);
+        setIsLoadingConfirmCode2FA(false);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+        setIsLoadingConfirmCode2FA(false);
+      }
+    }
+  }
+
+  const onConfirmEmailOTPClick = async () => {
+    setIsLoadingConfirmEmail2FA(true);
+    const response = await fetch(apiURL + 'api/v1/user/change/authentication', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        authentication: 1, // 1 for enable authentication
+        authentication_type: 'email'
+      })
+    });
+    const rsp = await response.json();
+    console.log("rsp --------------------------------");
+    console.log(response);
+    console.log(rsp);
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload) {
+        toast("Email authentication is ON!");
+        setUser({ ...user, fa: true, fa_type: 'email' });
+        getProfile(props.user.authToken);
+        setIsLoadingConfirmEmail2FA(false);
+        askEmailOTPModel.onClose();
+      } else {
+        handleAPIError(rsp);
+        setIsLoadingConfirmEmail2FA(false);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+        setIsLoadingConfirmEmail2FA(false);
+      }
+    }
+  }
+
+  const render2FAContent = () => {
+    if (user?.fa) {
+      if (user?.fa_type == 'email') {
+        return (
+          <>
+            <div className='fa-status-3ndak2'>
+              <InfoIcon size={18} />
+              <span className='fa-status-text-3ndak2'>Two-factor authentication via email one-time password (OTP) is on.</span>
+            </div>
+
+            <div className="info-cards-i73cas">
+              <div className="info-card-9cajy6">
+                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginTop: 10 }}>
+                  <LockIcon color="var(--fourth-color)" size={25} />
+                  <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
+                    <span className="info-value-ma82ba">
+                      Email Authorization
+                    </span>
+                  </div>
+                </div>
+                {isLoadingDisableFA ?
+                  <Spinner size='md' color='primary' style={{ marginRight: 10 }} />
+                  :
+                  <Switch
+                    size="lg"
+                    checked={user?.fa}
+                    isSelected={user?.fa}
+                    onChange={(e) => disableTwoFA()}
+                  />
+                }
+              </div>
+            </div>
+          </>
+        );
+      }
+      else if (user?.fa_type == 'code') {
+        return (
+          <>
+            <div className='fa-status-3ndak2'>
+              <InfoIcon size={18} />
+              <span className='fa-status-text-3ndak2'>Two-factor authentication via secret code is on.</span>
+            </div>
+
+            <div className="info-cards-i73cas">
+              <div className="info-card-9cajy6">
+                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginTop: 10 }}>
+                  <LockIcon color="var(--fourth-color)" size={25} />
+                  <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
+                    <span className="info-value-ma82ba">
+                      Secret Code Authorization
+                    </span>
+                  </div>
+                </div>
+                {isLoadingDisableFA ?
+                  <Spinner size='md' color='primary' style={{ marginRight: 10 }} />
+                  :
+                  <Switch
+                    size="lg"
+                    checked={user?.fa}
+                    isSelected={user?.fa}
+                    onChange={(e) => disableTwoFA()}
+                  />
+                }
+              </div>
+            </div>
+          </>
+        );
+      }
+    } else {
+      return (
+        <>
+          <div style={{ borderRadius: 6 }}>
+            <div className="info-card-9cajy6" style={{ cursor: 'pointer', }} onClick={enableEmailAuth}>
+              <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', }}>
+                <MailIcon color="var(--fourth-color)" size={22} />
+                <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
+                  <span className="fa-title-ma82ba" style={{ fontSize: 16 }} >
+                    Email Authentication (via OTP)
+                  </span>
+                  <span className="fa-sub-title-ma82ba">
+                    Use your email ({props.user?.user?.email}) to receive security code
+                  </span>
+                </div>
+              </div>
+              <div style={{}}>
+                <ChevronRightIcon color="var(--fourth-color)" size={23} />
+              </div>
+            </div>
+
+            <div className="info-card-9cajy6" style={{ cursor: 'pointer', }} onClick={enableCodeAuth}>
+              <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', }}>
+                <BinaryIcon color="var(--fourth-color)" size={24} />
+                <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
+                  <span className="fa-title-ma82ba" style={{ fontSize: 16 }} >
+                    Secret Code Authentication
+                  </span>
+                  <span className="fa-sub-title-ma82ba">
+                    Create a new secret code for authentication
+                  </span>
+                </div>
+              </div>
+              <div style={{}}>
+                <ChevronRightIcon color="var(--fourth-color)" size={23} />
+              </div>
+            </div>
+          </div>
+
+        </>
+      );
+    }
   }
 
   return (
@@ -170,7 +451,7 @@ function Account(props) {
               <Image
                 className="avatar-93nasj"
                 alt="Avatar"
-                src={user?.avatar ? user?.avatar : "/assets/hp.jpg"}
+                src={user?.avatar ? encodeURI(apiURL.slice(0, -1) + user?.avatar) : "/assets/hp.jpg"}
                 width={46}
                 height={46}
               />
@@ -179,9 +460,9 @@ function Account(props) {
                   <span className="username-312c02qena">{user?.first_name + " " + user?.last_name}</span>
                 </div>
                 <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
-                  <AtSign color="var(--fifth-color)" size={13.5} style={{ marginRight: 2 }} />
+                  {/* <AtSign color="var(--fifth-color)" size={13.5} style={{ marginRight: 2 }} /> */}
                   {/* <InfoIcon color='#c5bfbf' size={14} style={{ marginRight: 4 }} /> */}
-                  <span className="tag-kla3mca2">{user?.username}</span>
+                  <span className="tag-kla3mca2">{user?.email}</span>
                 </div>
               </div>
             </div>
@@ -230,23 +511,10 @@ function Account(props) {
             <div style={{ marginTop: 15 }}></div>
 
             <b className="info-title-mczw72b">Two-Factor Authorization</b>
-            <div className="info-cards-i73cas">
-              <div className="info-card-9cajy6">
-                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginTop: 10 }}>
-                  <LockIcon color='white' size={25} />
-                  <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
-                    <span className="info-value-ma82ba">
-                      Email Authorization
-                    </span>
-                  </div>
-                </div>
-                <Switch
-                  size="lg"
-                  checked={is2FAEnabled}
-                  onChange={() => setIs2FAEnabled(!is2FAEnabled)}
-                />
-              </div>
-            </div>
+            <p style={{ color: 'var(--fourth-color)', fontSize: 14 }}>Add an extra layer of security by enabling 2FA on your account.</p>
+
+            {render2FAContent()}
+
           </div>
         </div>
       </div>
@@ -257,7 +525,6 @@ function Account(props) {
         radius="md"
         onClose={() => {
           setUsername('');
-          setPassword('');
         }}
         onOpenChange={changeUserNameModel.onOpenChange}
         classNames={{
@@ -268,7 +535,7 @@ function Account(props) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1 text-white">Change Username</ModalHeader>
+              <ModalHeader className="modal-title-mcan3 flex flex-col gap-1">Change Username</ModalHeader>
               <ModalBody>
                 <ValidatedForm
                   rules={{
@@ -282,7 +549,7 @@ function Account(props) {
                     username: {
                       required: "Username is required!",
                       minLength: "Minimum 3 digit is required!",
-                      notSameUsername: "Your current username!"
+                      notSameUsername: "Your existing current username!"
                     },
                   }}
                   onSubmit={onChangeUsernameClick}
@@ -303,9 +570,10 @@ function Account(props) {
                       />
                     </div>
 
-                    <button className="main-button-7ajb312" type="submit">
+                    <Button className='main-button-7ajb312' isLoading={isLoadingUpdateUsername} spinner={<Spinner color='current' size='sm' />} fullWidth radius='sm' size='lg' type='submit' color=''>
                       Update Username
-                    </button>
+                    </Button>
+
                   </form>
                 </ValidatedForm>
               </ModalBody>
@@ -332,7 +600,7 @@ function Account(props) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1 text-white">Change Password</ModalHeader>
+              <ModalHeader className="modal-title-mcan3 flex flex-col gap-1">Change Password</ModalHeader>
               <ModalBody>
                 <ValidatedForm
                   rules={{
@@ -355,7 +623,7 @@ function Account(props) {
                     },
                     confirmPassword: {
                       required: "Confirm Password is required!",
-                      matches: "Confirm Password is matched!",
+                      matches: "Confirm Password is not matched!",
                     },
                     password: {
                       required: "Current Password is required!",
@@ -365,7 +633,7 @@ function Account(props) {
                 >
                   <form>
                     <div>
-                      <span className='fs-6 text-white'>New password</span>
+                      <span className='modal-title-mcan3 fs-6'>New password</span>
                       <input
                         type="password"
                         name="newPassword"
@@ -388,7 +656,7 @@ function Account(props) {
                           setConfirmPassword(event.target.value)
                         }
                       />
-                      <span className='fs-6 text-white'>Confirm your current password</span>
+                      <span className='modal-title-mcan3 fs-6'>Confirm your current password</span>
                       <input
                         type="password"
                         name="password"
@@ -402,12 +670,117 @@ function Account(props) {
                       />
                     </div>
 
-                    <button className="main-button-7ajb312" type="submit">
+                    <Button className='main-button-7ajb312' isLoading={isLoadingUpdatePassword} spinner={<Spinner color='current' size='sm' />} fullWidth radius='sm' size='lg' type='submit' color=''>
                       Update Password
-                    </button>
+                    </Button>
+
                   </form>
                 </ValidatedForm>
               </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        id="ask-email-otp"
+        isOpen={askEmailOTPModel.isOpen}
+        backdrop="opaque"
+        radius="md"
+        onOpenChange={askEmailOTPModel.onOpenChange}
+        classNames={{
+          body: "py-6 modal-mcan3",
+          header: "modal-header-mcan3 border-b-[1px] border-[#292f46]",
+          footer: "modal-mcan3",
+        }}
+        onClose={() => {
+          setCode('');
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="modal-title-mcan3 flex flex-col gap-1">Confirm Action</ModalHeader>
+              <ModalBody>
+                <>
+                  <div>
+                    <span className='modal-title-mcan3 fs-6'>Are you sure do you want to enable Email Authentication?</span>
+                  </div>
+                </>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" className='side-button-23nfk3w3Z' style={{ marginLeft: 30 }} radius='sm' size='lg' color='' onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button className='main-button-7ajb312' style={{ width: 'fit-content', marginBottom: 0 }} spinner={<Spinner color='current' size='sm' />} isLoading={isLoadingConfirmEmail2FA} radius='sm' size='lg' type='submit' color='' onPress={onConfirmEmailOTPClick}>
+                  Confirm
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal
+        id="ask-code"
+        isOpen={askCodeModel.isOpen}
+        backdrop="opaque"
+        radius="md"
+        onOpenChange={askCodeModel.onOpenChange}
+        classNames={{
+          body: "py-6 modal-mcan3",
+          header: "modal-header-mcan3 border-b-[1px] border-[#292f46]",
+          footer: "modal-mcan3 pt-2",
+        }}
+        onClose={() => {
+          setCode('');
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="modal-title-mcan3 flex flex-col gap-1">Confirm Action</ModalHeader>
+              <ModalBody>
+                <ValidatedForm
+                  rules={{
+                    code: {
+                      required: true,
+                      minLength: 4
+                    },
+                  }}
+                  messages={{
+                    code: {
+                      required: "Code is required!",
+                      minLength: "Minimum 4 digits required!"
+                    }
+                  }}
+                  onSubmit={onConfirmCodeClick}
+                >
+                  <form>
+                    <div>
+                      <span className='modal-title-mcan3 fs-6'>Create your secret code</span>
+                      <input
+                        type="text"
+                        name="code"
+                        className="form-control-7ajb312"
+                        placeholder="Enter the code"
+                        autoComplete="off"
+                        value={code}
+                        maxLength={4}
+                        onChange={(event) =>
+                          setCode(event.target.value)
+                        }
+                      />
+                    </div>
+                  </form>
+                </ValidatedForm>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" className='side-button-23nfk3w3Z' style={{ marginLeft: 30 }} radius='sm' size='lg' color='' onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button className='main-button-7ajb312' style={{ width: 'fit-content', marginBottom: 0 }} spinner={<Spinner color='current' size='sm' />} isLoading={isLoadingConfirmCode2FA} radius='sm' size='lg' type='submit' color='' onPress={onConfirmCodeClick}>
+                  Confirm
+                </Button>
+              </ModalFooter>
             </>
           )}
         </ModalContent>

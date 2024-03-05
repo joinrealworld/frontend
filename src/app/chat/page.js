@@ -281,7 +281,7 @@ function Chat(props) {
 
                 <div className="menu-23maaa">
                     <div id="sidebar-btn-3cjana" onClick={onMenuToggle}>
-                        <MenuIcon color='white' size={20} />
+                        <MenuIcon color="var(--fourth-color)" size={20} />
                     </div>
                     <h2 className="menu-name-1mcasa">{selectedChannel.channel_name}</h2>
                 </div>

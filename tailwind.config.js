@@ -20,6 +20,10 @@ module.exports = {
       },
     },
   },
-  plugins: [nextui()],
+  plugins: [
+    nextui({
+      addCommonColors: true
+    })
+  ],
   darkMode: "class",
 };

@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { UserIcon, ArrowLeft, Aperture, Edit, TargetIcon, LogOutIcon, LockIcon, AwardIcon, LifeBuoyIcon, X, } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import $ from "jquery";
 
 import './styles.css';
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react';
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, useDisclosure } from '@nextui-org/react';
 import { apiURL } from '@/constant/global';
 
-// zzz
 export const SettingsMenuOptions = [
-  { Text: "Account", Value: 1, Route: "/settings/account", Icon: (<UserIcon color="var(--fourth-color)" size={22} style={{ marginRight: 12 }} />), },
-  { Text: "Membership", Value: 2, Route: "/settings/membership", Icon: (<AwardIcon color="var(--fourth-color)" size={22} style={{ marginRight: 12 }} />), },
-  { Text: "Profile", Value: 3, Route: "/settings/profile", Icon: (<Aperture color="var(--fourth-color)" size={22} style={{ marginRight: 12 }} />), },
-  { Text: "Preference", Value: 4, Route: "/settings/preference", Icon: (<Edit color="var(--fourth-color)" size={22} style={{ marginRight: 12 }} />), },
-  { Text: "Refer a friend", Value: 5, Route: "/settings/referral", Icon: (<TargetIcon color="var(--fourth-color)" size={22} style={{ marginRight: 12 }} />), },
-  { Text: "Feedback", Value: 6, Route: "/settings/feedback", Icon: (<LifeBuoyIcon color="var(--fourth-color)" size={22} style={{ marginRight: 12 }} />), },
+  { Text: "Account", Value: 1, Route: "/settings/account", Icon: (isSelected) => (<UserIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
+  { Text: "Membership", Value: 2, Route: "/settings/membership", Icon: (isSelected) => (<AwardIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
+  { Text: "Profile", Value: 3, Route: "/settings/profile", Icon: (isSelected) => (<Aperture color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
+  { Text: "Preference", Value: 4, Route: "/settings/preference", Icon: (isSelected) => (<Edit color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
+  { Text: "Refer a friend", Value: 5, Route: "/settings/referral", Icon: (isSelected) => (<TargetIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
+  { Text: "Feedback", Value: 6, Route: "/settings/feedback", Icon: (isSelected) => (<LifeBuoyIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
 ];
 
 function SettingsMenu(props) {
@@ -34,8 +33,27 @@ function SettingsMenu(props) {
     id: 'all-device-logout-popup',
   });
 
+  useEffect(() => {
+    const onResizeWindow = (e) => {
+      console.log("callled.....", window.innerWidth);
+      if (window.innerWidth < 800) {
+        $('#setting-menu').addClass("invisible");
+        $('#setting-menu').removeClass("visible");
+      } else {
+        $('#setting-menu').addClass("visible");
+        $('#setting-menu').removeClass("invisible");
+      }
+    };
+    onResizeWindow(null);
+    window.addEventListener('resize', onResizeWindow);
+    return () => {
+      window.removeEventListener('resize', onResizeWindow)
+    };
+  }, []);
+
   const onLogoutClick = (e) => {
     e.preventDefault();
+    onToggleMenu();
     logoutPopup.onOpen();
   };
 
@@ -59,6 +77,7 @@ function SettingsMenu(props) {
 
   const onAllLogoutClick = (e) => {
     e.preventDefault();
+    onToggleMenu();
     allDeviceLogoutPopup.onOpen();
   };
 
@@ -81,18 +100,17 @@ function SettingsMenu(props) {
   }
 
   const onBack = (e) => {
-    router.replace('/courses');
+    router.replace('/courses?tab=1');
   }
 
-  const onToggleMenu = (e) => {
+  const onToggleMenu = () => {
+    $('#setting-menu').toggleClass("invisible");
     $('#setting-menu').toggleClass("visible");
   }
 
   const onNavigateMenu = (item) => {
     router.push(item.Route);
-    setTimeout(() => {
-      $('#setting-menu').toggleClass("visible");
-    }, 700);
+    onToggleMenu();
   }
 
   return (
@@ -122,9 +140,9 @@ function SettingsMenu(props) {
         <div
           className="close-icon-n82nz"
           style={{ cursor: "pointer" }}
-          onClick={onToggleMenu}
+          onClick={(e) => onToggleMenu()}
         >
-          <X color="#ededed" size={22} />
+          <X color="var(--fourth-color)" size={22} />
         </div>
       </div>
       <h2 className="title-3oanz3a">Settings</h2>
@@ -138,7 +156,7 @@ function SettingsMenu(props) {
               className={className}
               onClick={(e) => onNavigateMenu(item)}
             >
-              {item.Icon}
+              {item.Icon(item.Route == path)}
               <span>{item.Text}</span>
             </div>
           );
@@ -177,17 +195,17 @@ function SettingsMenu(props) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className='text-white'>Logout</ModalHeader>
+              <ModalHeader className='modal-title-mcan3'>Logout</ModalHeader>
               <ModalBody style={{ marginTop: -10 }}>
-                <span className='text-white'>
+                <span className='modal-title-mcan3'>
                   Are you sure you want to logout of this device?
                 </span>
               </ModalBody>
               <ModalFooter>
-                <Button className='text-white' color="default" variant="light" onPress={onClose}>
+                <Button variant="light" className='side-button-23nfkw3Z' style={{ marginLeft: 30 }} radius='sm' size='lg' color='' onClick={onClose}>
                   CANCEL
                 </Button>
-                <Button isLoading={isBtnLoading} onPress={onLogoutProcess}>
+                <Button className='main-button-23nfkw3Z' isLoading={isBtnLoading} spinner={<Spinner color='current' size='sm' />} radius='sm' size='lg' type='submit' color='' onPress={onLogoutProcess}>
                   LOGOUT
                 </Button>
               </ModalFooter>
@@ -210,17 +228,17 @@ function SettingsMenu(props) {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className='text-white'>Logout All Devices</ModalHeader>
+              <ModalHeader className='modal-title-mcan3'>Logout All Devices</ModalHeader>
               <ModalBody style={{ marginTop: -10 }}>
-                <span className='text-white'>
+                <span className='modal-title-mcan3'>
                   Are you sure you want to logout of all signed in devices?
                 </span>
               </ModalBody>
               <ModalFooter>
-                <Button className='text-white' color="default" variant="light" onPress={onClose}>
+                <Button variant="light" className='side-button-23nfkw3Z' style={{ marginLeft: 30 }} radius='sm' size='lg' color='' onClick={onClose}>
                   CANCEL
                 </Button>
-                <Button isLoading={isBtnLoading} onPress={onAllLogoutProcess}>
+                <Button className='main-button-23nfkw3Z' isLoading={isBtnLoading} spinner={<Spinner color='current' size='sm' />} radius='sm' size='lg' type='submit' color='' onPress={onAllLogoutProcess}>
                   LOGOUT ALL DEVICES
                 </Button>
               </ModalFooter>

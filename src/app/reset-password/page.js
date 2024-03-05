@@ -4,12 +4,13 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
 import { MoveLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { Button, Spinner } from '@nextui-org/react';
 
 import './styles.css';
-import ValidatedForm from "../../components/ValidatedForm";
+import ValidatedForm from "@/components/ValidatedForm";
 import connect from '@/components/ConnectStore/connect';
-import { apiURL } from '@/constant/global';
-import { toast } from 'react-toastify';
+import { apiURL, handleAPIError } from '@/constant/global';
 
 function ResetPassword(props) {
 
@@ -18,10 +19,11 @@ function ResetPassword(props) {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const onResetPasswordClick = async () => {
     try {
-      // zzz
+      setIsLoading(true);
       const response = await fetch(apiURL + 'api/v1/user/set_password', {
         method: 'POST',
         headers: {
@@ -29,34 +31,31 @@ function ResetPassword(props) {
         },
         body: JSON.stringify({
           "password": password,
-          "token": params, // zzz
+          "token": get('t'), // zzz
         })
       });
+      const rsp = await response.json();
       if (response.status >= 200 && response.status < 300) {
-        const rsp = await response.json();
         if (rsp.payload) {
           router.replace('/login');
           toast("Password reset successfully!");
         } else {
-          if (rsp.message && typeof rsp.message === 'string') {
-            toast(rsp.message);
-          } else {
-            toast("Something went wrong!");
-          }
+          handleAPIError(rsp);
         }
+        setIsLoading(false);
       } else {
-        toast("Something went wrong!");
+        handleAPIError(rsp);
+        setIsLoading(false);
       }
     } catch (error) {
       toast("Something went wrong!");
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     // zzz
-    console.log("params --------------------------------");
-    console.log(props);
-    if (!get('token')) {
+    if (!get('t')) {
       toast("Invalid request!");
       router.push('/');
     }
@@ -118,7 +117,9 @@ function ResetPassword(props) {
                 />
               </div>
 
-              <button className="main-button-o3n2dc" type="submit">Reset Password</button>
+              <Button className="main-button-o3n2dc" isLoading={isLoading} fullWidth radius='sm' size='lg' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
+                Reset Password
+              </Button>
 
               <div className='back-action-k823nc'>
                 <MoveLeft color="#b78727" size={23} style={{ marginTop: -16 }} />

@@ -4,7 +4,7 @@ const nextConfig = {
     swcMinify: true,
     images: {
         domains: [
-            'cdn.discordapp.com', 'discordapp.com'
+            'cdn.discordapp.com', 'discordapp.com', '13.59.98.200'
         ],
         remotePatterns: [
             {

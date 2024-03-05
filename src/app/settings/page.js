@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 
 import './styles.css';
 import SettingsMenu, { SettingsMenuOptions } from "@/components/SettingsMenu";
 import connect from '@/components/ConnectStore/connect';
-import { useRouter, usePathname } from 'next/navigation';
 
 function Settings(props) {
 

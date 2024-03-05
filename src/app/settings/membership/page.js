@@ -48,6 +48,7 @@ function Membership(props) {
   // }
 
   const onToggleMenu = (e) => {
+    $('#setting-menu').toggleClass("invisible");
     $('#setting-menu').toggleClass("visible");
   }
 
@@ -58,7 +59,7 @@ function Membership(props) {
       <div className='right-side-8cnac'>
         <div className='w-full align-left' id="menu-icon">
           <MenuIcon
-            color='white'
+            color="var(--fourth-color)"
             style={{ marginBottom: 20, cursor: 'pointer', marginLeft: '5%', textAlign: 'left' }}
             onClick={onToggleMenu}
           />

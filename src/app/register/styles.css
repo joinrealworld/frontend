@@ -49,6 +49,7 @@
 
 .title-m3ic4n {
     color: #ededed;
+    font-size: 30px;
     font-weight: 500;
     margin-top: 20px;
 }
@@ -78,24 +79,16 @@
     cursor: pointer;
 }
 
-
-.form-139nc3 p {
-    font-size: 12px;
-    color: #EC5800;
-    margin-bottom: 5px;
-    text-align: left;
-    text-decoration: none;
-}
-
 .form-control-3mac82n {
     outline: 0;
     background: #dedede;
     border-radius: 7px;
     width: 100%;
     border: 0;
-    margin: 10px 0;
+    margin-bottom: 3px;
+    margin-top: 5px;
     color: #232323;
-    padding: 15px;
+    padding: 13px 15px;
     font-size: 15px;
 }
 

@@ -1,9 +1,10 @@
 "use client";
 
-import OnBoard from '@/components/OnBoard/index';
-import connect from '@/components/ConnectStore/connect';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+
+import OnBoard from '@/components/OnBoard/index';
+import connect from '@/components/ConnectStore/connect';
 
 function Home(props) {
 
@@ -12,7 +13,7 @@ function Home(props) {
 
   useEffect(() => {
     if (props?.user?.isLoggedIn) {
-      router.replace('/courses');
+      router.replace('/courses?tab=1'); // navigate to categories tab
     }
   }, []);
 

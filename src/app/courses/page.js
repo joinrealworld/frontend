@@ -1,16 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import connect from '@/components/ConnectStore/connect';
 import { useRouter } from 'next/navigation';
-
-import './styles.css';
-import Loading from "@/components/Loading";
-import { RefreshCcw } from 'lucide-react';
-import { User } from '@nextui-org/react';
-import { apiURL } from '@/constant/global';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
+import { ChevronRightIcon, MoonIcon, RefreshCcw, SunIcon } from 'lucide-react';
+import { Accordion, AccordionItem, Avatar, User } from '@nextui-org/react';
+
+import './styles.css';
+import connect from '@/components/ConnectStore/connect';
+import Loading from "@/components/Loading";
+import { apiURL } from '@/constant/global';
+import { darkTheme } from "@/themes/darkTheme";
+import { lightTheme } from "@/themes/lightTheme";
 
 const tabValues = {
   categories: 1,
@@ -26,11 +28,17 @@ const Tabs = [
 
 function Courses(props) {
 
-  const [selectedTab, setSelectedTab] = useState(Tabs[0]);
+  const [selectedTab, setSelectedTab] = useState(null);
   const [channels, setChannels] = useState([]);
+  const [isFetchChannels, setIsFetchChannels] = useState(false);
   const [favChannels, setFavChannels] = useState([]);
+  const [isFetchFavChannels, setIsFetchFavChannels] = useState(false);
   const [inprogressChannels, setInprogressChannels] = useState([]);
-  const [isFetch, setIsFetch] = useState(false);
+  const [isFetchInProgressChannels, setIsFetchInProgressChannels] = useState(false);
+
+  const [mountTheme, setMountTheme] = useState(
+    JSON.parse(localStorage.getItem("theme")) || "dark"
+  );
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -45,13 +53,13 @@ function Courses(props) {
         console.log("callled...");
         setSelectedTab(Tabs.find(d => d.Value == Number(props.searchParams?.tab)));
         if (Number(props.searchParams?.tab) == tabValues.categories) {
-          getCategoryData();
+          getCategoryData(isFetchChannels);
         }
         else if (Number(props.searchParams?.tab) == tabValues.favorites) {
-          getFavoriteData();
+          getFavoriteData(isFetchFavChannels);
         }
         else if (Number(props.searchParams?.tab) == tabValues.inProgress) {
-          getInProgressData();
+          getInProgressData(isFetchInProgressChannels);
         }
       } else {
         router.push('?tab=' + tabValues.categories);
@@ -63,18 +71,19 @@ function Courses(props) {
     if (props.searchParams?.tab && Number(props.searchParams?.tab) > 0 && Number(props.searchParams?.tab) != selectedTab?.Value) {
       setSelectedTab(Tabs.find(d => d.Value == Number(props.searchParams?.tab)));
       if (Number(props.searchParams?.tab) == tabValues.categories) {
-        getCategoryData();
+        getCategoryData(isFetchChannels);
       }
       else if (Number(props.searchParams?.tab) == tabValues.favorites) {
-        getFavoriteData();
+        getFavoriteData(isFetchFavChannels);
       }
       else if (Number(props.searchParams?.tab) == tabValues.inProgress) {
-        getInProgressData();
+        getInProgressData(isFetchInProgressChannels);
       }
     }
   }, [props.searchParams?.tab]);
 
-  const getCategoryData = async () => {
+  const getCategoryData = async (isFetch = isFetchChannels) => {
+    if (isFetch) return;
     const response = await fetch(apiURL + 'api/v1/channel/fetch/category', {
       method: 'GET',
       headers: {
@@ -88,7 +97,7 @@ function Courses(props) {
       console.log(rsp);
       if (rsp.payload && typeof rsp.payload == 'object') {
         setChannels(rsp.payload);
-        setIsFetch(true);
+        setIsFetchChannels(true);
       } else {
         toast("Error while fetching data!");
       }
@@ -101,7 +110,8 @@ function Courses(props) {
     }
   }
 
-  const getFavoriteData = async () => {
+  const getFavoriteData = async (isFetch = isFetchFavChannels) => {
+    if (isFetch) return;
     const response = await fetch(apiURL + 'api/v1/channel/fetch/favourite/courses', {
       method: 'GET',
       headers: {
@@ -115,7 +125,7 @@ function Courses(props) {
       console.log(rsp);
       if (rsp.payload && typeof rsp.payload == 'object') {
         setFavChannels(rsp.payload);
-        setIsFetch(true);
+        setIsFetchFavChannels(true);
       } else {
         toast("Error while fetching data!");
       }
@@ -128,7 +138,8 @@ function Courses(props) {
     }
   }
 
-  const getInProgressData = async () => {
+  const getInProgressData = async (isFetch = isFetchInProgressChannels) => {
+    if (isFetch) return;
     const response = await fetch(apiURL + 'api/v1/channel/fetch/inprogress/courses', {
       method: 'GET',
       headers: {
@@ -142,7 +153,7 @@ function Courses(props) {
       console.log(rsp);
       if (rsp.payload && typeof rsp.payload == 'object') {
         setInprogressChannels(rsp.payload);
-        setIsFetch(true);
+        setIsFetchInProgressChannels(true);
       } else {
         toast("Error while fetching data!");
       }
@@ -160,7 +171,6 @@ function Courses(props) {
   }
 
   const onSelectTab = (tab) => {
-    setIsFetch(false);
     router.push('?tab=' + tab?.Value);
   }
 
@@ -169,90 +179,247 @@ function Courses(props) {
   }
 
   const renderChannelContent = () => {
-    if (selectedTab.Value == tabValues.categories) {
-      if (channels.length > 0) {
-        return channels.map((item, index) => {
-          return (
-            <div key={index} className="col" onClick={(e) => onSelectCategory(item)}>
-              <div className="card-9ama2f card">
-                <img src={item.category_pic} className="card-img-9ama2f card-img-top" alt="..." />
-                <div className="card-body-9ama2f card-body">
-                  <h5 className="card-name-9ama2f card-title">{item.name}</h5>
-                  <p className="card-description-9ama2f card-text">{item.description}</p>
-                </div>
-              </div>
-            </div>
-          );
-        });
-      } else {
+    if (selectedTab?.Value == tabValues.categories) {
+      if (!isFetchChannels) {
+        return (
+          <div style={{ width: '100%' }}>
+            <Loading />
+          </div>
+        );
+      }
+      if (channels.length == 0) {
         return (
           <div className="w-full">
             <h3 className='text-center text-white fs-5 mt-5'>No categories found!</h3>
           </div>
         );
       }
-    }
-    else if (selectedTab.Value == tabValues.inProgress) {
-      if (inprogressChannels.length > 0) {
-        return inprogressChannels.map((item, index) => {
-          return (
-            <div key={index} className="col" onClick={(e) => onSelectCategory(item)}>
-              <div className="card-9ama2f card">
-                <img src={item.category_pic} className="card-img-9ama2f card-img-top" alt="..." />
-                <div className="card-body-9ama2f card-body">
-                  <h5 className="card-name-9ama2f card-title">{item.name}</h5>
-                  <p className="card-description-9ama2f card-text">{item.description}</p>
-                </div>
+      return channels.map((item, index) => {
+        return (
+          <div key={index} className="col" onClick={(e) => onSelectCategory(item)}>
+            <div className="card-9ama2f card">
+              <img src={item.category_pic} className="card-img-9ama2f card-img-top" alt="..." />
+              <div className="card-body-9ama2f card-body">
+                <h5 className="card-name-9ama2f card-title">{item.name}</h5>
+                <p className="card-description-9ama2f card-text">{item.description}</p>
               </div>
             </div>
-          );
-        });
-      } else {
+          </div>
+        );
+      });
+    }
+    else if (selectedTab?.Value == tabValues.inProgress) {
+      if (!isFetchInProgressChannels) {
+        return (
+          <div style={{ width: '100%' }}>
+            <Loading />
+          </div>
+        );
+      }
+      if (inprogressChannels.length == 0) {
         return (
           <div className="w-full">
             <h3 className='text-center text-white fs-5 mt-5'>No in-progress categories!</h3>
           </div>
         );
       }
+      return inprogressChannels.map((item, index) => {
+        return (
+          <Accordion selectionMode="multiple" variant="splitted" >
+            {inprogressChannels.map((item, index) => {
+              return (
+                <AccordionItem
+                  className='accordion-93asnc'
+                  classNames={{
+                    title: 'light'
+                  }}
+                  key={index}
+                  aria-label={item?.category?.name}
+                  startContent={
+                    <Avatar
+                      radius="sm"
+                      size='lg'
+                      src={item?.category?.category_pic}
+                    />
+                  }
+                  indicator={<ChevronRightIcon size='26' color='var(--fourth-color)' />}
+                  subtitle={item?.category?.description}
+                  title={item?.category?.name}
+                >
+                  {item.courses && item.courses.length > 0 ?
+                    item.courses.map((course, courseIndex) => {
+                      console.log("course?.pic", course?.pic);
+                      return (
+                        <div
+                          key={courseIndex}
+                          style={{ cursor: 'pointer', marginLeft: 20, marginRight: 20, flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}
+                          onClick={(e) => router.push('/courses/' + item?.category?.uuid + '?cid=' + course?.uuid)}
+                        >
+                          <User
+                            name={course?.name}
+                            description={course?.lessons + ' lessons | ' + course?.completed + '% completed'}
+                            classNames={{
+                              wrapper: 'ml-2',
+                              description: 'mt-1',
+                              name: 'light'
+                            }}
+                            slot='name'
+                            avatarProps={{
+                              src: course?.pic,
+                              radius: 'sm'
+                            }}
+                          />
+                          <ChevronRightIcon size='20' color='var(--fourth-color)' />
+                        </div>
+                      );
+                    })
+                    :
+                    null
+                  }
+                </AccordionItem>
+              );
+            })
+            }
+          </Accordion>
+        );
+      });
     }
-    else if (selectedTab.Value == tabValues.favorites) {
-      if (favChannels.length > 0) {
-        return favChannels.map((item, index) => {
-          return (
-            <div key={index} className="col" onClick={(e) => onSelectCategory(item)}>
-              <div className="card-9ama2f card">
-                <img src={item.category_pic} className="card-img-9ama2f card-img-top" alt="..." />
-                <div className="card-body-9ama2f card-body">
-                  <h5 className="card-name-9ama2f card-title">{item.name}</h5>
-                  <p className="card-description-9ama2f card-text">{item.description}</p>
-                </div>
-              </div>
-            </div>
-          );
-        });
-      } else {
+    else if (selectedTab?.Value == tabValues.favorites) {
+      if (!isFetchFavChannels) {
+        return (
+          <div style={{ width: '100%' }}>
+            <Loading />
+          </div>
+        );
+      }
+      if (favChannels.length == 0) {
         return (
           <div className="w-full">
             <h3 className='text-center text-white fs-5 mt-5'>No favorite categories!</h3>
           </div>
         );
       }
+      return (
+        <Accordion selectionMode="multiple" variant="splitted" >
+          {favChannels.map((item, index) => {
+            return (
+              <AccordionItem
+                className='accordion-93asnc'
+                classNames={{
+                  title: 'light'
+                }}
+                key={index}
+                aria-label={item?.category?.name}
+                startContent={
+                  <Avatar
+                    radius="sm"
+                    size='lg'
+                    src={item?.category?.category_pic}
+                  />
+                }
+                indicator={<ChevronRightIcon size='26' color='var(--fourth-color)' />}
+                subtitle={item?.category?.description}
+                title={item?.category?.name}
+              >
+                {item.courses && item.courses.length > 0 ?
+                  item.courses.map((course, courseIndex) => {
+                    console.log("course?.pic", course?.pic);
+                    return (
+                      <div
+                        key={courseIndex}
+                        style={{ cursor: 'pointer', marginLeft: 20, marginRight: 20, flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}
+                        onClick={(e) => router.push('/courses/' + item?.category?.uuid + '?cid=' + course?.uuid)}
+                      >
+                        <User
+                          name={course?.name}
+                          description={course?.lessons + ' lessons | ' + course?.completed + '% completed'}
+                          classNames={{
+                            wrapper: 'ml-2',
+                            description: 'mt-1',
+                            name: 'light'
+                          }}
+                          slot='name'
+                          avatarProps={{
+                            src: course?.pic,
+                            radius: 'sm'
+                          }}
+                        />
+                        <ChevronRightIcon size='20' color='var(--fourth-color)' />
+                      </div>
+                    );
+                  })
+                  :
+                  null
+                }
+              </AccordionItem>
+            );
+          })
+          }
+        </Accordion>
+      )
     }
   }
 
   const onRefreshData = (e) => {
-    setIsFetch(false);
-    setChannels([]);
-    setFavChannels([]);
-    setInprogressChannels([]);
     if (selectedTab?.Value == tabValues.categories) {
-      getCategoryData();
+      setIsFetchChannels(false);
+      setChannels([]);
+      getCategoryData(false);
     }
     else if (selectedTab?.Value == tabValues.favorites) {
+      setIsFetchFavChannels(false);
+      setFavChannels([]);
       getFavoriteData();
     }
     else if (selectedTab?.Value == tabValues.inProgress) {
+      setIsFetchInProgressChannels(false);
+      setInprogressChannels([]);
       getInProgressData();
+    }
+  }
+
+  useEffect(() => {
+    localStorage.setItem("theme", JSON.stringify(mountTheme));
+  }, [mountTheme]);
+
+  const onChangeTheme = (theme) => {
+    if (theme == 'light') {
+      setMountTheme("light");
+      lightTheme();
+    } else {
+      setMountTheme("dark");
+      darkTheme();
+    }
+    changeTheme(props.user.authToken, theme);
+  }
+
+  const changeTheme = async (authToken, theme) => {
+    const response = await fetch(apiURL + 'api/v1/user/theme', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify({
+        theme: theme
+      })
+    });
+    const rsp = await response.json();
+    console.log("rsp --------------------------------");
+    console.log(response);
+    console.log(rsp);
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload) {
+        if (theme == 'dark') {
+          toast("Dark Mode applied!");
+        } else {
+          toast("Light Mode applied!");
+        }
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      }
     }
   }
 
@@ -264,7 +431,7 @@ function Courses(props) {
             name={props.user?.user?.first_name + " " + props.user?.user?.last_name}
             description={props.user?.user?.username}
             avatarProps={{
-              src: props.user?.user?.avatar ? props.user?.user?.avatar : "/assets/hp.jpg"
+              src: props.user?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.avatar) : "/assets/hp.jpg"
             }}
             classNames={{
               base: 'user-info-mc2nw',
@@ -276,18 +443,30 @@ function Courses(props) {
             onClick={onProfileClick}
           />
         </div>
-        <div className="flex justify-between items-center">
-          <div style={{ cursor: "pointer" }} onClick={onRefreshData}>
+
+        <div className="flex justify-between items-center" >
+          {
+            mountTheme === "dark" ?
+              <div style={{ cursor: "pointer" }} onClick={(e) => onChangeTheme('light')}>
+                <MoonIcon className="refresh" />
+              </div>
+              :
+              <div style={{ cursor: "pointer" }} onClick={(e) => onChangeTheme('dark')}>
+                <SunIcon className="refresh" />
+              </div>
+          }
+          <div style={{ cursor: "pointer", marginLeft: '2rem' }} onClick={onRefreshData}>
             <RefreshCcw className="refresh" />
           </div>
         </div>
+
       </div>
       <div className='content-92acn3a'>
         <h2 className='title-mzj3dam'>Cryptocurrency Investing Learning Center</h2>
 
         <div className='tab-nav-n38can'>
           {Tabs.map((tab, index) => {
-            const isSelected = selectedTab.Value == tab.Value;
+            const isSelected = selectedTab?.Value == tab.Value;
             return (
               <div key={index} style={{ flex: 1, display: 'flex', flexDirection: 'column', cursor: 'pointer', textAlign: 'center' }} onClick={(e) => onSelectTab(tab)}>
                 <div className='tab-bar-button-zsmk73'>
@@ -301,13 +480,7 @@ function Courses(props) {
 
         <div className="cards-row-82ncaj23 row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" >
 
-          {isFetch ?
-            renderChannelContent()
-            :
-            <div style={{ width: '100%' }}>
-              <Loading />
-            </div>
-          }
+          {renderChannelContent()}
 
         </div>
       </div>

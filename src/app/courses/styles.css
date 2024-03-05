@@ -174,14 +174,39 @@
 .card-img-9ama2f {
     height: 65%;
 }
-.light{
+
+.light {
+    color: var(--fourth-color) !important;
+}
+
+.refresh {
     color: var(--fourth-color);
 }
-.refresh{
-    color: var(--fourth-color);
-}
-.dark{
+
+.dark {
     color: black !important;
+}
+
+.group.is-splitted .group-\[\.is-splitted\]\:bg-content1 {
+    background-color: var(--primary-color) !important;
+}
+
+.accordion-93asnc {
+    width: 66%;
+    align-self: center;
+    padding-left: 0px !important;
+    background-color: var(--primary-color) !important;
+
+    h2 {
+        margin-bottom: 0px !important;
+        margin-left: 6px;
+        margin-right: 6px;
+        /* background-color: var(--primary-color) !important; */
+    }
+
+    section {
+        /* background-color: var(--primary-color) !important; */
+    }
 }
 
 @media screen and (max-width: 500px) {
