@@ -266,7 +266,7 @@ function Courses(props) {
                   title: 'light'
                 }}
                 onClick={(e) => {
-                  router.push('/courses/' + item?.uuid + '?cid=' + item?.uuid)
+                  router.push('/courses/' + item?.category_uuid + '?cid=' + item?.uuid)
                 }}
                 key={index}
                 aria-label={item?.name}
