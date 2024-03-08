@@ -72,15 +72,23 @@
 }
 
 .tab-bar-button-zsmk73 {
+    height: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: 6px;
+
     span {
         color: var(--fourth-color) !important;
         font-weight: 500;
         text-align: center;
-        font-size: 15px !important;
+        font-size: 18px !important;
     }
 
     span:hover {
         color: var(--secondary-color) !important;
+        font-size: 20px !important;
+        transition: ease-in-out 0.3s;
     }
 
     .active {

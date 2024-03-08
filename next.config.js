@@ -1,10 +1,13 @@
+import { apiURLDomain } from "./src/constant/global";
+
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
     reactStrictMode: false,
     swcMinify: true,
     images: {
         domains: [
-            'cdn.discordapp.com', 'discordapp.com', '13.59.98.200'
+            'cdn.discordapp.com', 'discordapp.com', apiURLDomain
         ],
         remotePatterns: [
             {

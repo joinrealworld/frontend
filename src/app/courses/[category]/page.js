@@ -64,7 +64,15 @@ function CoursesByCategory(props) {
   useEffect(() => {
     if (props?.searchParams?.lid && props?.searchParams?.lid != selectedLesson?.uuid) {
       console.log("calle......");
-      let lesson = props?.searchParams?.lid ? selectedCourse?.data?.find(c => c.uuid === props?.searchParams?.lid) : selectedCourse?.data?.[0];
+      let lesson = selectedCourse?.data?.[0];
+      if (props?.searchParams?.lid && selectedCourse?.data?.some(c => c.uuid === props?.searchParams?.lid)) {
+        lesson = selectedCourse?.data?.find(c => c.uuid === props?.searchParams?.lid);
+      } else {
+        let index = Math.min(selectedCourse?.data?.findIndex(c => c.uuid === selectedCourse?.last_checked) + 1, selectedCourse?.data?.length - 1);
+        if (index > -1 && selectedCourse?.data?.[index] != null) {
+          lesson = selectedCourse?.data?.[index];
+        }
+      }
       if (lesson?.section == Sections.quiz) {
         getQuizFromId(selectedCourse?.uuid, lesson?.quiz_id, () => {
           setSelectedLesson(lesson);
@@ -75,7 +83,7 @@ function CoursesByCategory(props) {
         setSelectedLesson(lesson);
       }
     }
-  }, [props?.searchParams?.lid]);
+  }, [props?.searchParams?.lid, selectedCourse?.uuid]);
 
   const getCoursesByCategory = async () => {
     if (category) {
@@ -123,21 +131,16 @@ function CoursesByCategory(props) {
         setIsCourseDataFetch(true);
 
         if (isNavigateToLesson) {
-          let paramLesson = rsp.payload?.data?.find(c => c.uuid === props?.searchParams?.lid);
-          let lesson = props?.searchParams?.lid && paramLesson && paramLesson?.uuid ? paramLesson : rsp.payload?.data?.[0];
-          if (!selectedLesson) {
-            if (lesson?.section == Sections.quiz) {
-              getQuizFromId(rsp.payload?.uuid, lesson?.quiz_id, () => {
-                setSelectedLesson(lesson);
-              });
-            } else {
-              setCurrentQuiz(null);
-              setIsQuizFetch(false);
-              setSelectedLesson(lesson);
-            }
+          let lesson = rsp.payload?.data?.[0];
+          if (props?.searchParams?.lid && rsp.payload?.data?.some(c => c.uuid === props?.searchParams?.lid)) {
+            lesson = rsp.payload?.data?.find(c => c.uuid === props?.searchParams?.lid);
           } else {
-            router.replace('?cid=' + courseId + '&lid=' + lesson?.uuid);
+            let index = Math.min(rsp.payload?.data?.findIndex(c => c.uuid === rsp.payload?.last_checked) + 1, rsp.payload?.data?.length - 1);
+            if (index > -1 && rsp.payload?.data?.[index] != null) {
+              lesson = rsp.payload?.data?.[index];
+            }
           }
+          router.replace('?cid=' + courseId + '&lid=' + lesson?.uuid);
         }
 
       } else {
@@ -256,7 +259,7 @@ function CoursesByCategory(props) {
     if (response.status >= 200 && response.status < 300) {
       if (rsp.payload) {
         let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
-        let newIndex = Math.min(selectedLessonIndex + 1, selectedCourse?.data?.length);
+        let newIndex = Math.min(selectedLessonIndex + 1, selectedCourse?.data?.length - 1);
         let newLesson = selectedCourse?.data?.[newIndex];
         if (selectedCourse && selectedCourse?.uuid) {
           router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);

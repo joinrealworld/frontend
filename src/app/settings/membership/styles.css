@@ -32,6 +32,14 @@
     margin-top: 10px;
 }
 
+.modal-title-8bca382 {
+    color: var(--fourth-color);
+}
+
+.text-color-73bab {
+    color: var(--fourth-color);
+}
+
 .info-title-mczw72b {
     margin-bottom: 4px;
     color: var(--fourth-color);
@@ -71,7 +79,7 @@
     font-size: 13px;
 }
 
-.info-value-ma82ba {
+.info-value-7cban2d {
     color: var(--fourth-color);
     font-weight: 500;
     font-size: 18px;
@@ -79,14 +87,14 @@
 
 .card-number-ma82ba {
     color: var(--fourth-color);
-    font-weight: 700;
-    font-size: 18px;
+    font-weight: 500;
+    font-size: 14.5px;
 }
 
 .card-expiry-ma82ba {
     color: var(--fourth-color);
-    font-weight: 500;
-    font-size: 18px;
+    font-weight: 400;
+    font-size: 14.5px;
 }
 
 .card-logo-3mcal2 {
@@ -121,7 +129,7 @@
 }
 
 .card-input-3mac82n:focus {
-    box-shadow: 0 0 10px 0 var(--fourth-color);
+    box-shadow: 0 0 10px 0 var(--third-color);
 }
 
 .modal-header-mcan3 {
