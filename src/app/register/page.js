@@ -109,7 +109,11 @@ function Register(props) {
           "password": password
         })
       });
+      console.log("response");
+      console.log(response);
       const rsp = await response.json();
+      console.log("rsp--------------------------------");
+      console.log(rsp);
       if (response.status >= 200 && response.status < 300) {
         console.log("rsp: ", rsp);
         if (rsp.payload) {
@@ -124,6 +128,8 @@ function Register(props) {
         setIsLoading(false);
       }
     } catch (error) {
+      console.log("error--------------------------------");
+      console.log(error);
       toast("Something went wrong!");
       setIsLoading(false);
     }
