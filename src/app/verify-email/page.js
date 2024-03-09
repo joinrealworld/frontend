@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { CircularProgress } from '@nextui-org/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button, CircularProgress } from '@nextui-org/react';
 import Image from 'next/image';
 
 import './styles.css';
@@ -11,6 +11,7 @@ import { apiURL, handleAPIError } from '@/constant/global';
 
 function VerifyEmail(props) {
 
+  const router = useRouter();
   const { get } = useSearchParams();
 
   const [result, setResult] = useState("Wait for confirming...");
@@ -69,6 +70,12 @@ function VerifyEmail(props) {
             <CircularProgress size='lg' color="warning" aria-label="Loading..." />
           }
           <h3 className='form-title-2kncasz'>{result}</h3>
+        </div>
+
+        <div>
+          <Button className="main-button-72bahv2" radius='sm' size='lg' type='submit' color='' onClick={(e) => router.replace('/login')}>
+            Log In
+          </Button>
         </div>
       </div>
     </div >
