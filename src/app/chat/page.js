@@ -84,7 +84,7 @@ function Chat(props) {
                 <div className="sidebar-3marlva">
                     <Link href={'/settings'} className="childWrapper-jb">
                         <div className="childWrapper-1j_1ub">
-                            <Image className="avatar-2mllmv4a" alt="Avatar" src="/assets/hp.jpg" width={46} height={46} />
+                            <Image className="avatar-2mllmv4a" alt="Avatar" src="/assets/person.png" width={46} height={46} />
                         </div>
                     </Link>
                     <hr className="minihr-aawlmv4a" />
@@ -267,7 +267,7 @@ function Chat(props) {
 
                     <div className="account-user-39cmaz">
                         <Link href={'/settings'} className='user-30cmzmc'>
-                            <Image className="avatar-2mllmv4a" alt="Avatar" src="/assets/hp.jpg" width={46} height={46} />
+                            <Image className="avatar-2mllmv4a" alt="Avatar" src="/assets/person.png" width={46} height={46} />
                             <div className="channels-footer-details-23mas">
                                 <span className="username-312c02qena">Harsh Patel</span>
                                 <span className="tag-kla3mca2">hp120</span>

@@ -451,7 +451,7 @@ function Account(props) {
               <Image
                 className="avatar-93nasj"
                 alt="Avatar"
-                src={user?.avatar ? encodeURI(apiURL.slice(0, -1) + user?.avatar) : "/assets/hp.jpg"}
+                src={user?.avatar ? encodeURI(apiURL.slice(0, -1) + user?.avatar) : "/assets/person.png"}
                 width={46}
                 height={46}
               />

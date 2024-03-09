@@ -17,7 +17,7 @@ function VerifyEmail(props) {
   const [isFetch, setIsFetch] = useState(false);
 
   useEffect(() => {
-    if (!get('t')) {
+    if (!get('e')) {
       setIsFetch(false);
       setResult("Invalid URL Request!");
     } else {
@@ -27,7 +27,7 @@ function VerifyEmail(props) {
 
   const onVerifyEmail = async () => {
     try {
-      const response = await fetch(apiURL + 'api/v1/user/verify_email?t=' + get('t'), {
+      const response = await fetch(apiURL + 'api/v1/user/verify_email?t=' + get('e'), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

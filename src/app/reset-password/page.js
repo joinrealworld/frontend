@@ -21,6 +21,13 @@ function ResetPassword(props) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (!get('t')) {
+      toast("Invalid request!");
+      router.push('/');
+    }
+  }, []);
+
   const onResetPasswordClick = async () => {
     try {
       setIsLoading(true);
@@ -52,14 +59,6 @@ function ResetPassword(props) {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    // zzz
-    if (!get('t')) {
-      toast("Invalid request!");
-      router.push('/');
-    }
-  }, []);
 
   return (
     <div className="main-body-pa23cs absolute inset-0 flex row justify-content-lg-center justify-content-md-center">

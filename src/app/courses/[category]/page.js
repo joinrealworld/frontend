@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { User, Progress, Button, RadioGroup, useRadio, cn, VisuallyHidden, Spinner } from "@nextui-org/react";
 import Link from "next/link";
 import $ from "jquery";
@@ -23,6 +23,12 @@ const Sections = {
 }
 
 function CoursesByCategory(props) {
+
+  const { get } = useSearchParams();
+  const searchParams = {
+    cid: get('cid'),
+    lid: get('lid'),
+  }
 
   const [category, setCategory] = useState(props.params.category);
   const [isCoursesFetch, setIsCoursesFetch] = useState(false);
@@ -56,17 +62,17 @@ function CoursesByCategory(props) {
   }, [props.user.isLoggedIn]);
 
   useEffect(() => {
-    if (props?.searchParams?.cid && props?.searchParams?.cid != selectedCourse?.uuid) {
-      getCourseDataById(props?.searchParams?.cid);
+    if (searchParams?.cid && searchParams?.cid != selectedCourse?.uuid) {
+      getCourseDataById(searchParams?.cid);
     }
-  }, [props?.searchParams?.cid]);
+  }, [searchParams?.cid]);
 
   useEffect(() => {
-    if (props?.searchParams?.lid && props?.searchParams?.lid != selectedLesson?.uuid) {
+    if (searchParams?.lid && searchParams?.lid != selectedLesson?.uuid) {
       console.log("calle......");
       let lesson = selectedCourse?.data?.[0];
-      if (props?.searchParams?.lid && selectedCourse?.data?.some(c => c.uuid === props?.searchParams?.lid)) {
-        lesson = selectedCourse?.data?.find(c => c.uuid === props?.searchParams?.lid);
+      if (searchParams?.lid && selectedCourse?.data?.some(c => c.uuid === searchParams?.lid)) {
+        lesson = selectedCourse?.data?.find(c => c.uuid === searchParams?.lid);
       } else {
         let index = Math.min(selectedCourse?.data?.findIndex(c => c.uuid === selectedCourse?.last_checked) + 1, selectedCourse?.data?.length - 1);
         if (index > -1 && selectedCourse?.data?.[index] != null) {
@@ -83,7 +89,7 @@ function CoursesByCategory(props) {
         setSelectedLesson(lesson);
       }
     }
-  }, [props?.searchParams?.lid, selectedCourse?.uuid]);
+  }, [searchParams?.lid, selectedCourse?.uuid]);
 
   const getCoursesByCategory = async () => {
     if (category) {
@@ -100,7 +106,7 @@ function CoursesByCategory(props) {
           setCourses(rsp.payload);
           setOriginalCourses(rsp.payload);
           setIsCoursesFetch(true);
-          if (!props?.searchParams?.cid) {
+          if (!searchParams?.cid) {
             router.replace('?cid=' + rsp.payload?.[0]?.uuid);
           }
         } else {
@@ -132,8 +138,8 @@ function CoursesByCategory(props) {
 
         if (isNavigateToLesson) {
           let lesson = rsp.payload?.data?.[0];
-          if (props?.searchParams?.lid && rsp.payload?.data?.some(c => c.uuid === props?.searchParams?.lid)) {
-            lesson = rsp.payload?.data?.find(c => c.uuid === props?.searchParams?.lid);
+          if (searchParams?.lid && rsp.payload?.data?.some(c => c.uuid === searchParams?.lid)) {
+            lesson = rsp.payload?.data?.find(c => c.uuid === searchParams?.lid);
           } else {
             let index = Math.min(rsp.payload?.data?.findIndex(c => c.uuid === rsp.payload?.last_checked) + 1, rsp.payload?.data?.length - 1);
             if (index > -1 && rsp.payload?.data?.[index] != null) {

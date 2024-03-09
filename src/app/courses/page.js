@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { ChevronRightIcon, MoonIcon, RefreshCcw, SunIcon, Trash2Icon } from 'lucide-react';
@@ -28,6 +28,11 @@ const Tabs = [
 
 function Courses(props) {
 
+  const { get } = useSearchParams();
+  const searchParams = {
+    tab: get('tab'),
+  }
+
   const [selectedTab, setSelectedTab] = useState(null);
   const [channels, setChannels] = useState([]);
   const [isFetchChannels, setIsFetchChannels] = useState(false);
@@ -47,18 +52,18 @@ function Courses(props) {
     if (!props.user.isLoggedIn) {
       router.push('/login');
     } else {
-      console.log(Number(props.searchParams?.tab));
+      console.log(Number(searchParams?.tab));
       console.log(tabValues.categories);
-      if (props.searchParams?.tab && Number(props.searchParams?.tab) > 0) {
+      if (searchParams?.tab && Number(searchParams?.tab) > 0) {
         console.log("callled...");
-        setSelectedTab(Tabs.find(d => d.Value == Number(props.searchParams?.tab)));
-        if (Number(props.searchParams?.tab) == tabValues.categories) {
+        setSelectedTab(Tabs.find(d => d.Value == Number(searchParams?.tab)));
+        if (Number(searchParams?.tab) == tabValues.categories) {
           getCategoryData(isFetchChannels);
         }
-        else if (Number(props.searchParams?.tab) == tabValues.favorites) {
+        else if (Number(searchParams?.tab) == tabValues.favorites) {
           getFavoriteData(isFetchFavChannels);
         }
-        else if (Number(props.searchParams?.tab) == tabValues.inProgress) {
+        else if (Number(searchParams?.tab) == tabValues.inProgress) {
           getInProgressData(isFetchInProgressChannels);
         }
       } else {
@@ -68,19 +73,19 @@ function Courses(props) {
   }, []);
 
   useEffect(() => {
-    if (props.searchParams?.tab && Number(props.searchParams?.tab) > 0 && Number(props.searchParams?.tab) != selectedTab?.Value) {
-      setSelectedTab(Tabs.find(d => d.Value == Number(props.searchParams?.tab)));
-      if (Number(props.searchParams?.tab) == tabValues.categories) {
+    if (searchParams?.tab && Number(searchParams?.tab) > 0 && Number(searchParams?.tab) != selectedTab?.Value) {
+      setSelectedTab(Tabs.find(d => d.Value == Number(searchParams?.tab)));
+      if (Number(searchParams?.tab) == tabValues.categories) {
         getCategoryData(isFetchChannels);
       }
-      else if (Number(props.searchParams?.tab) == tabValues.favorites) {
+      else if (Number(searchParams?.tab) == tabValues.favorites) {
         getFavoriteData(isFetchFavChannels);
       }
-      else if (Number(props.searchParams?.tab) == tabValues.inProgress) {
+      else if (Number(searchParams?.tab) == tabValues.inProgress) {
         getInProgressData(isFetchInProgressChannels);
       }
     }
-  }, [props.searchParams?.tab]);
+  }, [searchParams?.tab]);
 
   const getCategoryData = async (isFetch = isFetchChannels) => {
     if (isFetch) return;
@@ -453,7 +458,7 @@ function Courses(props) {
             name={props.user?.user?.first_name + " " + props.user?.user?.last_name}
             description={props.user?.user?.username}
             avatarProps={{
-              src: props.user?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.avatar) : "/assets/hp.jpg"
+              src: props.user?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.avatar) : "/assets/person.png"
             }}
             classNames={{
               base: 'user-info-mc2nw',

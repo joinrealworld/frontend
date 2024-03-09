@@ -25,9 +25,9 @@ function Profile(props) {
     const [firstName, setFirstName] = useState(props.user?.user?.first_name ?? '');
     const [lastName, setLastName] = useState(props.user?.user?.last_name ?? '');
     const [bio, setBio] = useState(props.user?.user?.bio ?? '');
-    const [profilePic, setProfilePic] = useState(props.user?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.avatar) : "/assets/hp.jpg");
+    const [profilePic, setProfilePic] = useState(props.user?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.avatar) : "/assets/person.png");
     const [isProfilePicLoading, setIsProfilePicLoading] = useState(false);
-    const [profileCover, setProfileCover] = useState(props.user?.user?.background ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.background) : "/assets/hp.jpg"); // zzz
+    const [profileCover, setProfileCover] = useState(props.user?.user?.background ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.background) : "/assets/cover-4.jpg");
     const [isProfileCoverLoading, setIsProfileCoverLoading] = useState(false);
     const [userStatus, setUserStatus] = useState(props.user?.user?.status ?? '');
     const [isStatusLoading, setIsStatusLoading] = useState(false);
@@ -62,8 +62,8 @@ function Profile(props) {
                 setLastName(rsp.payload?.last_name);
                 setBio(rsp.payload?.bio);
                 setUserStatus(rsp.payload?.status);
-                setProfilePic(rsp.payload?.avatar ? encodeURI(apiURL.slice(0, -1) + rsp.payload?.avatar) : "/assets/hp.jpg");
-                setProfileCover(rsp.payload?.background ? encodeURI(apiURL.slice(0, -1) + rsp.payload?.background) : "/assets/hp.jpg");
+                setProfilePic(rsp.payload?.avatar ? encodeURI(apiURL.slice(0, -1) + rsp.payload?.avatar) : "/assets/person.png");
+                setProfileCover(rsp.payload?.background ? encodeURI(apiURL.slice(0, -1) + rsp.payload?.background) : "/assets/cover-4.jpg");
                 dispatch(props.actions.setUser({
                     user: rsp.payload
                 }));
