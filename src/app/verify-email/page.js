@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 import './styles.css';
 import connect from '@/components/ConnectStore/connect';
-import { apiURL, handleAPIError } from '@/constant/global';
+import { apiURL } from '@/constant/global';
 
 function VerifyEmail(props) {
 
@@ -41,11 +41,15 @@ function VerifyEmail(props) {
         if (rsp.payload) {
           setResult("Thank you! For confirming your email address.");
         } else {
-          handleAPIError(rsp);
+          if (rsp.payload && typeof rsp.payload === 'string') {
+            setResult(rsp.payload + "");
+          }
         }
         setIsFetch(true);
       } else {
-        handleAPIError(rsp);
+        if (rsp.payload && typeof rsp.payload === 'string') {
+          setResult(rsp.payload + "");
+        }
         setIsFetch(true);
       }
     } catch (error) {
