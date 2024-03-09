@@ -97,7 +97,7 @@ function Register(props) {
   const onRegister = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(apiURL + 'api/v1/user/login', {
+      const response = await fetch(apiURL + 'api/v1/user/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
