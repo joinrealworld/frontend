@@ -31,7 +31,7 @@ function ResetPassword(props) {
         },
         body: JSON.stringify({
           "password": password,
-          "token": get('t'), // zzz
+          "token": get('t'),
         })
       });
       const rsp = await response.json();

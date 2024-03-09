@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 import './styles.css';
 import connect from '@/components/ConnectStore/connect';
-import { apiURL } from '@/constant/global';
+import { apiURL, handleAPIError } from '@/constant/global';
 
 function VerifyEmail(props) {
 
@@ -17,7 +17,8 @@ function VerifyEmail(props) {
   const [isFetch, setIsFetch] = useState(false);
 
   useEffect(() => {
-    if (!get('o') || !get('e')) {
+    if (!get('t')) {
+      setIsFetch(false);
       setResult("Invalid URL Request!");
     } else {
       onVerifyEmail();
@@ -26,37 +27,24 @@ function VerifyEmail(props) {
 
   const onVerifyEmail = async () => {
     try {
-      const response = await fetch(apiURL + 'api/v1/user/verify_otp', {
-        method: 'POST',
+      const response = await fetch(apiURL + 'api/v1/user/verify_email?t=' + get('t'), {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          "otp": get('o'), // zzz
-          "email": get('e'), // zzz
-        })
+        }
       });
       console.log("response--------------------------------");
       console.log(response);
+      const rsp = await response.json();
       if (response.status >= 200 && response.status < 300) {
-        const rsp = await response.json();
         if (rsp.payload) {
-          // zzz
           setResult("Thank you! For confirming your email address.");
-          setIsFetch(true);
-
-
         } else {
-          if (rsp.message && typeof rsp.message === 'string') {
-            setResult("Invalid URL Request!");
-            setIsFetch(true);
-          } else {
-            setResult("Invalid URL Request!");
-            setIsFetch(true);
-          }
+          handleAPIError(rsp);
         }
+        setIsFetch(true);
       } else {
-        setResult("Invalid URL Request!");
+        handleAPIError(rsp);
         setIsFetch(true);
       }
     } catch (error) {
