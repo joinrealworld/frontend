@@ -12,7 +12,7 @@ import { Button, Spinner } from '@nextui-org/react';
 import './styles.css';
 import ValidatedForm from "@/components/ValidatedForm";
 import connect from '@/components/ConnectStore/connect';
-import { appName, handleAPIError } from "@/constant/global";
+import { appName, apiURL, handleAPIError } from "@/constant/global";
 
 const SubscriptionPlans = [
   {
