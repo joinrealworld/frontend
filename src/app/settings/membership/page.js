@@ -101,7 +101,7 @@ function Membership(props) {
                   <GemIcon color="var(--fourth-color)" size={25} />
                   <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
                     <span className="info-lable-7cban2d">
-                      plan
+                      Plan
                     </span>
                     <span className="info-value-7cban2d">
                       Comet

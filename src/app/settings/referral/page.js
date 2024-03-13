@@ -1,21 +1,23 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { FacebookIcon, InstagramIcon, MailIcon, MenuIcon, TwitterIcon } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { FacebookIcon, MailIcon, MenuIcon } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import { EmailShareButton, FacebookShareButton, TwitterShareButton, WhatsappShareButton } from "react-share";
 import { useRouter } from "next/navigation";
+import Image from 'next/image';
 import $ from 'jquery';
 
 import "./../styles.css";
 import "./style.css";
 import SettingsMenu from "@/components/SettingsMenu";
 import connect from '@/components/ConnectStore/connect';
+import { frontEndURL } from '@/constant/global';
 
 function Referral(props) {
 
   const router = useRouter();
 
-  const referralURL = `https://www.therealworld.com/?ref=${props.user?.user?.referral_code}`;
+  const referralURL = `${frontEndURL}?ref=${props.user?.user?.referral_code}`;
 
   const [copyText, setCopyText] = useState("");
 
@@ -51,7 +53,7 @@ function Referral(props) {
         </div>
         <div className="content-3mcnaj3zcs">
 
-          <h5 style={{ color: "var(--fourth-color)" }}>Refer a friend</h5>
+          <h5 style={{ color: "var(--fourth-color)" }}>Refer a Friend</h5>
 
           <b className="info-title-basg2ba">Share your site by copying the URL and sending it to your friends.</b>
 
@@ -68,7 +70,7 @@ function Referral(props) {
             <p style={{ marginBottom: 0, color: 'var(--fourth-color)' }}>Share to</p>
             <div className="social-icon-3nckan">
               <WhatsappShareButton url={referralURL}>
-                <InstagramIcon color="#ededed" size={20} />
+                <Image alt="WhatsApp" src="/assets/WhatsappIcon.png" width={18} height={18} />
               </WhatsappShareButton>
             </div>
             <div className="social-icon-3nckan">
@@ -78,7 +80,7 @@ function Referral(props) {
             </div>
             <div className="social-icon-3nckan">
               <TwitterShareButton url={referralURL}>
-                <TwitterIcon color="#ededed" size={20} />
+                <Image alt="X" src="/assets/XIcon.png" width={16} height={16} />
               </TwitterShareButton>
             </div>
             <div className="social-icon-3nckan">

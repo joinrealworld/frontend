@@ -360,12 +360,13 @@ summary:focus>svg {
     cursor: pointer;
 }
 
+/* 
 .avatar-2mllmv4a img {
     width: 15%;
     height: auto;
     border-radius: 50%;
     margin-top: 7px;
-}
+} */
 
 .info {
     position: absolute;
@@ -434,12 +435,6 @@ main {
 .tag-kla3mca2 {
     color: rgba(#FFF, 0.45);
     font-size: 0.7rem;
-}
-
-.avatar-2mllmv4a {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
 }
 
 .vert-container-23mazz {

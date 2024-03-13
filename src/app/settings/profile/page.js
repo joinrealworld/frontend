@@ -324,6 +324,7 @@ function Profile(props) {
                         placeholder="Enter status"
                         autoComplete="off"
                         value={userStatus}
+                        maxLength={50}
                         onChange={(event) =>
                             setUserStatus(event.target.value)
                         }
@@ -345,6 +346,7 @@ function Profile(props) {
                         className="user-input-3mac82n"
                         style={{ height: 100 }}
                         aria-multiline
+                        maxLength={250}
                         placeholder="Enter The Bio"
                         autoComplete="off"
                         value={bio}

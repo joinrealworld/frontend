@@ -5,7 +5,7 @@ const nextConfig = {
     swcMinify: true,
     images: {
         domains: [
-            'cdn.discordapp.com', 'discordapp.com', 'onrender.com'
+            'cdn.discordapp.com', 'discordapp.com', 'onrender.com', 'joinrealworld-backend.onrender.com'
         ],
         remotePatterns: [
             {

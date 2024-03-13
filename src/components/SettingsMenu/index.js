@@ -13,7 +13,7 @@ export const SettingsMenuOptions = [
   { Text: "Membership", Value: 2, Route: "/settings/membership", Icon: (isSelected) => (<AwardIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
   { Text: "Profile", Value: 3, Route: "/settings/profile", Icon: (isSelected) => (<Aperture color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
   { Text: "Preference", Value: 4, Route: "/settings/preference", Icon: (isSelected) => (<Edit color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
-  { Text: "Refer a friend", Value: 5, Route: "/settings/referral", Icon: (isSelected) => (<TargetIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
+  { Text: "Refer a Friend", Value: 5, Route: "/settings/referral", Icon: (isSelected) => (<TargetIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
   { Text: "Feedback", Value: 6, Route: "/settings/feedback", Icon: (isSelected) => (<LifeBuoyIcon color={isSelected ? "#FFFFFF" : "var(--fourth-color)"} size={22} style={{ marginRight: 12 }} />), },
 ];
 
@@ -35,7 +35,6 @@ function SettingsMenu(props) {
 
   useEffect(() => {
     const onResizeWindow = (e) => {
-      console.log("callled.....", window.innerWidth);
       if (window.innerWidth < 800) {
         $('#setting-menu').addClass("invisible");
         $('#setting-menu').removeClass("visible");
