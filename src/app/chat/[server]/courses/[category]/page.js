@@ -503,8 +503,8 @@ function CoursesByCategory(props) {
         <>
           {currentQuiz.map((quiz, i) => {
             return (
-              <>
-                <span key={i} className="lesson-description-mcajn2">
+              <div key={i}>
+                <span className="lesson-description-mcajn2">
                   {i + 1}. {quiz?.question}
                 </span>
                 <RadioGroup
@@ -530,7 +530,7 @@ function CoursesByCategory(props) {
                   })}
                 </RadioGroup>
                 {selectedQuizAnswerError && !selectedQuizAnswer.some(c => c?.question == quiz?.question) ? <span className="option-error-ncka2nx">{selectedQuizAnswerError}</span> : null}
-              </>
+              </div>
             );
           })}
 

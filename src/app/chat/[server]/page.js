@@ -1513,7 +1513,7 @@ function Chat(props) {
                                             <span className='poll-options-label-72bak'>Options:</span>
                                             {pollOptions.map((option, index) => {
                                                 return (
-                                                    <div style={{ position: 'relative', flexDirection: 'column', justifyContent: 'center', display: 'flex' }}>
+                                                    <div key={index} style={{ position: 'relative', flexDirection: 'column', justifyContent: 'center', display: 'flex' }}>
                                                         {(index >= 2 && index <= 6) &&
                                                             <XIcon
                                                                 color="#EC5800"
