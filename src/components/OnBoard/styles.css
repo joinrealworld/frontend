@@ -31,7 +31,9 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    padding-top: 80px;
+    padding-bottom: 32px;
+    justify-content: space-between;
 }
 
 .side-button-v92mc2 {
@@ -39,12 +41,12 @@
     width: 100%;
     border: 0;
     margin-top: 10px;
-    background: rgba(200, 200, 200, 0.4);
-    border-radius: 7px;
-    padding: 15px;
+    border-radius: 5px !important;
+    height: 60px !important;
     color: #dedede;
-    font-weight: 500;
-    font-size: 15px;
+    font-weight: 500 !important;
+    font-size: 15.5px !important;
+    letter-spacing: 0.7px;
     -webkit-transition: all 0.3 ease;
     transition: all 0.4s ease-in-out;
     cursor: pointer;
@@ -60,15 +62,15 @@
 
 .main-button-32mci3 {
     outline: 0;
-    background: #b78727;
+    background: #ecc879;
     width: 100%;
     border: 0;
     margin-top: 10px;
-    border-radius: 7px;
-    padding: 15px;
-    color: #fff;
-    font-weight: 500;
-    font-size: 15px;
+    border-radius: 5px !important;
+    height: 60px !important;
+    color: #343434;
+    font-weight: 600 !important;
+    font-size: 16px !important;
     -webkit-transition: all 0.3 ease;
     transition: all 0.4s ease-in-out;
     cursor: pointer;
@@ -77,8 +79,6 @@
 .main-button-32mci3:hover,
 .main-button-32mci3:active,
 .main-button-32mci3:focus {
-    background: #b78727;
-    color: #dedede;
-    box-shadow: 0 0 10px 0 #b78727;
-    font-size: 16px;
+    background: #e3ae3a;
+    color: #343434;
 }

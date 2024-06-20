@@ -11,44 +11,10 @@ import { Button, Spinner } from '@nextui-org/react';
 
 import './styles.css';
 import ValidatedForm from "@/components/ValidatedForm";
+import { lightTheme } from '@/themes/lightTheme';
+import { darkTheme } from '@/themes/darkTheme';
 import connect from '@/components/ConnectStore/connect';
 import { appName, apiURL, handleAPIError } from "@/constant/global";
-
-const SubscriptionPlans = [
-  {
-    id: 'card-basic-plan',
-    price: '$49.99',
-    duration: '1 month',
-    name: 'Cadet',
-    description: 'A first step towards breaking free',
-    benefits: [],
-    savePercentage: 0,
-  },
-  {
-    id: 'card-standard-plan',
-    price: '$250',
-    duration: '6 months',
-    name: 'Contender',
-    description: 'Six months to harness your power',
-    benefits: [
-      { text: 'Daily coin bonus' }
-    ],
-    savePercentage: 17,
-  },
-  {
-    id: 'card-premium-plan',
-    price: '$850',
-    duration: '2 years',
-    name: 'Champion',
-    description: 'Two years of complete commitment',
-    benefits: [
-      { text: 'Maximum daily coin bonus' },
-      { text: 'Exclusive features' },
-      { text: 'Special emergency broadcasts' }
-    ],
-    savePercentage: 29,
-  },
-]
 
 const Steps = {
   personalInfo: 1,
@@ -64,6 +30,8 @@ function Register(props) {
   useEffect(() => {
     if (props.user.isLoggedIn) {
       router.push('/');
+    } else {
+      getSubscriptionList();
     }
   }, []);
 
@@ -75,14 +43,15 @@ function Register(props) {
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCVV] = useState('');
-  const [billingAddress, setBillingAddress] = useState('');
+  const [cardHolder, setCardHolder] = useState('');
 
-  const [selectedPlan, setSelectedPlan] = useState(SubscriptionPlans[0]);
+  const [plans, setPlans] = useState([]);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedStep, setSelectedStep] = useState(Steps.personalInfo);
   const [isLoading, setIsLoading] = useState(false);
 
   const onPersonalInfoNext = async () => {
-    setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length));
+    checkEmailExistOrNot();
   };
 
   const onPlanSelectionNext = async () => {
@@ -93,6 +62,57 @@ function Register(props) {
     setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length));
     onRegister();
   };
+
+  const getSubscriptionList = async () => {
+    try {
+      const response = await fetch(apiURL + 'api/v1/payment/fetch_prices', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const rsp = await response.json();
+      if (response.status >= 200 && response.status < 300) {
+        if (rsp.payload && rsp.payload.data) {
+          let prices = rsp.payload.data;
+          prices.sort((a, b) => a.unit_amount - b.unit_amount);
+          setPlans(prices);
+          setSelectedPlan(prices[0]);
+        } else {
+          handleAPIError(rsp);
+        }
+      } else {
+        handleAPIError(rsp);
+      }
+    } catch (error) {
+      toast("Something went wrong!");
+    }
+  }
+
+  const checkEmailExistOrNot = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(apiURL + 'api/v1/user/check/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "email": emailAddress
+        })
+      });
+      const rsp = await response.json();
+      if (rsp?.status > 0) {
+        setSelectedStep(Math.min((selectedStep + 1), Object.keys(Steps).length));
+      } else {
+        handleAPIError(rsp);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      toast("Something went wrong!");
+      setIsLoading(false);
+    }
+  }
 
   const onRegister = async () => {
     try {
@@ -106,19 +126,32 @@ function Register(props) {
           "first_name": firstName,
           "last_name": lastName,
           "email": emailAddress,
-          "password": password
+          "password": password,
+          "card_number": Number(cardNumber),
+          "card_exp_month": Number(expiryDate.split('/')[0]),
+          "card_exp_year": Number(expiryDate.split('/')[1]),
+          "card_cvc": Number(cvv),
+          "card_name": cardHolder,
+          "price_id": selectedPlan?.id
         })
       });
-      console.log("response");
-      console.log(response);
       const rsp = await response.json();
-      console.log("rsp--------------------------------");
-      console.log(rsp);
       if (response.status >= 200 && response.status < 300) {
-        console.log("rsp: ", rsp);
-        if (rsp.payload) {
-          toast("Register successfully! Please verify your Email to login.");
-          router.replace('/login');
+        if (rsp.payload?.data?.user && rsp.payload?.data?.user?.id) {
+          if (rsp.payload?.data?.user?.theme == 'dark') {
+            darkTheme();
+            localStorage.setItem("theme", JSON.stringify('dark'));
+          }
+          else if (rsp.payload?.data?.user?.theme == 'light') {
+            lightTheme();
+            localStorage.setItem("theme", JSON.stringify('light'));
+          }
+          dispatch(props.actions.userLogin({
+            user: rsp.payload?.data?.user,
+            authToken: rsp.payload?.data?.token?.access,
+            refreshToken: rsp.payload?.data?.token?.refresh
+          }));
+          router.replace('/');
         } else {
           handleAPIError(rsp);
           setIsLoading(false);
@@ -128,8 +161,6 @@ function Register(props) {
         setIsLoading(false);
       }
     } catch (error) {
-      console.log("error--------------------------------");
-      console.log(error);
       toast("Something went wrong!");
       setIsLoading(false);
     }
@@ -182,6 +213,11 @@ function Register(props) {
           onSubmit={onPersonalInfoNext}
         >
           <form >
+            <Link href="/login" className="back-2fk29a">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg> Go to Login
+            </Link>
             <h3 className='form-title-130mcad'>Personal Information</h3>
             <div>
               <input
@@ -249,41 +285,54 @@ function Register(props) {
               />
             </div>
 
-            <button className="main-button-mac31cas" type="submit">
-              Next
-            </button>
+            <Button className="main-button-mac31cas" isLoading={isLoading} fullWidth radius='sm' size='lg' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
+              NEXT
+            </Button>
 
-            <div className='back-action-31ca22'>
-              <MoveLeft color="#b78727" size={23} />
-              <Link href="/login">
-                <span className="back-2fk29a">Go To Login</span>
-              </Link>
-            </div>
           </form>
         </ValidatedForm>
       </div>
     );
   }
 
+  const getCurrencySymbol = (currencyCode, locale = 'en-US') => {
+    const formatter = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+
+    // Extract the currency symbol
+    const symbol = formatter.formatToParts(0).find(part => part.type === 'currency').value;
+
+    return symbol;
+  }
+
   const renderPlans = () => {
     return (
       <div className={"form-139nc3"}>
         <form onSubmit={onPlanSelectionNext}>
+          <div className="back-2fk29a" onClick={() => setSelectedStep(Math.max((selectedStep - 1), 1))}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg> Back
+          </div>
           <h3 className='form-title-130mcad'>Select Plan</h3>
           <div className="pricing-card-da2fma">
             <div className="card-header-ea21caw">
               <div className="card-btn-parent-1mqidn">
-                {SubscriptionPlans.map((item, index) => {
+                {plans.map((item, index) => {
                   return (
                     <button
                       key={index}
-                      className={selectedPlan.id == item.id ? "active" : undefined}
+                      className={selectedPlan?.id == item.id ? "active" : undefined}
                       onClick={(e) => {
                         e.preventDefault();
                         setSelectedPlan(item)
                       }}
                     >
-                      {item.name}
+                      {item.nickname}
                     </button>
                   );
                 })}
@@ -291,17 +340,17 @@ function Register(props) {
               </div>
             </div>
             <div className="card-body-mzc29q">
-              {SubscriptionPlans.map((item, index) => {
+              {plans.map((item, index) => {
                 return (
-                  <div key={index} id={item.id} className={selectedPlan.id == item.id ? "active" : undefined}>
+                  <div key={index} id={item.id} className={selectedPlan?.id == item.id ? "active" : undefined}>
                     <div className="card-plans-cnq27as">
-                      <span className="plan-tag-23an1cz">{item.name}</span>
+                      <span className="plan-tag-23an1cz">{item.nickname}</span>
                       <div className="card-sub-plan-mcai2bc">
-                        <h3 className="plan-title-nc17ab">{item.price}</h3>
-                        <h6 className="plan-duration-mc81bd"> / {item.duration}</h6>
+                        <h3 className="plan-title-nc17ab">{getCurrencySymbol((item.currency + "").toUpperCase())}{item.unit_amount / 100}</h3>
+                        <h6 className="plan-duration-mc81bd"> / {item?.recurring?.interval_count} {item?.recurring?.interval}</h6>
                       </div>
                     </div>
-                    <div className="card-content-va32da">
+                    {/* <div className="card-content-va32da">
                       <p>{item.description}</p>
                       <div className="card-lists-cn127s">
                         {item.benefits.map((item, index) => {
@@ -315,21 +364,17 @@ function Register(props) {
                           )
                         })}
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 )
               })}
             </div>
           </div>
 
-          <button className="main-button-mac31cas" type="submit">Select</button>
+          <button className="main-button-mac31cas" type="submit">
+            SELECT
+          </button>
 
-          <div className='back-action-31ca22'>
-            <MoveLeft color="#b78727" size={23} />
-            <div onClick={() => setSelectedStep(Math.max((selectedStep - 1), 1))}>
-              <span className="back-2fk29a">Back</span>
-            </div>
-          </div>
         </form>
       </div>
     );
@@ -353,9 +398,8 @@ function Register(props) {
               required: true,
               cvv: true
             },
-            billingAddress: {
+            cardHolder: {
               required: true,
-              billingAddress: true,
             },
           }}
           messages={{
@@ -371,15 +415,32 @@ function Register(props) {
               required: "CVV is required!",
               cvv: "Invalid CVV"
             },
-            billingAddress: {
-              required: "Billing address is required!",
-              billingAddress: "Invalid Billing Address",
+            cardHolder: {
+              required: "Card Holder Name is required!"
             },
           }}
           onSubmit={onCardInfoNext}
         >
           <form >
+            <div className="back-2fk29a" onClick={() => setSelectedStep(Math.max((selectedStep - 1), 1))}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg> Back
+            </div>
             <h3 className='form-title-130mcad'>Enter Credit Card</h3>
+            <div>
+              <input
+                type="text"
+                name="cardHolder"
+                className="form-control-3mac82n"
+                placeholder="Card Holder Name"
+                autoComplete="off"
+                value={cardHolder}
+                onChange={(event) =>
+                  setCardHolder(event.target.value)
+                }
+              />
+            </div>
             <div>
               <input
                 type="text"
@@ -398,9 +459,9 @@ function Register(props) {
               <input
                 type="tel"
                 name="expiryDate"
-                maxLength={5}
+                maxLength={7}
                 className="form-control-3mac82n"
-                placeholder="Expiration Date (MM/YY)"
+                placeholder="Expiration Date (MM/YYYY)"
                 autoComplete="off"
                 value={expiryDate}
                 onChange={(event) =>
@@ -414,7 +475,7 @@ function Register(props) {
                 name="cvv"
                 maxLength={3}
                 className="form-control-3mac82n"
-                placeholder="CVV"
+                placeholder="cvv"
                 autoComplete="off"
                 value={cvv}
                 onChange={(event) =>
@@ -422,30 +483,11 @@ function Register(props) {
                 }
               />
             </div>
-            <div>
-              <input
-                type="text"
-                name="billingAddress"
-                className="form-control-3mac82n"
-                placeholder="Billing Address"
-                autoComplete="off"
-                value={billingAddress}
-                onChange={(event) =>
-                  setBillingAddress(event.target.value)
-                }
-              />
-            </div>
 
             <Button className="main-button-mac31cas" isLoading={isLoading} fullWidth radius='sm' size='lg' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
-              Submit
+              SUBMIT
             </Button>
 
-            <div className='back-action-31ca22'>
-              <MoveLeft color="#b78727" size={23} />
-              <div onClick={() => setSelectedStep(Math.max((selectedStep - 1), 1))}>
-                <span className="back-2fk29a">Back</span>
-              </div>
-            </div>
           </form>
         </ValidatedForm>
       </div>

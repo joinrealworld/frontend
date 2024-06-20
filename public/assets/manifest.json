@@ -1,0 +1,52 @@
+{
+    "name": "The Real World",
+    "short_name": "The Real World",
+    "start_url": "https://app.jointherealworld.com",
+    "display": "standalone",
+    "description": "Wake up, Neo...",
+    "icons": [
+        {
+            "src": "https://app.jointherealworld.com/assets/logo-128.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        },
+        {
+            "src": "https://app.jointherealworld.com/assets/logo-256.png",
+            "type": "image/png",
+            "sizes": "256x256",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://app.jointherealworld.com/assets/logo-72.png",
+            "type": "image/png",
+            "sizes": "72x72",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://app.jointherealworld.com/assets/logo-96.png",
+            "type": "image/png",
+            "sizes": "96x96",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://app.jointherealworld.com/assets/logo-128.png",
+            "type": "image/png",
+            "sizes": "128x128",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://app.jointherealworld.com/assets/logo-256.png",
+            "type": "image/png",
+            "sizes": "256x256",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://app.jointherealworld.com/assets/logo-512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any maskable"
+        }
+    ],
+    "background_color": "#000000",
+    "theme_color": "#1D2B3A"
+}

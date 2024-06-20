@@ -29,7 +29,6 @@ function ForgetPassword(props) {
           'Content-Type': 'application/json'
         }
       });
-      console.log(response);
       if (response.status >= 200 && response.status < 300) {
         const rsp = await response.json();
         if (rsp.payload) {
@@ -76,6 +75,11 @@ function ForgetPassword(props) {
             onSubmit={onResetPasswordClick}
           >
             <form >
+              <Link className="back-msji783" href="/login">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg> Back to Login
+              </Link>
               <h3 className='form-title-2kncasz'>Reset your password</h3>
               <div>
                 <input
@@ -92,16 +96,10 @@ function ForgetPassword(props) {
                 />
               </div>
 
-              <Button className="main-button-o3n2dc" isLoading={isLoading} fullWidth radius='sm' size='lg' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
-                Send Reset Password Email
+              <Button className="main-button-o3n2dc" isLoading={isLoading} fullWidth size='' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
+                SEND RESET PASSWORD EMAIL
               </Button>
 
-              <div className='back-action-k823nc'>
-                <MoveLeft color="#b78727" size={23} style={{ marginTop: -16 }} />
-                <Link href="/login">
-                  <p className="back-msji783">Back To Login</p>
-                </Link>
-              </div>
             </form>
           </ValidatedForm>
         </div>

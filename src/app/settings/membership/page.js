@@ -5,7 +5,7 @@ import { GemIcon, MenuIcon, Trash2Icon } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import $ from 'jquery';
 import { useRouter } from 'next/navigation';
-import { Button, Modal, ModalBody, ModalContent, ModalHeader, Switch, useDisclosure } from "@nextui-org/react";
+import { Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner, Switch, useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
 
 import './../styles.css';
@@ -13,41 +13,23 @@ import './styles.css';
 import SettingsMenu from "@/components/SettingsMenu";
 import connect from '@/components/ConnectStore/connect';
 import ValidatedForm from "@/components/ValidatedForm";
-
-const sampleCard = {
-  "id": "card_1MvoiELkdIwHu7ixOeFGbN9D",
-  "object": "card",
-  "address_city": null,
-  "address_country": null,
-  "address_line1": null,
-  "address_line1_check": null,
-  "address_line2": null,
-  "address_state": null,
-  "address_zip": null,
-  "address_zip_check": null,
-  "brand": "Visa",
-  "country": "US",
-  "customer": "cus_NhD8HD2bY8dP3V",
-  "cvc_check": null,
-  "dynamic_last4": null,
-  "exp_month": 4,
-  "exp_year": 2024,
-  "fingerprint": "mToisGZ01V71BCos",
-  "funding": "credit",
-  "last4": "4242",
-  "metadata": {},
-  "name": null,
-  "tokenization_method": null,
-  "wallet": null
-};
+import { apiURL, handleAPIError } from "@/constant/global";
+import { toast } from "react-toastify";
+import moment from "moment";
 
 function Membership(props) {
 
   useEffect(() => {
+    const getData = async () => {
+      // get data
+      await getCardList(props.user.authToken);
+      await getCustomer(props.user.authToken);
+      await getSubscription(props.user.authToken);
+    }
     if (!props.user.isLoggedIn) {
       router.push('/login');
     } else {
-      // get data
+      getData();
     }
   }, []);
 
@@ -63,11 +45,135 @@ function Membership(props) {
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCVV] = useState('');
-  const [billingAddress, setBillingAddress] = useState('');
-  const [cards, setCards] = useState([sampleCard, sampleCard]);
+  const [cardHolder, setCardHolder] = useState('');
+  const [currentPlan, setCurrentPlan] = useState(null);
+  const [savedCards, setSavedCards] = useState([]);
+  const [isLoadingAddCard, setIsLoadingAddCard] = useState(false);
+  const [customer, setCustomer] = useState(null);
 
-  const onSubmitCardInfo = () => {
+  const getSubscription = async (authToken) => {
+    console.log("authToken ----------------");
+    console.log(authToken);
+    const response = await fetch(apiURL + 'api/v1/payment/retrive_subscription', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      }
+    });
+    console.log("response --------------------------------");
+    console.log(response);
+    const rsp = await response.json();
+    if (response.status >= 200 && response.status < 300) {
+      console.log("rsp.payload --------------------------------");
+      console.log(JSON.stringify(rsp));
+      if (rsp.payload && rsp.payload?.plan) {
+        setCurrentPlan(rsp.payload);
+      } else {
+        handleAPIError(rsp);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+      }
+    }
+  }
 
+  const getCustomer = async (authToken) => {
+    const response = await fetch(apiURL + 'api/v1/payment/fetch/None/customer', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      }
+    });
+    console.log("response --------------------------------");
+    console.log(response);
+    const rsp = await response.json();
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp.payload && rsp.payload) {
+        setCustomer(rsp.payload);
+      } else {
+        handleAPIError(rsp);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      }
+    }
+  }
+
+  const getCardList = async (authToken) => {
+    const response = await fetch(apiURL + 'api/v1/payment/card_list', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      }
+    });
+    console.log("response --------------------------------");
+    console.log(response);
+    const rsp = await response.json();
+    if (response.status >= 200 && response.status < 300) {
+      console.log("rsp.payload --------------------------------");
+      console.log(rsp);
+      if (rsp.payload && rsp.payload?.object == 'list' && rsp.payload?.data?.length > 0) {
+        setSavedCards(rsp.payload?.data);
+      } else {
+        handleAPIError(rsp);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+      }
+    }
+  }
+
+  const onSubmitCardInfo = async () => {
+    try {
+      setIsLoadingAddCard(true);
+      let formData = new FormData();
+      formData.append('card_number', cardNumber);
+      formData.append('card_exp_month', expiryDate.split('/')[0]);
+      formData.append('card_exp_year', expiryDate.split('/')[1]);
+      formData.append('card_cvc', cvv);
+      formData.append('card_name', cardHolder);
+      const response = await fetch(apiURL + 'api/v1/payment/create_card_token', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + props.user.authToken
+        },
+        body: formData
+      });
+      console.log("response");
+      console.log(response);
+      const rsp = await response.json();
+      console.log("rsp--------------------------------");
+      console.log(rsp);
+      if (response.status >= 200 && response.status < 300) {
+        console.log("rsp: ", rsp);
+        if (rsp.payload) {
+          toast("Card added successfully!");
+          addCardModel.onClose();
+          manageCardModel.onClose();
+        } else {
+          handleAPIError(rsp);
+          setIsLoadingAddCard(false);
+        }
+      } else {
+        handleAPIError(rsp);
+        setIsLoadingAddCard(false);
+      }
+    } catch (error) {
+      console.log("error--------------------------------");
+      console.log(error);
+      toast("Something went wrong!");
+      setIsLoadingAddCard(false);
+    }
   }
 
   // const onSubmitCardInfo = () => {
@@ -77,6 +183,91 @@ function Membership(props) {
   const onToggleMenu = (e) => {
     $('#setting-menu').toggleClass("invisible");
     $('#setting-menu').toggleClass("visible");
+  }
+
+  const renderCurrentPlan = () => {
+    return (
+      <div className='content-3mcnaj3zcs'>
+
+        <div className='account-info-9c7as'>
+          <b className="info-title-mczw72b">My Plan - The Real World</b>
+          <div className="info-cards-9anc2j">
+            <div className="info-card-9cajyk">
+              <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
+                <GemIcon color="var(--fourth-color)" size={25} />
+                <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
+                  <span className="info-lable-7cban2d">
+                    Plan
+                  </span>
+                  <span className="info-value-7cban2d">
+                    {currentPlan?.plan?.nickname}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div style={{ marginTop: 10, marginBottom: 10, flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
+              <span className="info-value-7cban2d" style={{ fontSize: 30, marginRight: 8 }}>
+                ${currentPlan?.plan?.amount / 100}
+              </span>
+              <span className="info-lable-7cban2d" style={{ fontSize: 20 }}>
+                / {currentPlan?.plan?.interval_count} {currentPlan?.plan?.interval}
+              </span>
+            </div>
+            <div style={{ marginTop: 10, marginBottom: 5, flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
+              <span className="info-lable-7cban2d" style={{ fontSize: 16, marginRight: 8 }}>
+                Started on
+              </span>
+              <span className="info-value-7cban2d" style={{ fontSize: 16 }}>
+                {moment.unix(currentPlan?.current_period_start).format('DD MMM, YYYY')}
+              </span>
+            </div>
+            <div style={{ marginBottom: 10, flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
+              <span className="info-lable-7cban2d" style={{ fontSize: 16, marginRight: 8 }}>
+                Renews on
+              </span>
+              <span className="info-value-7cban2d" style={{ fontSize: 16 }}>
+                {moment.unix(currentPlan?.current_period_end).format('DD MMM, YYYY')}
+              </span>
+            </div>
+            <div className="info-card-9cajyk" style={{ paddingLeft: 0 }}>
+              <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
+                <span className="info-value-7cban2d" >
+                  Active
+                </span>
+              </div>
+
+              <Switch
+                size="lg"
+                defaultSelected
+                checked={isSubscribed}
+                onChange={() => setIsSubscribed(!isSubscribed)}
+              />
+            </div>
+            <div className="info-card-9cajyk" style={{ paddingLeft: 0 }}>
+              <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
+                <Image
+                  src={"https://www.mastercard.co.in/content/dam/public/mastercardcom/in/en/logos/mc-logo-52.svg"}
+                  height={200}
+                  width={200}
+                  className="card-logo-3mcal2"
+                  priority
+                />
+                <span className="card-number-ma82ba" style={{ marginLeft: 15 }}>
+                  •••• {savedCards?.[0]?.last4 ?? "4242"}
+                </span>
+                <span className="card-expiry-ma82ba" style={{ marginLeft: 15 }}>
+                  {String(savedCards?.[0]?.exp_month).padStart(2, 0) ?? "12"}/{savedCards?.[0]?.exp_year ?? new Date().getFullYear() + 2}
+                </span>
+              </div>
+
+              <div className="card-manage-ma82ba" onClick={manageCardModel.onOpen}>
+                <p>Manage</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -91,70 +282,9 @@ function Membership(props) {
             onClick={onToggleMenu}
           />
         </div>
-        <div className='content-3mcnaj3zcs'>
 
-          <div className='account-info-9c7as'>
-            <b className="info-title-mczw72b">My Plan - The Real World</b>
-            <div className="info-cards-9anc2j">
-              <div className="info-card-9cajyk">
-                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
-                  <GemIcon color="var(--fourth-color)" size={25} />
-                  <div style={{ marginLeft: 20, flexDirection: 'column', display: 'flex' }}>
-                    <span className="info-lable-7cban2d">
-                      Plan
-                    </span>
-                    <span className="info-value-7cban2d">
-                      Comet
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div style={{ marginTop: 10, marginBottom: 10, flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
-                <span className="info-value-7cban2d" style={{ fontSize: 30, marginRight: 8 }}>
-                  $299
-                </span>
-                <span className="info-lable-7cban2d" style={{ fontSize: 20 }}>
-                  / monthly
-                </span>
-              </div>
-              <div className="info-card-9cajyk" style={{ paddingLeft: 0 }}>
-                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
-                  <span className="info-value-7cban2d" >
-                    Active
-                  </span>
-                </div>
+        {currentPlan ? renderCurrentPlan() : null}
 
-                <Switch
-                  size="lg"
-                  defaultSelected
-                  checked={isSubscribed}
-                  onChange={() => setIsSubscribed(!isSubscribed)}
-                />
-              </div>
-              <div className="info-card-9cajyk" style={{ paddingLeft: 0 }}>
-                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
-                  <Image
-                    src={"https://www.mastercard.co.in/content/dam/public/mastercardcom/in/en/logos/mc-logo-52.svg"}
-                    height={200}
-                    width={200}
-                    className="card-logo-3mcal2"
-                    priority
-                  />
-                  <span className="card-number-ma82ba" style={{ marginLeft: 15 }}>
-                    •••• 4242
-                  </span>
-                  <span className="card-expiry-ma82ba" style={{ marginLeft: 15 }}>
-                    12/25
-                  </span>
-                </div>
-
-                <div className="card-manage-ma82ba" onClick={manageCardModel.onOpen}>
-                  <p>Manage</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <Modal
         id="manage-card"
@@ -174,7 +304,7 @@ function Membership(props) {
               <ModalHeader className="modal-title-8bca382 flex flex-col gap-1">Manage Payment</ModalHeader>
               <ModalBody>
                 <div>
-                  {cards.map((card, index) => {
+                  {savedCards.map((card, index) => {
                     return (
                       <div key={index} style={{ marginTop: index == 0 ? 0 : 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', display: 'flex' }}>
                         <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
@@ -189,11 +319,15 @@ function Membership(props) {
                             •••• {card.last4}
                           </span>
                           <span className="card-expiry-ma82ba" style={{ marginLeft: 20 }}>
-                            {card.exp_month}/{card.exp_year}
+                            {String(card.exp_month).padStart(2, 0)}/{card.exp_year}
                           </span>
                         </div>
-                        <Trash2Icon color={'black'} size={17} style={{ marginRight: 8, cursor: 'pointer' }} />
-                        {/* <p className="text-color-73bab mb-0" style={{ fontSize: 12 }}>Default</p> */}
+
+                        {card.id == customer?.default_source ?
+                          <p className="text-color-73bab mb-0" style={{ fontSize: 13 }}>Default</p>
+                          :
+                          <Trash2Icon color="var(--fourth-color)" size={17} style={{ marginRight: 8, cursor: 'pointer' }} />
+                        }
                       </div>
                     );
                   })}
@@ -239,9 +373,8 @@ function Membership(props) {
                       required: true,
                       cvv: true
                     },
-                    billingAddress: {
+                    cardHolder: {
                       required: true,
-                      billingAddress: true,
                     },
                   }}
                   messages={{
@@ -257,14 +390,26 @@ function Membership(props) {
                       required: "CVV is required!",
                       cvv: "Invalid CVV"
                     },
-                    billingAddress: {
-                      required: "Billing address is required!",
-                      billingAddress: "Invalid Billing Address",
+                    cardHolder: {
+                      required: "Card Holder Name is required!"
                     },
                   }}
                   onSubmit={onSubmitCardInfo}
                 >
                   <form >
+                    <div>
+                      <input
+                        type="text"
+                        name="cardHolder"
+                        className="card-input-3mac82n"
+                        placeholder="Card Holder Name"
+                        autoComplete="off"
+                        value={cardHolder}
+                        onChange={(event) =>
+                          setCardHolder(event.target.value)
+                        }
+                      />
+                    </div>
                     <div>
                       <input
                         type="text"
@@ -283,9 +428,9 @@ function Membership(props) {
                       <input
                         type="tel"
                         name="expiryDate"
-                        maxLength={5}
+                        maxLength={7}
                         className="card-input-3mac82n"
-                        placeholder="Expiration Date (MM/YY)"
+                        placeholder="Expiration Date (MM/YYYY)"
                         autoComplete="off"
                         value={expiryDate}
                         onChange={(event) =>
@@ -307,23 +452,10 @@ function Membership(props) {
                         }
                       />
                     </div>
-                    <div>
-                      <input
-                        type="text"
-                        name="billingAddress"
-                        className="card-input-3mac82n"
-                        placeholder="Billing Address"
-                        autoComplete="off"
-                        value={billingAddress}
-                        onChange={(event) =>
-                          setBillingAddress(event.target.value)
-                        }
-                      />
-                    </div>
 
-                    <button className="main-button-23fa2wd" type="submit">
+                    <Button className='main-button-23fa2wd' isLoading={isLoadingAddCard} spinner={<Spinner color='current' size='sm' />} fullWidth radius='sm' size='lg' type='submit' color=''>
                       Save Card Information
-                    </button>
+                    </Button>
                   </form>
                 </ValidatedForm>
               </ModalBody>

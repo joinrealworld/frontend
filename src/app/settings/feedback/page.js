@@ -20,9 +20,6 @@ function Profile(props) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const [firstName, setFirstName] = useState(props.user?.user?.first_name ?? '');
-    const [lastName, setLastName] = useState(props.user?.user?.last_name ?? '');
-    const [bio, setBio] = useState(props.user?.user?.bio ?? '');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 

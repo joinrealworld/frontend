@@ -18,7 +18,7 @@ export default function OnBoard(props) {
                         height={256}
                         priority
                     />
-                    <h3 className="mt-3 text-center font-bold text-white">JOIN THE WORLD</h3>
+                    <h3 style={{ fontSize: 30, fontWeight: 'bolder' }} className="mt-3 text-center font-bold text-white">THE REAL WORLD</h3>
                 </div>
                 <div style={{ width: '100%', marginTop: 20 }}>
                     <Link href="/register">

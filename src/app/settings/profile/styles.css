@@ -256,9 +256,8 @@
 .side-button-7ajb312:hover,
 .side-button-7ajb312:active,
 .side-button-7ajb312:focus {
-    background: #343434;
+    background: var(--seventh-color);
     color: #dedede;
-    /* box-shadow: 0 0 10px 0 #b78727; */
     font-size: 16px;
 }
 

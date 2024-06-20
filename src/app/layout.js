@@ -8,6 +8,7 @@ import { X } from 'lucide-react';
 import "./globals.css";
 import ThemeContext from "@/themes/ThemeContext";
 import StoreColor from "@/themes/StoreColor";
+import { SoundProvider } from '@/components/SoundContext';
 
 export const metadata = {
   title: appName
@@ -18,16 +19,28 @@ export default function RootLayout({ children }) {
     <StoreProvider>
       <html lang="en">
         <head>
-          <meta charSet="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossOrigin="anonymous" />
 
+          <meta charSet="UTF-8" />
+          <title>Real World Portal</title>
+
+          <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+          <meta name="msapplication-tap-highlight" content="no" />
+          <meta name="robots" content="noindex, nofollow" />
+
+          <link rel="manifest" href="/assets/manifest.json" />
+          <link rel="icon" type="image/x-icon" href="/assets/logo-256.png" />
+          <link rel="favicon" href="/assets/logo-256.png" />
+
+          {/* <script type="text/javascript" async="" src="https://widget.intercom.io/widget/z3s8zv7r"></script> */}
+          <style data-styled="active" data-styled-version="5.3.11"></style>
         </head>
         <body>
           <PersistGateProvider>
             <NextUIProviderWrap>
               <ThemeContext>
-                <main>{children}</main>
+                <SoundProvider>
+                  <main>{children}</main>
+                </SoundProvider>
                 <StoreColor />
               </ThemeContext>
             </NextUIProviderWrap>

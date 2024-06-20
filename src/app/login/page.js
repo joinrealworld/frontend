@@ -63,8 +63,6 @@ function Login(props) {
 				body: JSON.stringify(data)
 			});
 			const rsp = await response.json();
-			console.log("data: ", data);
-			console.log("rsp: ", rsp);
 			if (response.status >= 200 && response.status < 300) {
 				if (rsp.payload?.user && rsp.payload?.user?.id) {
 					if (rsp.payload?.user?.theme == 'dark') {
@@ -117,7 +115,6 @@ function Login(props) {
 			});
 			const rsp = await response.json();
 			if (response.status >= 200 && response.status < 300) {
-				console.log("rsp: ", rsp);
 				if (rsp.payload && rsp.payload) {
 					setIsLoadingEmailVerification(false);
 					toast("Verification mail sent to your email address! Check your email.");
@@ -170,6 +167,11 @@ function Login(props) {
 						onSubmit={onLoginClick}
 					>
 						<form>
+							<Link className="back-jak29a" href="/">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+									<polyline points="15 18 9 12 15 6"></polyline>
+								</svg> Back
+							</Link>
 							<h3 className='form-title-sm2fca'>Sign in to your account</h3>
 							<div>
 								<input
@@ -205,16 +207,10 @@ function Login(props) {
 								<p className="fp-link-23mcma">Forgot your password?</p>
 							</Link>
 
-							<Button className="main-button-mc2342" isLoading={isLoading} fullWidth radius='sm' size='lg' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
-								Log In
+							<Button className="main-button-mc2342" isLoading={isLoading} fullWidth size='' type='submit' color='' spinner={<Spinner color='current' size='sm' />}>
+								LOG IN
 							</Button>
 
-							<div className='back-action-ms32sa'>
-								<MoveLeft color="#b78727" size={23} style={{ marginBottom: 3.5 }} />
-								<Link href="/">
-									<span className="back-jak29a">Go Back</span>
-								</Link>
-							</div>
 						</form>
 					</ValidatedForm>
 				</div>
@@ -243,10 +239,10 @@ function Login(props) {
 								</div>
 							</ModalBody>
 							<ModalFooter>
-								<Button variant="light" className='side-button-mc2342' style={{ marginLeft: 30 }} radius='sm' size='lg' color='' onClick={onClose}>
+								<Button variant="light" className='side-button-mc2342' style={{ marginLeft: 30 }} size='lg' color='' onClick={onClose}>
 									Cancel
 								</Button>
-								<Button className='main-button-mc2342' style={{ width: 'fit-content', marginBottom: 0 }} spinner={<Spinner color='current' size='sm' />} isLoading={isLoadingEmailVerification} radius='sm' size='lg' type='submit' color='' onPress={onSendEmailVerification}>
+								<Button className='main-button-mc2342' style={{ width: 'fit-content', marginBottom: 0 }} spinner={<Spinner color='current' size='sm' />} isLoading={isLoadingEmailVerification} type='submit' color='' onPress={onSendEmailVerification}>
 									Send Verification Email
 								</Button>
 							</ModalFooter>

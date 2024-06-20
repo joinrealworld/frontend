@@ -99,7 +99,7 @@ function SettingsMenu(props) {
   }
 
   const onBack = (e) => {
-    router.replace('/courses?tab=1');
+    router.push('/');
   }
 
   const onToggleMenu = () => {

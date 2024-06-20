@@ -82,7 +82,7 @@
     overflow-x: hidden;
     flex-direction: column;
     user-select: none;
-    background-color: var(--sixth-color);
+    background-color: var(--primary-color);
 }
 
 .course-item-27aca92 {
@@ -121,7 +121,7 @@
 }
 
 .course-item-header-acnk3 {
-    background-color: var(--sixth-color);
+    background-color: var(--primary-color);
     padding: 13px 18px;
     display: flex;
     margin-bottom: 12px;
@@ -136,7 +136,9 @@
 
 .course-item-header-acnk3.active {
     width: 100%;
-    background-color: var(--seventh-color);
+    background-color: var(--third-color);
+    border-color: var(--fifth-color);
+    border-width: 1px;
 }
 
 .course-progress-983bzs {
@@ -163,7 +165,7 @@
 }
 
 .search-input-7ajb312 {
-    border-color: var(--sixth-color);
+    border-color: var(--primary-color);
     border-radius: 7px;
     border-width: 1px;
     width: 100%;
@@ -247,7 +249,7 @@
 }
 
 .lesson-item-header-acnk3 {
-    background-color: var(--sixth-color);
+    background-color: var(--primary-color);
     padding: 12px 16px;
     display: flex;
     margin-bottom: 7px;
@@ -262,7 +264,9 @@
 
 .lesson-item-header-acnk3.active {
     width: 100%;
-    background-color: var(--seventh-color);
+    background-color: var(--third-color);
+    border-color: aliceblue;
+    border-width: 1px;
 }
 
 .lesson-progress-983bzs {

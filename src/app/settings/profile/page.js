@@ -20,10 +20,6 @@ function Profile(props) {
     const dispatch = useDispatch();
     const router = useRouter();
 
-    const [user, setUser] = useState(props.user?.user);
-
-    const [firstName, setFirstName] = useState(props.user?.user?.first_name ?? '');
-    const [lastName, setLastName] = useState(props.user?.user?.last_name ?? '');
     const [bio, setBio] = useState(props.user?.user?.bio ?? '');
     const [profilePic, setProfilePic] = useState(props.user?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.avatar) : "/assets/person.png");
     const [isProfilePicLoading, setIsProfilePicLoading] = useState(false);
@@ -57,9 +53,6 @@ function Profile(props) {
             console.log("rsp.payload --------------------------------");
             console.log(rsp.payload);
             if (rsp.payload && rsp.payload?.id) {
-                setUser(rsp.payload);
-                setFirstName(rsp.payload?.first_name);
-                setLastName(rsp.payload?.last_name);
                 setBio(rsp.payload?.bio);
                 setUserStatus(rsp.payload?.status);
                 setProfilePic(rsp.payload?.avatar ? encodeURI(apiURL.slice(0, -1) + rsp.payload?.avatar) : "/assets/person.png");

@@ -3,8 +3,10 @@ import { Map } from 'immutable';
 import { bindActionCreators } from 'redux';
 
 import { userSlice } from '@/redux/slices/userSlice/userSlice';
+import { chatSlice } from '@/redux/slices/chatSlice/chatSlice';
 const actions = [
-    userSlice.actions
+    userSlice.actions,
+    chatSlice.actions
 ];
 
 

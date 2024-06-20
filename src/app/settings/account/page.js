@@ -457,7 +457,7 @@ function Account(props) {
               />
               <div className="user-details-23mas">
                 <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
-                  <span className="username-312c02qena">{user?.first_name + " " + user?.last_name}</span>
+                  <span className="username-312c02qena">{user?.first_name + " " + user?.last_name + " " + (user?.selected_emoji ?? '')}</span>
                 </div>
                 <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
                   {/* <AtSign color="var(--fifth-color)" size={13.5} style={{ marginRight: 2 }} /> */}

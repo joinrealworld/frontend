@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User, Progress, Button, RadioGroup, useRadio, cn, VisuallyHidden, Spinner } from "@nextui-org/react";
@@ -9,10 +10,17 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, } from 'lucide-react';
 
+import '@vidstack/react/player/styles/default/theme.css';
+import '@vidstack/react/player/styles/default/layouts/audio.css';
+import '@vidstack/react/player/styles/default/layouts/video.css';
+
+import { MediaPlayer, MediaProvider, Poster, Track } from "@vidstack/react"
+import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default';
+
 import './styles.css';
 import connect from '@/components/ConnectStore/connect';
 import Loading from "@/components/Loading";
-import { apiURL, handleAPIError } from "@/constant/global";
+import { apiURL, handleAPIError, transformVimeoUrl } from "@/constant/global";
 
 const Sections = {
   video: 'video',
@@ -23,6 +31,8 @@ const Sections = {
 }
 
 function CoursesByCategory(props) {
+
+  const serverId = props.params?.server;
 
   const { get } = useSearchParams();
   const searchParams = {
@@ -69,7 +79,6 @@ function CoursesByCategory(props) {
 
   useEffect(() => {
     if (searchParams?.lid && searchParams?.lid != selectedLesson?.uuid) {
-      console.log("calle......");
       let lesson = selectedCourse?.data?.[0];
       if (searchParams?.lid && selectedCourse?.data?.some(c => c.uuid === searchParams?.lid)) {
         lesson = selectedCourse?.data?.find(c => c.uuid === searchParams?.lid);
@@ -212,9 +221,6 @@ function CoursesByCategory(props) {
       })
     });
     const rsp = await response.json();
-    console.log("rsp --------------------------------");
-    console.log(response);
-    console.log(rsp);
     if (response.status >= 200 && response.status < 300) {
       if (rsp.payload) {
         if (selectedCourseTemp.is_favorite) {
@@ -259,9 +265,6 @@ function CoursesByCategory(props) {
       })
     });
     const rsp = await response.json();
-    console.log("rsp --------------------------------");
-    console.log(response);
-    console.log(rsp);
     if (response.status >= 200 && response.status < 300) {
       if (rsp.payload) {
         let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
@@ -314,9 +317,6 @@ function CoursesByCategory(props) {
     //   })
     // });
     // const rsp = await response.json();
-    // console.log("rsp --------------------------------");
-    // console.log(response);
-    // console.log(rsp);
     // if (response.status >= 200 && response.status < 300) {
     //   if (rsp.payload) {
     //     let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
@@ -354,7 +354,6 @@ function CoursesByCategory(props) {
     });
     if (response.status >= 200 && response.status < 300) {
       const rsp = await response.json();
-      console.log("rsp.payload?.data: ", rsp.payload?.data);
       if (rsp?.payload && typeof rsp?.payload == 'object' && rsp.payload?.data) {
         setCurrentQuiz(rsp.payload?.data);
         setIsQuizFetch(true);
@@ -439,15 +438,37 @@ function CoursesByCategory(props) {
       return (
         <>
           <div className="lesson-video-3naksn">
-            <iframe
-              src={getVimeoPlayerURL(currentMessage?.section_url)}
+            {/* <iframe
+              // src={getVimeoPlayerURL(currentMessage?.section_url)}
+              src={"https://player.vimeo.com/video/856230447?h=553ef6e21b&vimeo_logo=0"}
+              // src={"https://drive.google.com/uc?id=1JOZBkMwOllSNg7ameXnAj1dlagusMeux/preview"}
               width="640"
               height="360"
               frameborder="0"
               allowfullscreen
               allow="autoplay; encrypted-media"
             >
-            </iframe>
+            </iframe> */}
+
+            <MediaPlayer
+              // src={`https://drive.google.com/file/d/1uYMjUoyQpt0c14DGCEGFp_pTk5I4Q9Ka/preview`}
+              src={transformVimeoUrl(currentMessage?.section_url)}
+              viewType='video'
+              streamType='on-demand'
+              logLevel='warn'
+              crossOrigin
+            // playsInline
+            // title='Sprite Fight'
+            // poster='https://drive.google.com/thumbnail?id=1JOZBkMwOllSNg7ameXnAj1dlagusMeux&sz=w1000'
+            >
+              <MediaProvider>
+                <Poster className="vds-poster" />
+              </MediaProvider>
+              <DefaultVideoLayout
+                thumbnails='https://files.vidstack.io/sprite-fight/thumbnails.vtt'
+                icons={defaultLayoutIcons}
+              />
+            </MediaPlayer>
           </div>
           <span dangerouslySetInnerHTML={{ __html: currentMessage?.content }} className="lesson-description-mcajn2">
           </span>
@@ -491,8 +512,6 @@ function CoursesByCategory(props) {
                   onChange={(e) => {
                     let selectedQuizAnswers = [...selectedQuizAnswer];
                     let index = selectedQuizAnswers.findIndex(c => c?.question == quiz?.question);
-                    console.log(selectedQuizAnswers);
-                    console.log(index);
                     if (index > -1) {
                       selectedQuizAnswers[index] = { ...quiz, selectedAnswer: e.target.value };
                       setSelectedQuizAnswer([...selectedQuizAnswers]);
@@ -580,10 +599,6 @@ function CoursesByCategory(props) {
       if (selectedCourse) {
 
         let currentMessage = { ...selectedLesson };
-
-        // console.log("currentMessage--------------------------------");
-        // console.log(currentMessage);
-        // console.log(Number(selectedCourse?.completed).toFixed(0));
 
         // currentMessage.content = currentMessage?.content.replace(/\*\*(.*?)\*\*/g, `<b>$1</b>`);
         // // Replace \n with <br>
@@ -754,18 +769,15 @@ function CoursesByCategory(props) {
       );
     }
   }
-  // console.log("selectedCourse?.course_pic");
-  // console.log(selectedCourse);
-  // console.log(selectedLesson);
   return (
     <div className='container-93ca2aw'>
       <div className='header-3m32aaw'>
         <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-          <Link href={'/courses?tab=1'} className="back-icon-nw3rf">
+          <Link href={'/chat/' + serverId + '/courses/'} className="back-icon-nw3rf">
             <ArrowLeft style={{ color: "var(--fourth-color)" }} />
           </Link>
           <div className="course-navigation-cnaw34">
-            <Link href={'/courses?tab=1'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 20 }}>
+            <Link href={'/chat/' + serverId + '/courses/'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 20 }}>
               {/* <img
                 src={"https://img.freepik.com/free-vector/online-certification-illustration_23-2148575636.jpg?size=626&ext=jpg"}
                 className="category-img-9ama2f"

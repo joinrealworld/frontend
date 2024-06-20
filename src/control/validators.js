@@ -16,7 +16,7 @@ export default {
     return validator.equals(value, rule);
   },
   expiryDate: (rule, value = "") => {
-    const regex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+    const regex = /^(0[1-9]|1[0-2])\/\d{4}$/;
     return regex.test(value);
   },
   cvv: (rule, value = "") => {
