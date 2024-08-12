@@ -135,38 +135,39 @@ function Membership(props) {
 
   const onSubmitCardInfo = async () => {
     try {
-      setIsLoadingAddCard(true);
-      let formData = new FormData();
-      formData.append('card_number', cardNumber);
-      formData.append('card_exp_month', expiryDate.split('/')[0]);
-      formData.append('card_exp_year', expiryDate.split('/')[1]);
-      formData.append('card_cvc', cvv);
-      formData.append('card_name', cardHolder);
-      const response = await fetch(apiURL + 'api/v1/payment/create_card_token', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + props.user.authToken
-        },
-        body: formData
-      });
-      console.log("response");
-      console.log(response);
-      const rsp = await response.json();
-      console.log("rsp--------------------------------");
-      console.log(rsp);
-      if (response.status >= 200 && response.status < 300) {
-        console.log("rsp: ", rsp);
-        if (rsp.payload) {
-          toast("Card added successfully!");
-          addCardModel.onClose();
-          manageCardModel.onClose();
+      if (savedCards.find(c => c.last4 == cardNumber.substr(-4))) {
+        toast("Your card is already added!");
+        setIsLoadingAddCard(false);
+      } else {
+        setIsLoadingAddCard(true);
+        let formData = new FormData();
+        formData.append('card_number', cardNumber);
+        formData.append('card_exp_month', expiryDate.split('/')[0]);
+        formData.append('card_exp_year', expiryDate.split('/')[1]);
+        formData.append('card_cvc', cvv);
+        formData.append('card_name', cardHolder);
+        const response = await fetch(apiURL + 'api/v1/payment/create_card_token', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + props.user.authToken
+          },
+          body: formData
+        });
+        const rsp = await response.json();
+        if (response.status >= 200 && response.status < 300) {
+          console.log("rsp: ", rsp);
+          if (rsp.payload) {
+            toast("Card added successfully!");
+            addCardModel.onClose();
+            manageCardModel.onClose();
+          } else {
+            handleAPIError(rsp);
+            setIsLoadingAddCard(false);
+          }
         } else {
           handleAPIError(rsp);
           setIsLoadingAddCard(false);
         }
-      } else {
-        handleAPIError(rsp);
-        setIsLoadingAddCard(false);
       }
     } catch (error) {
       console.log("error--------------------------------");
@@ -175,10 +176,6 @@ function Membership(props) {
       setIsLoadingAddCard(false);
     }
   }
-
-  // const onSubmitCardInfo = () => {
-
-  // }
 
   const onToggleMenu = (e) => {
     $('#setting-menu').toggleClass("invisible");
@@ -229,7 +226,8 @@ function Membership(props) {
                 {moment.unix(currentPlan?.current_period_end).format('DD MMM, YYYY')}
               </span>
             </div>
-            <div className="info-card-9cajyk" style={{ paddingLeft: 0 }}>
+            {/* zzz */}
+            {/* <div className="info-card-9cajyk" style={{ paddingLeft: 0 }}>
               <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
                 <span className="info-value-7cban2d" >
                   Active
@@ -242,7 +240,7 @@ function Membership(props) {
                 checked={isSubscribed}
                 onChange={() => setIsSubscribed(!isSubscribed)}
               />
-            </div>
+            </div> */}
             <div className="info-card-9cajyk" style={{ paddingLeft: 0 }}>
               <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex' }}>
                 <Image

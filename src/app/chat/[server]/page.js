@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon } from 'lucide-react';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
@@ -145,42 +145,6 @@ const ChatData = [
     }
 ]
 
-// zzz - wait for API
-const SoundClickOptions = [
-    {
-        "id": 1,
-        "uuid": "df5cad6f-f6ce-4b0f-ac6c-0f7b4ca96ada",
-        "sound": 'sound-1.mp3',
-        "price": 30,
-        "is_purchase": true,
-        "selected": true
-    },
-    {
-        "id": 2,
-        "uuid": "88542627-e21c-45cb-8d04-54a2e29905b7",
-        "sound": 'sound-2.mp3',
-        "price": 20,
-        "is_purchase": false,
-        "selected": false
-    },
-    {
-        "id": 3,
-        "uuid": "19970dc0-eeb4-493c-9af2-a52259c3a93d",
-        "sound": 'sound-3.mp3',
-        "price": 20,
-        "is_purchase": false,
-        "selected": true
-    },
-    {
-        "id": 4,
-        "uuid": "8eedd7f1-a36d-40d6-b7cc-55958b859e63",
-        "sound": 'sound-4.mp3',
-        "price": 10,
-        "is_purchase": false,
-        "selected": false
-    }
-]
-
 const IDENTITY_BOOSTER_COIN_PRICE = 20;
 
 function Chat(props) {
@@ -217,12 +181,12 @@ function Chat(props) {
 
     const [isLoadingPurchaseEmoji, setIsLoadingPurchaseEmoji] = useState(false);
 
-    const [soundClickData, setSoundClickData] = useState(SoundClickOptions);
+    const [soundClickData, setSoundClickData] = useState([]);
     const [playedSoundClick, setPlayedSoundClick] = useState({ itemId: null });
     const [isLoadingChangeSoundClick, setIsLoadingChangeSoundClick] = useState({ isLoading: false, itemId: null });
 
     const [isChooseBackground, setIsChooseBackground] = useState(false);
-    const [chatBackgroundImage, setChatBackgroundImage] = useState(props.user?.user?.selected_wallpaper ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.selected_wallpaper) : null);
+    const [chatBackgroundImage, setChatBackgroundImage] = useState(props.user?.user?.selected_wallpaper ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.selected_wallpaper) : "");
 
     const [isChooseSoundClick, setIsChooseSoundClick] = useState(false);
 
@@ -285,6 +249,13 @@ function Chat(props) {
             $('#chat-background').css('background-image', 'url(' + url + ')');
             $('#chat-background').css('background-size', 'contain');
             $('#chat-background').css('background-repeat', 'round');
+            setChatBackgroundImage(url);
+        } else {
+            $('#chat-background').css('background-image', 'unset');
+            $('#chat-background').css('background-size', 'unset');
+            $('#chat-background').css('background-repeat', 'unset');
+            $('#chat-background').css('background-color', 'var(--third-color)');
+            setChatBackgroundImage("");
         }
     }
 
@@ -517,11 +488,10 @@ function Chat(props) {
 
     const getWallpapersSoundData = () => {
         getWallpapers(props.user.authToken, () => {
-            // getTunes(props.user.authToken, () => {
-            suitcaseModel.onOpen();
-            setIsLoadingSuitcaseClick(false);
-            // });
-            // zzz
+            getTunes(props.user.authToken, () => {
+                suitcaseModel.onOpen();
+                setIsLoadingSuitcaseClick(false);
+            });
         });
     }
 
@@ -616,10 +586,13 @@ function Chat(props) {
         setIsLoadingChangeWallpaper({ isLoading: false, itemId: null });
     }
 
-    const changeWallpaper = async (authToken, item) => {
-        setIsLoadingChangeWallpaper({ isLoading: true, itemId: item.uuid });
+    const changeWallpaper = async (authToken, item, isDefault = false) => {
+        setIsLoadingChangeWallpaper({ isLoading: true, itemId: item?.uuid });
         let formData = new FormData();
-        formData.append('uuid', item.uuid);
+        formData.append('uuid', item?.uuid);
+        if (isDefault) {
+            formData.append('is_default', 'True');
+        }
         const response = await fetch(apiURL + 'api/v1/user/change/wallpaper', {
             method: 'PATCH',
             headers: {
@@ -630,11 +603,21 @@ function Chat(props) {
         const rsp = await response.json();
         if (response.status >= 200 && response.status < 300) {
             if (rsp.payload) {
-                $('#chat-background').css('background-image', 'url(' + encodeURI(apiURL.slice(0, -1) + item?.wallpaper) + ')');
-                $('#chat-background').css('background-size', 'contain');
-                $('#chat-background').css('background-repeat', 'round');
+                if (isDefault) {
+                    $('#chat-background').css('background-image', 'unset');
+                    $('#chat-background').css('background-size', 'unset');
+                    $('#chat-background').css('background-repeat', 'unset');
+                    $('#chat-background').css('background-color', 'var(--third-color)');
+                    setChatBackgroundImage("");
+                    toast('Default Background set successfully!');
+                } else {
+                    $('#chat-background').css('background-image', 'url(' + encodeURI(apiURL.slice(0, -1) + item?.wallpaper) + ')');
+                    $('#chat-background').css('background-size', 'contain');
+                    $('#chat-background').css('background-repeat', 'round');
+                    toast('Background Image set successfully!');
+                    setChatBackgroundImage(encodeURI(apiURL.slice(0, -1) + item?.wallpaper));
+                }
                 getWallpapers(authToken);
-                toast('Background Image set successfully!');
             } else {
                 handleAPIError(rsp);
             }
@@ -649,8 +632,7 @@ function Chat(props) {
     }
 
     const getTunes = async (authToken, onSuccess = () => { }) => {
-        // zzz - wait for API
-        const response = await fetch(apiURL + 'api/v1/user/fetch/tunes', {
+        const response = await fetch(apiURL + 'api/v1/user/list/tune', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -676,15 +658,14 @@ function Chat(props) {
 
     const purchaseTune = async (authToken, item) => {
         setIsLoadingChangeSoundClick({ isLoading: true, itemId: item.uuid });
-        const response = await fetch(apiURL + 'api/v1/user/buy/tune', {
+        let formData = new FormData();
+        formData.append('uuid', item.uuid);
+        const response = await fetch(apiURL + 'api/v1/user/purches/tune', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + authToken
             },
-            body: JSON.stringify({
-                "tune": item.sound,
-                "price": item.price
-            }) // zzz
+            body: formData
         });
         const rsp = await response.json();
         if (response.status >= 200 && response.status < 300) {
@@ -717,7 +698,7 @@ function Chat(props) {
         const rsp = await response.json();
         if (response.status >= 200 && response.status < 300) {
             if (rsp.payload) {
-                localStorage.setItem('sound_click_tune', item.sound);
+                localStorage.setItem('sound_click_tune', item.tune);
                 getTunes(authToken);
                 toast('Sound selected successfully!');
             } else {
@@ -1068,11 +1049,14 @@ function Chat(props) {
         }
     }
 
-    const answerChecklistClick = (selected, user_checklist) => () => {
-        let formData = new FormData();
-        formData.append('selected', selected);
-        formData.append('user_checklist', user_checklist);
-        answerChecklist(props.user.authToken, formData);
+    const answerChecklistClick = (selected, cData) => () => {
+        if (!cData.checked?.[selected]?.find(c => c?.user?.uuid === props.user?.user?.uuid)) {
+            let user_checklist = cData.uuid;
+            let formData = new FormData();
+            formData.append('selected', selected);
+            formData.append('user_checklist', user_checklist);
+            answerChecklist(props.user.authToken, formData);
+        }
     }
 
     const renderChecklistMessage = (checkListData) => {
@@ -1097,9 +1081,8 @@ function Chat(props) {
                         {index == 0 ?
                             <div className='user-info-3kzc3'>
                                 <div style={{ position: 'relative' }}>
-                                    {/* zzz */}
                                     <img
-                                        src={'/assets/person.png'}
+                                        src={cData.admin_data?.avatar ? encodeURI(apiURL.slice(0, -1) + cData.admin_data?.avatar) : "/assets/person.png"}
                                         style={{ height: 40, width: 40, borderRadius: '50%', }}
                                     />
                                     <img
@@ -1110,15 +1093,13 @@ function Chat(props) {
                             </div>
                             :
                             <div style={{ alignItems: 'center' }}>
-                                <p style={{ color: 'var(--fourth-color)', opacity: 0.6, fontSize: 11, marginTop: 20 }}>{""}</p>
                             </div>
                         }
                     </div>
                     <div className="message-ac2s2">
                         <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
                             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                {/* zzz */}
-                                <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{"Harsh Patel"}</p>
+                                <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{cData.admin_data.first_name} {cData.admin_data.last_name}</p>
                                 <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
                             </div>
                         </div>
@@ -1137,7 +1118,7 @@ function Chat(props) {
                                             //     }
                                             //     closeDelay={100}
                                             // >
-                                            <div className='checklist-answer-923mas' key={index} style={{}} onClick={answerChecklistClick(checklist, cData.uuid)}>
+                                            <div className='checklist-answer-923mas' key={index} style={{}} onClick={answerChecklistClick(checklist, cData)}>
                                                 {checklist}
                                                 <div style={{ marginLeft: 10 }}>{cData.checked?.[checklist]?.length ?? 0}</div>
                                             </div>
@@ -1319,14 +1300,13 @@ function Chat(props) {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <div className="flex justify-between items-center">
-                            {/* zzz */}
-                            {/* {isLoadingSuitcaseClick ?
+                            {isLoadingSuitcaseClick ?
                                 <Spinner size='sm' color='default' style={{ marginRight: '2.5rem' }} />
                                 :
                                 <div style={{ cursor: "pointer", marginRight: '2rem' }} onClick={onSuitCaseClick}>
                                     <LuggageIcon size={21} className="refresh" />
                                 </div>
-                            } */}
+                            }
                             <MoonIcon size={22} className="refresh" />
                             <Switch
                                 size="sm"
@@ -1679,7 +1659,6 @@ function Chat(props) {
                                                 </div>
                                                 <div style={{ borderTopWidth: 1, borderTopColor: 'var(--third-color)' }} />
                                                 <p className='coin-body-footer-title-72bak'>IDENTITY BOOSTER</p>
-                                                {/* zzz */}
                                                 {props.user?.user?.identity_booster ?
                                                     <div className='main-button-7ajb412' style={{ marginLeft: 0, backgroundColor: 'var(--third-color)', color: 'var(--fourth-color)', borderRadius: 10 }}>
                                                         UNLOCKED
@@ -1880,7 +1859,7 @@ function Chat(props) {
                                                             }}
                                                         >
                                                         </div>
-                                                        {chatBackgroundImage != null ?
+                                                        {chatBackgroundImage == "" ?
                                                             <Button className='main-button-7ajb412' style={{ cursor: 'unset', marginLeft: 0, backgroundColor: 'var(--seventh-color)', color: 'var(--fourth-color)' }} disabled size='sm' color='' >
                                                                 Default Selected
                                                                 <CheckCircleIcon color='var(--fourth-color)' strokeWidth={2.8} size={14} />
@@ -1892,12 +1871,7 @@ function Chat(props) {
                                                                 size='sm'
                                                                 color=''
                                                                 onClick={(e) => {
-                                                                    $('#chat-background').css('background-image', 'unset');
-                                                                    $('#chat-background').css('background-size', 'unset');
-                                                                    $('#chat-background').css('background-repeat', 'unset');
-                                                                    $('#chat-background').css('background-color', 'var(--third-color)');
-                                                                    setChatBackgroundImage(null);
-                                                                    toast('Default Background set successfully!');
+                                                                    changeWallpaper(props.user.authToken, chatBackgroundWallpapers[0], true);
                                                                 }}
                                                             >
                                                                 APPLY DEFAULT
@@ -1957,7 +1931,7 @@ function Chat(props) {
                                         <>
                                             <div className='suitcase-box-wrap-72bak'>
                                                 <div className="suitcase-bgimage-grid-72bak">
-                                                    {soundClickData.map((sound, index) => (
+                                                    {soundClickData.map((tune, index) => (
                                                         <div key={index}
                                                             style={{ height: 350, width: 250, flexDirection: 'column', display: 'flex', justifyContent: 'center' }}>
                                                             <div
@@ -1967,7 +1941,7 @@ function Chat(props) {
                                                                 }}
                                                             >
 
-                                                                {playedSoundClick?.itemId == sound.uuid ?
+                                                                {playedSoundClick?.itemId == tune.uuid ?
                                                                     <PauseCircleIcon
                                                                         color='var(--fourth-color)'
                                                                         size={100}
@@ -1984,8 +1958,8 @@ function Chat(props) {
                                                                         strokeWidth={1}
                                                                         style={{ cursor: 'pointer' }}
                                                                         onClick={(e) => {
-                                                                            setPlayedSoundClick({ itemId: sound.uuid });
-                                                                            const soundUrl = '/audio/' + sound.sound;
+                                                                            setPlayedSoundClick({ itemId: tune.uuid });
+                                                                            const soundUrl = '/audio/' + tune.tune + '.mp3';
                                                                             const audio = new Audio(soundUrl);
                                                                             audio.play();
                                                                             audio.addEventListener('ended', () => {
@@ -1997,23 +1971,23 @@ function Chat(props) {
                                                                 <p style={{ color: 'var(--fourth-color)', fontSize: 16, marginTop: 10 }}>Tune {index + 1}</p>
                                                             </div>
 
-                                                            {!sound.is_purchase ?
+                                                            {!tune.is_purchased ?
                                                                 <Button
                                                                     className='main-button-7ajb412'
                                                                     style={{ marginLeft: 0 }}
                                                                     size='sm'
                                                                     color=''
-                                                                    isLoading={isLoadingChangeSoundClick.itemId == sound.uuid ? isLoadingChangeSoundClick.isLoading : false}
+                                                                    isLoading={isLoadingChangeSoundClick.itemId == tune.uuid ? isLoadingChangeSoundClick.isLoading : false}
                                                                     spinner={<Spinner color='current' size='sm' />}
                                                                     onClick={(e) => {
-                                                                        purchaseTune(props.user.authToken, sound);
+                                                                        purchaseTune(props.user.authToken, tune);
                                                                     }}
                                                                 >
-                                                                    UNLOCK FOR {sound.price} COINS
+                                                                    UNLOCK FOR {tune.price} COINS
                                                                     <img alt="Avatar" src="/assets/coin.svg" width={16} height={16} />
                                                                 </Button>
                                                                 :
-                                                                sound.selected ?
+                                                                tune.selected ?
                                                                     <Button className='main-button-7ajb412' style={{ cursor: 'unset', marginLeft: 0, backgroundColor: 'var(--seventh-color)', color: 'var(--fourth-color)' }} disabled size='sm' color='' >
                                                                         Selected
                                                                         <CheckCircleIcon color='var(--fourth-color)' strokeWidth={2.8} size={14} />
@@ -2022,12 +1996,12 @@ function Chat(props) {
                                                                     <Button
                                                                         className='main-button-7ajb412'
                                                                         style={{ marginLeft: 0 }}
-                                                                        isLoading={isLoadingChangeSoundClick.itemId == sound.uuid ? isLoadingChangeSoundClick.isLoading : false}
+                                                                        isLoading={isLoadingChangeSoundClick.itemId == tune.uuid ? isLoadingChangeSoundClick.isLoading : false}
                                                                         spinner={<Spinner color='current' size='sm' />}
                                                                         size='sm'
                                                                         color=''
                                                                         onClick={(e) => {
-                                                                            changeTune(props.user.authToken, sound);
+                                                                            changeTune(props.user.authToken, tune);
                                                                         }}
                                                                     >
                                                                         APPLY
@@ -2136,7 +2110,6 @@ function Chat(props) {
                                                         count > 10 && <p style={{ marginLeft: 20, width: 44, marginBottom: 0, fontSize: 15, color: 'white', textAlign: 'right' }}>+{count} users</p>
                                                     )}
                                                 >
-                                                    {/* zzz */}
                                                     {[...categoryUsers].filter(c => c.is_online).map((value, index) => {
                                                         return (
                                                             <Avatar key={index} src={value.avatar ? value.avatar : '/assets/person.png'} />
@@ -2145,7 +2118,6 @@ function Chat(props) {
                                                 </AvatarGroup>
                                             </div>
                                         </div>
-                                        {/* zzz - wait for API*/}
                                         <div className='online-count-box-72bak'>
                                             <div className='online-count-box-header-72bak' style={{ justifyContent: 'center' }}>
                                                 <AvatarGroup
@@ -2155,7 +2127,6 @@ function Chat(props) {
                                                     max={4}
                                                     renderCount={(count) => null}
                                                 >
-                                                    {/* zzz */}
                                                     {[...categoryUsers].filter(c => c.is_online).map((value, index) => {
                                                         return (
                                                             <Avatar key={index} src={value.avatar ? value.avatar : '/assets/person.png'} />

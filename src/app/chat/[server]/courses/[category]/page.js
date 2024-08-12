@@ -112,11 +112,12 @@ function CoursesByCategory(props) {
       if (response.status >= 200 && response.status < 300) {
         const rsp = await response.json();
         if (rsp?.payload && typeof rsp?.payload == 'object') {
-          setCourses(rsp.payload);
-          setOriginalCourses(rsp.payload);
+          let coursesList = rsp.payload.filter(c => c.lessons > 0);
+          setCourses(coursesList);
+          setOriginalCourses(coursesList);
           setIsCoursesFetch(true);
           if (!searchParams?.cid) {
-            router.replace('?cid=' + rsp.payload?.[0]?.uuid);
+            router.replace('?cid=' + coursesList?.[0]?.uuid);
           }
         } else {
           toast("Error while fetching data!");
@@ -144,6 +145,15 @@ function CoursesByCategory(props) {
       if (rsp.payload && rsp.payload?.uuid) {
         setSelectedCourse(rsp.payload);
         setIsCourseDataFetch(true);
+        let coursesList = [...courses];
+        coursesList = coursesList.map(c => {
+          if (c.uuid == rsp.payload?.uuid) {
+            c = rsp.payload;
+            c.lessons = rsp.payload?.data?.length;
+          }
+          return c;
+        })
+        setCourses(coursesList);
 
         if (isNavigateToLesson) {
           let lesson = rsp.payload?.data?.[0];
@@ -465,7 +475,6 @@ function CoursesByCategory(props) {
                 <Poster className="vds-poster" />
               </MediaProvider>
               <DefaultVideoLayout
-                thumbnails='https://files.vidstack.io/sprite-fight/thumbnails.vtt'
                 icons={defaultLayoutIcons}
               />
             </MediaPlayer>

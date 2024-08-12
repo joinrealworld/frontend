@@ -13,7 +13,7 @@ export const SoundProvider = ({ children }) => {
                 const sound_click_tune = localStorage.getItem('sound_click_tune');
                 if (sound_click_tune !== undefined && sound_click_tune !== null) {
                     // audio/sound-1.mp3
-                    const soundUrl = '/audio/' + sound_click_tune;
+                    const soundUrl = '/audio/' + sound_click_tune + '.mp3';
                     const audio = new Audio(soundUrl);
                     audio.play();
                 }
