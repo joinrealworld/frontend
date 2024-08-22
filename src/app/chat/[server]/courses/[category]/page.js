@@ -8,7 +8,7 @@ import Link from "next/link";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, } from 'lucide-react';
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon } from 'lucide-react';
 
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/audio.css';
@@ -142,7 +142,9 @@ function CoursesByCategory(props) {
     });
     if (response.status >= 200 && response.status < 300) {
       const rsp = await response.json();
+
       if (rsp.payload && rsp.payload?.uuid) {
+        console.log(rsp.payload);
         setSelectedCourse(rsp.payload);
         setIsCourseDataFetch(true);
         let coursesList = [...courses];
@@ -154,7 +156,6 @@ function CoursesByCategory(props) {
           return c;
         })
         setCourses(coursesList);
-
         if (isNavigateToLesson) {
           let lesson = rsp.payload?.data?.[0];
           if (searchParams?.lid && rsp.payload?.data?.some(c => c.uuid === searchParams?.lid)) {
@@ -479,7 +480,7 @@ function CoursesByCategory(props) {
               />
             </MediaPlayer>
           </div>
-          <span dangerouslySetInnerHTML={{ __html: currentMessage?.content }} className="lesson-description-mcajn2">
+          <span dangerouslySetInnerHTML={{ __html: currentMessage?.content }} className="lesson-description1-mcajn2">
           </span>
         </>
       )
@@ -608,7 +609,6 @@ function CoursesByCategory(props) {
       if (selectedCourse) {
 
         let currentMessage = { ...selectedLesson };
-
         // currentMessage.content = currentMessage?.content.replace(/\*\*(.*?)\*\*/g, `<b>$1</b>`);
         // // Replace \n with <br>
         // currentMessage.content = currentMessage?.content.replace(/\n/g, `<br />`);
@@ -622,12 +622,14 @@ function CoursesByCategory(props) {
                   style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
                   onClick={onOpenSideMenu}
                 />
+                <div style={{ height: "2rem", width: "2rem" }}></div>
                 {selectedCourse &&
                   <>
                     <h2 className="lesson-title-1mcasa">{selectedCourse?.name}</h2>
                     <HeartIcon
+                      className="heart-icon"
                       fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
-                      style={{ position: "absolute", right: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
                       onClick={(e) => onToggleFavorite()}
                     />
                   </>
@@ -646,39 +648,34 @@ function CoursesByCategory(props) {
         return (
           <>
             <div className="lesson-header-23maaa">
+              {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 ?
+                <ArrowLeft isLoading={isPreviousLoading} className="arrow-left" onClick={onPreStep} /> :
+                <div style={{ height: "2rem", width: "2rem" }}></div>
+              }
               <ArrowLeft
                 id="sidebar-btn-nack3"
-                style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
+                style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--third-color)", }}
                 onClick={onOpenSideMenu}
               />
               <h2 className="lesson-title-1mcasa">{selectedCourse?.name}</h2>
               <HeartIcon
+                className="heart-icon"
                 fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
-                style={{ position: "absolute", right: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
+                style={{ cursor: "pointer", color: "var(--fourth-color)", }}
                 onClick={(e) => onToggleFavorite()}
               />
             </div>
             <div className="lesson-content-mdak32">
-
               {renderCourseContentBySection(currentMessage)}
-
               <div style={{ display: 'flex', width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-
-                {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 &&
-                  <Button color="default" isLoading={isPreviousLoading} variant="ghost" className="next-button-mdkad" onClick={onPreStep}>
-                    <span className="next-button-text-mdkad">Previous</span>
-                  </Button>
-                }
-
-                {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 &&
-                  <div style={{ width: '10%' }} />
-                }
-
+                {/* {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 &&
+                 
+                } */}
+                <div style={{ width: '90%' }} />
                 <Button spinner={<Spinner color='current' size='sm' />} color="default" isLoading={isNextLoading} variant="ghost" className="next-button-mdkad" onClick={onNextStep}>
-                  <span className="next-button-text-mdkad">Next</span>
+                  <span className="next-button-text-mdkad">NEXT</span>
                 </Button>
               </div>
-
             </div>
           </>
         );
@@ -691,12 +688,14 @@ function CoursesByCategory(props) {
                 style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
                 onClick={onOpenSideMenu}
               />
+              <div style={{ height: "2rem", width: "2rem" }}></div>
               {selectedCourse &&
                 <>
                   <h2 className="lesson-title-1mcasa">{selectedCourse?.name}</h2>
                   <HeartIcon
+                    className="heart-icon"
                     fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
-                    style={{ position: "absolute", right: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
+                    style={{ cursor: "pointer", color: "var(--fourth-color)", }}
                     onClick={(e) => onToggleFavorite()}
                   />
                 </>
@@ -721,48 +720,51 @@ function CoursesByCategory(props) {
         return courses.map((course, index) => {
           const isSelected = selectedCourse?.uuid == course.uuid;
           return (
-            <div key={index} className="course-item-k3bda">
-              <div className={`course-item-header-acnk3 ${isSelected ? "active" : undefined}`} onClick={(e) => onSelectCourse(course)}>
-                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                  <User
-                    name={course.name}
-                    description={(isSelected ? selectedCourse?.completed : course.completed) + "% completed"}
-                    avatarProps={{
-                      src: course.course_pic ? (apiURL + course.course_pic) : ''
-                    }}
+            // <div key={index} className="course-item-k3bda">
+            //   <div className={`course-item-header-acnk3 ${isSelected ? "active" : undefined}`} onClick={(e) => onSelectCourse(course)}>
+            //     <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <div key={index} className={`course-box ${course.completed === 100 ? 'success-course-box' : 'course-box'}`} onClick={(e) => onSelectCourse(course)} >
+              <div className="course-info-mc2nw">
+                <div className="course-text-info">
+                  <div className="course-name-9qncq6">{course.name}</div>
+                  <div className="course-name1-9qncq6">{(isSelected ? selectedCourse?.completed : course.completed)}%<span className="course-label-nja72b"> complete</span></div>
+
+                  <Progress
+                    size="sm"
+                    radius="sm"
+                    aria-label="Loading..."
+                    value={isSelected ? selectedCourse?.completed : course.completed}
+                    style={{ marginTop: 4 }}
                     classNames={{
-                      base: 'course-info-mc2nw',
-                      wrapper: 'course-name-info-mc2nw',
-                      name: 'course-name-9qncq6',
-                      description: 'course-description-9qncq6'
+                      indicator: "course-progress-983bzs",
                     }}
-                    style={{ cursor: 'pointer' }}
+                    color="success"
                   />
-
-                  <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
-
-                </div>
-                <Progress
-                  size="sm"
-                  radius="sm"
-                  aria-label="Loading..."
-                  value={isSelected ? selectedCourse?.completed : course.completed}
-                  style={{ marginTop: 12 }}
-                  classNames={{
-                    indicator: "course-progress-983bzs",
-                  }}
-                  color="success"
-                />
-                <div style={{ flexDirection: 'row', marginTop: 8, alignItems: 'center', display: 'flex', alignSelf: 'flex-start' }}>
-                  {/* <span className="course-value-nja72b">{(course.completed * course.lessons) / 100} / {course.lessons}</span> */}
-                  <span className="course-value-nja72b">{course.lessons}</span>
-                  <span className="course-label-nja72b">Lessons</span>
-                  {/* <span className="course-desc-divider-nja72b">|</span>
+                  <div style={{ flexDirection: 'row', marginTop: 5, alignItems: 'center', display: 'flex', }}>
+                    {/* <span className="course-value-nja72b">{(course.completed * course.lessons) / 100} / {course.lessons}</span> */}
+                    <span className="course-value-nja72b">{course.lessons}</span>
+                    <span className="course-label-nja72b">Lessons</span>
+                    {/* <span className="course-desc-divider-nja72b">|</span>
                   <span className="course-value-nja72b">{selectedCourse.data?.filter(x => x.section == 'video')?.length}</span>
                   <span className="course-label-nja72b">Videos</span> */}
+                  </div>
                 </div>
+                <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
+                {/* <div className="course-avatar">
+                <span>{(course.name).split('┃')[0]}</span>
+                </div> */}
               </div>
             </div>
+
+
+
+
+
+            //     </div>
+
+
+            //   </div>
+            // </div>
           );
         });
       } else {
@@ -778,15 +780,20 @@ function CoursesByCategory(props) {
       );
     }
   }
+
+  const handleClose = () => {
+    router.replace('/chat/' + serverId + '/courses/'); // This navigates back to the previous page in history
+  };
+
   return (
     <div className='container-93ca2aw'>
       <div className='header-3m32aaw'>
         <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
           <Link href={'/chat/' + serverId + '/courses/'} className="back-icon-nw3rf">
-            <ArrowLeft style={{ color: "var(--fourth-color)" }} />
+            <ArrowLeft className="arrow-left-header" style={{ color: "var(--fourth-color)", fontWeight: "600" }} />
           </Link>
           <div className="course-navigation-cnaw34">
-            <Link href={'/chat/' + serverId + '/courses/'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 20 }}>
+            <Link href={'/chat/' + serverId + '/courses/'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 18 }}>
               {/* <img
                 src={"https://img.freepik.com/free-vector/online-certification-illustration_23-2148575636.jpg?size=626&ext=jpg"}
                 className="category-img-9ama2f"
@@ -796,8 +803,8 @@ function CoursesByCategory(props) {
             </Link>
             {selectedCourse &&
               <>
-                <ChevronRight size={20} style={{ marginLeft: 20, marginRight: 10, color: "var(--fourth-color)" }} />
-                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', cursor: 'pointer', marginLeft: 12 }}>
+                <ChevronRight size={10} style={{ marginLeft: 8, marginRight: 8, color: "var(--fourth-color)" }} />
+                <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', cursor: 'pointer', marginLeft: 2 }}>
                   {/* <Image
                     src={selectedCourse?.pic ? (apiURL + selectedCourse?.pic) : null}
                     className="category-img-9ama2f"
@@ -811,13 +818,20 @@ function CoursesByCategory(props) {
           </div>
         </div>
         <span className="title-cnaw34">Learning Center</span>
+        <XIcon className="close-icon" onClick={handleClose} />
       </div>
 
       <div className='content-92a233a'>
 
         <div className='left-menu-6k2zzc' id="course-sidebar">
 
-          <div className="search-course-o38ca3">
+          <div className="search-course-o38ca3" style={{ position: 'relative' }}>
+            <SearchIcon
+              color="var(--fifth-color)"
+              size={17}
+              className="search-icon"
+              style={{ position: 'absolute', top: 21, left: 8 }}
+            />
             <input
               type="text"
               name="search"
@@ -825,6 +839,7 @@ function CoursesByCategory(props) {
               placeholder="Search course..."
               value={searchText}
               autoComplete="off"
+              style={{ paddingLeft: '40px' }} // Adjust padding to make space for the search icon
               onChange={(event) => {
                 let searchTextValue = event.target.value.trim().toLowerCase();
                 setSearchText(searchTextValue);
@@ -838,8 +853,9 @@ function CoursesByCategory(props) {
             />
             <XIcon
               color="var(--fifth-color)"
-              size={20}
-              style={{ cursor: 'pointer', position: 'absolute', top: 22, right: 10 }}
+              size={24}
+              className="close-icon-search"
+              style={{ cursor: 'pointer', position: 'absolute', top: 17.5, right: 8 }}
               onClick={(e) => {
                 setSearchText('');
                 setCourses(originalCourses);
