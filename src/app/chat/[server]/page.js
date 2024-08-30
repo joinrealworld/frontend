@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon } from 'lucide-react';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
@@ -22,7 +22,7 @@ import Image from 'next/image';
 const ChannelType = {
     checkList: 1,
     polls: 2,
-    generalChat: 3
+    media: 3
 }
 
 const Channels = [
@@ -35,6 +35,11 @@ const Channels = [
         uuid: '7DE517C0-B05F-47DB-986A-0B130638C91A',
         name: '📊┃polls',
         type: ChannelType.polls,
+    },
+    {
+        uuid: '7DE517C0-B05F-47DB-986A-0B130638C91B',
+        name: '📱|media',
+        type: ChannelType.media,
     },
     // do not need - so code commented for now
     // {
@@ -164,6 +169,8 @@ function Chat(props) {
     const [pollList, setPollList] = useState([]);
     const [isCheckListFetch, setIsCheckListFetch] = useState(false);
     const [checkList, setCheckList] = useState([]);
+    const [isMediaListFetch, setIsMediaListFetch] = useState(false);
+    const [mediaList, setMediaList] = useState([]);
 
     const [selectedSideMenu, setSelectedSideMenu] = useState(SideMenus[0]);
     const [searchText, setSearchText] = useState('');
@@ -189,6 +196,10 @@ function Chat(props) {
     const [chatBackgroundImage, setChatBackgroundImage] = useState(props.user?.user?.selected_wallpaper ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.selected_wallpaper) : "");
 
     const [isChooseSoundClick, setIsChooseSoundClick] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const handleMouseEnter = () => setIsModalVisible(true);
+    const handleCloseModal = () => setIsModalVisible(false);
 
     const [mountTheme, setMountTheme] = useState(
         JSON.parse(localStorage.getItem("theme")) || "dark"
@@ -408,6 +419,11 @@ function Chat(props) {
             setIsPollListFetch(false);
             setPollList([]);
             await getPollsData();
+        }
+        else if (channel?.type == ChannelType.media) {
+            setIsMediaListFetch(false);
+            setMediaList([]);
+            // await getMediaData();
         }
         // do not need - so code commented for now
         // else if (channel?.type == ChannelType.generalChat) {
@@ -875,6 +891,9 @@ function Chat(props) {
         else if (selectedChannel?.type == ChannelType.polls) {
             return renderPolls(pollList);
         }
+        else if (selectedChannel?.type == ChannelType.media) {
+            router.replace('/media')
+        }
         // do not need - so code commented for now
         // else if (selectedChannel?.type == ChannelType.generalChat) {
         //     return renderChatMessage({});
@@ -1329,7 +1348,7 @@ function Chat(props) {
                 <div id='chat-background' className="chat-gsdu3b">
 
                     {/* START - chat left content */}
-                    <div style={{ width: '67%', overflowX: 'hidden', overflowY: 'hidden' }}>
+                    <div style={{ width: '67%', overflowX: 'hidden', overflowY: 'hidden',position: 'relative' }}>
 
 
                         {/* START - chat content */}
@@ -1351,34 +1370,75 @@ function Chat(props) {
                             <div>
                                 {renderMainContent()}
                             </div>
+                            <div className={`popup-modal ${isModalVisible ? 'visible' : ''}`}>
+                            <div className="rectangle"></div>
+                            <XIcon className="close-btn" onClick={handleCloseModal} />
+                                    <h3 className="modal_text_title">✅┃daily-checklist</h3>
+                                    {checkList.length !== 0 ? <p style={{ opacity: 0.7, fontSize: 15, marginTop: 20 }}>No checklists available!</p> :
+                                      <ul className="modal_body" style={{ marginTop: 20 }} >
+                                         <li>
+                                            <input className="custom-checkbox" type="checkbox" id="list1" />
+                                            <label className="modal_text_body" htmlFor="list1">List item 1</label>
+                                        </li>
+                                        <li>
+                                            <input className="custom-checkbox" type="checkbox" id="list2" />
+                                            <label className="modal_text_body" htmlFor="list2">List item 2</label>
+                                        </li>
+                                        <li>
+                                            <input className="custom-checkbox" type="checkbox" id="list3" />
+                                            <label className="modal_text_body" htmlFor="list3">List item 3</label>
+                                        </li>
+                                        <li>
+                                            <input className="custom-checkbox" type="checkbox" id="list4" />
+                                            <label className="modal_text_body" htmlFor="list4">List item 4</label>
+                                        </li>
+                                        <li>
+                                            <input className="custom-checkbox" type="checkbox" id="list5" />
+                                            <label className="modal_text_body" htmlFor="list5">List item 5</label>
+                                        </li>
+                                       
+                                      </ul>
+                                    }
+                                </div>
                         </div>
                         {/* END - chat content */}
 
 
                         {/* START - chat input */}
                         <div style={{ height: '10%', backgroundColor: 'var(--seventh-color)' }} className="flex flex-col">
-                            <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                                <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
-                                    <input accept="image/*" id="add-media-9"
-                                        type="file" style={{ display: 'none' }} />
-                                    {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
-                                        <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
-                                            +
-                                        </label>
-                                        :
-                                        null}
-                                    <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                        <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                            {(selectedChannel?.name === "✅┃daily-checklist") ?
+                                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                    <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                        <div
+                                            className="relative"
+                                            onMouseEnter={handleMouseEnter}
+                                        >
+                                            <ClipboardList className='clipboard-icon' size={36} />
+
+                                        </div>
                                     </div>
-                                    {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+
+                                </footer>
+
+                                : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                    <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
+                                        <input accept="image/*" id="add-media-9"
+                                            type="file" style={{ display: 'none' }} />
+                                        {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
+                                            <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
+                                                +
+                                            </label>
+                                            :
+                                            null}
+                                        <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                            <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                        </div>
+                                        {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
                                         <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
                                     </form> */}
-                                </div>
-                            </footer>
+                                    </div>
+                                </footer>}
                         </div>
-
-
-
                     </div>
                     {/* END - chat input  END - chat left content */}
 

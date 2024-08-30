@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link';
-import { MoveLeft, CheckCircle2 } from 'lucide-react';
+import { MoveLeft, CheckCircle2 ,Check} from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -49,6 +49,14 @@ function Register(props) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedStep, setSelectedStep] = useState(Steps.personalInfo);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isAnnual, setIsAnnual] = useState(false);
+
+const handleBillingToggle = (event) => {
+  setIsAnnual(event.target.checked);
+  console.log(event.target.checked ? "Annually selected" : "Monthly selected");
+};
+  
 
   const onPersonalInfoNext = async () => {
     checkEmailExistOrNot();
@@ -318,9 +326,22 @@ function Register(props) {
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg> Back
           </div>
-          <h3 className='form-title-130mcad'>Select Plan</h3>
-          <div className="pricing-card-da2fma">
-            <div className="card-header-ea21caw">
+          <h3 className='form-title-130mcad'>Choose a Plan</h3>
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <div className="billing-toggle">
+            <label className="billing-switch">
+              <input type="checkbox" onChange={handleBillingToggle} />
+              <span className="slider">
+                <span className="billing-option monthly">Monthly</span>
+                <span className="billing-option annually">Annually</span>
+              </span>
+            </label>
+          </div>
+          <div className={`save-percentage ${isAnnual ? 'save-percentage' : 'save-percentage-gray'}`}>Save 16.67%</div>
+          </div>
+
+          <div className="pricing-card-da2fma" style={{flexDirection: 'row', alignItems: 'center', display: 'flex'}}>
+            {/* <div className="card-header-ea21caw">
               <div className="card-btn-parent-1mqidn">
                 {plans.map((item, index) => {
                   return (
@@ -338,11 +359,68 @@ function Register(props) {
                 })}
                 <div className="overlay"></div>
               </div>
+            </div> */}
+             <div className="card-body-mzc29q">
+                  <div className='active'>
+                    <div className="card-plans-cnq27as">
+                      <span className="plan-tag-23an1cz">Regular</span>
+                      <div className="card-sub-plan-mcai2bc">
+                        <h3 className="plan-title-nc17ab">{isAnnual ? <span ><s className='strike-plans'>$360</s> $300</span>: '$30'}</h3>
+                        <h6 className="plan-duration-mc81bd">{isAnnual ? <span > /per annual</span>: <span > /per month</span>} </h6>
+                      </div>
+                    </div>
+                    <button className="main-button-mac31cas-plans"  type="submit"  >
+                      Get Regular
+                    </button>
+                     <div className="card-content-va32da">
+                      <div className="card-lists-cn127s">
+                      <span className="plan-tag-23an1cz">Key features</span>
+                      <ul class="inline-list">
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Web libraries</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>API reference</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Test environments</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Responsive designs</li>
+                      </ul>
+                      </div>
+                    </div> 
+                     
+                  </div>     
             </div>
             <div className="card-body-mzc29q">
+                  <h3 className='recommeded-plan'>Recommended</h3>
+                  <div className='active'>
+                    <div className="card-plans-cnq27as">
+                      <span className="plan-tag-23an1cz">VIP</span>
+                      <div className="card-sub-plan-mcai2bc">
+                        <h3 className="plan-title-nc17ab">{isAnnual ? <span ><s className='strike-plans'>$720</s> $600</span>: '$60'}</h3>
+                        <h6 className="plan-duration-mc81bd">{isAnnual ? <span > /per annual</span>: <span > /per month</span>} </h6>
+                      </div>
+                    </div>
+                    <button className="main-button-mac31cas-plans"  type="submit"  >
+                      Get VIP
+                    </button>
+                     <div className="card-content-va32da">
+                      <div className="card-lists-cn127s">
+                      <span className="plan-tag-23an1cz">Key features</span>
+                      <ul class="inline-list">
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Developer friendly</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Web libraries</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>API reference</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Test environments</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Plug &amp; Play</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Responsive designs</li>
+                      </ul>
+                      </div>
+                    </div> 
+                     
+                  </div>     
+            </div>
+            
+            {/* <div className="card-body-mzc29q">
               {plans.map((item, index) => {
                 return (
                   <div key={index} id={item.id} className={selectedPlan?.id == item.id ? "active" : undefined}>
+                    <p className="plan-select-details">You've selected the {item.nickname} plan. You can still choose from the other two options.</p>
                     <div className="card-plans-cnq27as">
                       <span className="plan-tag-23an1cz">{item.nickname}</span>
                       <div className="card-sub-plan-mcai2bc">
@@ -350,7 +428,7 @@ function Register(props) {
                         <h6 className="plan-duration-mc81bd"> / {item?.recurring?.interval_count} {item?.recurring?.interval}</h6>
                       </div>
                     </div>
-                    {/* <div className="card-content-va32da">
+                    <div className="card-content-va32da">
                       <p>{item.description}</p>
                       <div className="card-lists-cn127s">
                         {item.benefits.map((item, index) => {
@@ -364,16 +442,30 @@ function Register(props) {
                           )
                         })}
                       </div>
-                    </div> */}
-                  </div>
+                    </div>
+                    <button className="main-button-mac31cas-plans"  type="submit"  >
+                      Get {item.nickname}
+                    </button>
+                     <div className="card-content-va32da">
+                      <div className="card-lists-cn127s">
+                      <span className="plan-tag-23an1cz">Key features</span>
+                      <ul class="inline-list">
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Developer friendly documents</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Web libraries</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>API reference</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Test environments</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Plug &amp; Play</li>
+                        <li ><Check size={18} style={{marginRight:"10",marginTop:2}}/>Responsive designs</li>
+                      </ul>
+                      </div>
+                    </div> 
+                     
+                  </div>     
                 )
               })}
-            </div>
+            </div> */}
           </div>
-
-          <button className="main-button-mac31cas" type="submit">
-            SELECT
-          </button>
+         
 
         </form>
       </div>

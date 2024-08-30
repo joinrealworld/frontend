@@ -1193,6 +1193,146 @@ main {
     color: var(--fourth-color);
 }
 
+.clipboard-icon{
+    color:var(--ninth-color);
+    background-color: #fff;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.clipboard-icon:hover{
+    color:#fff;
+    background-color: var(--ninth-color);
+   
+}
+/* Add these styles in your CSS file or within a <style> tag */
+.popup-modal {
+    position: absolute; /* Positioned relative to the parent container */
+    bottom: 0; /* Start at the bottom of the parent container */
+    left: 50%; /* Center horizontally */
+    width: 40%;
+    height:50%;
+    transform: translate(-50%, 100%); /* Start off-screen below */
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    background-color: var(--seventh-color);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popup-modal.visible {
+    transform: translate(-50%, -50%); /* End position (centered vertically) */
+    opacity: 1;
+}
+
+.rectangle {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    border: 5px solid var(--border-color);
+    transform: translateX(-50%);
+    width: 50%;
+    height: 20px;
+    background-color: var(--fifth-color);
+    border-radius: 5px;
+}
+
+.rectangle::before {
+    content: "•••••";
+    font-size: 28px;
+    color: var(--primary-color);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+.close-btn {
+    position: absolute;
+    top: 15px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    color: var(--fourth-color);
+    cursor: pointer;
+    height: 28px;
+    width: 28px;
+    border-radius: 50%;
+    padding: 3px;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.modal_text_title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--fourth-color);
+}
+
+.modal_text_body {
+    margin-left: 5px;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--fourth-color);
+}
+
+.modal_body li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Adjust as needed */
+}
+
+.custom-checkbox {
+    display: none;
+}
+
+/* Create a custom checkbox */
+.custom-checkbox + label {
+    position: relative;
+    display: inline-block;
+    padding-left: 25px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 20px;
+    vertical-align: middle;
+}
+
+/* Create the custom checkbox box */
+.custom-checkbox + label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    background-color: #ddd;
+    border-radius: 4px;
+}
+
+/* Style the custom checkbox when checked */
+.custom-checkbox:checked + label::before {
+    background-color: #ecc879;
+}
+
+/* Add a checkmark symbol when checked */
+.custom-checkbox:checked + label::after {
+    content: "✓";
+    position: absolute;
+    left: 4px;  /* Adjusted for better centering */
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 12px; /* Adjusted font size */
+    line-height: 1;
+}
+
+
+
+
 @media screen and (max-width: 1000px) {
     #chat {
         display: flex;
