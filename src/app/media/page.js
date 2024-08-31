@@ -57,6 +57,7 @@ function MediaPage(props) {
 
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
+  const [medias, setMedias] = useState([]);
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -82,6 +83,39 @@ function MediaPage(props) {
       getCourseDataById(searchParams?.cid);
     }
   }, [searchParams?.cid]);
+
+  const getMediaData = async () => {
+    const response = await fetch(apiURL + 'api/v1/media/fetch/message', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + props.user.authToken
+        }
+    });
+    if (response.status >= 200 && response.status < 300) {
+        const rsp = await response.json();
+        console.log(rsp.results);
+        if (rsp.results) {
+           setMedias(rsp.results);
+        }
+    } else {
+           toast("Error while fetching data!");
+    }
+}
+
+  const getInitData = async () => {
+    getMediaData();
+}
+
+  useEffect(() => {
+    if (!props.user.isLoggedIn) {
+        router.push('/login');
+    } else {
+        // get data
+        getInitData();
+    }
+}, []);
+
 
   useEffect(() => {
     if (searchParams?.lid && searchParams?.lid != selectedLesson?.uuid) {
@@ -360,11 +394,83 @@ function MediaPage(props) {
     router.push('?cid=' + originalCourses?.[index]?.uuid);
   }
 
+  function timeAgo(timestamp) {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - date) / 1000);
+
+    const seconds = diffInSeconds % 60;
+    const minutes = Math.floor(diffInSeconds / 60) % 60;
+    const hours = Math.floor(diffInSeconds / 3600) % 24;
+    const days = Math.floor(diffInSeconds / 86400);
+
+    if (days > 1) return `${days} Days ago`;
+    if (days === 1) return `1 Day ago`;
+    if (hours > 1) return `${hours} Hours ago`;
+    if (hours === 1) return `1 Hour ago`;
+    if (minutes > 1) return `${minutes} Minutes ago`;
+    if (minutes === 1) return `1 Minute ago`;
+    return `${seconds} Seconds ago`;
+}
+
   const renderMediaContent = () => {
      return(
       <>
       <div className="media-posts">
-          <div className="post">
+      {medias.map((media, index) => {
+                    return (
+                      <>
+                      {media.content == null ? 
+            <div className="post">
+              <div className="info2">
+                  <div className="user">
+                      <div className="profile-pic"><img
+                                            src='/assets/person.png'
+                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                        /></div>
+                      <p className="username">{media.user}</p>
+                  </div>
+                  
+              </div>
+              <p className="description-text">{media.message}</p>
+              <div className="post-content">
+                  <div className="reaction-wrapper">
+                  <HeartIcon
+                      className="heart-icon"
+                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
+                      
+                    />
+                     <p className="likes">{media.likes_count} Likes</p>
+                  </div>
+               <p className="post-time">{timeAgo(media.timestamp)}</p>
+              </div>
+          </div>
+          :<div className="post">
+              <div className="info2">
+                  <div className="user">
+                      <div className="profile-pic"><img
+                                            src='/assets/person.png'
+                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                        /></div>
+                      <p className="username">{media.user} </p>
+                  </div>
+                  
+              </div>
+              <img src={(apiURL + media.content.content)} className="post-image" alt="" />
+              <div className="post-content">
+                  <div className="reaction-wrapper">
+                  <HeartIcon
+                      className="heart-icon"
+                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10' }}
+                      
+                    />
+                     <p className="likes">{media.likes_count} Likes</p>
+                  </div>
+                  <p className="description">{media.message}</p>
+                  <p className="post-time">{timeAgo(media.timestamp)}</p>
+              </div>
+          </div>}
+        {/* <div className="post">
               <div className="info2">
                   <div className="user">
                       <div className="profile-pic"><img
@@ -388,11 +494,7 @@ function MediaPage(props) {
                   <p className="description">This is a sample text. @mention friends and add #hastags with the links https://products.com.</p>
                   <p className="post-time">2 minutes ago</p>
               </div>
-              {/* <div className="comment-wrapper">
-                  <img src="img/smile.PNG" className="icon" alt=""/>
-                  <input type="text" className="comment-box" placeholder="Add a comment"/>
-                  <button className="comment-btn">post</button>
-              </div> */}
+              
           </div>
           <div className="post">
               <div className="info2">
@@ -442,11 +544,7 @@ function MediaPage(props) {
                   <p className="description">This is a sample text. Add Hashtags and your desired text.</p>
                   <p className="post-time">5 minutes ago</p>
               </div>
-              {/* <div className="comment-wrapper">
-                  <img src="img/smile.PNG" className="icon" alt=""/>
-                  <input type="text" className="comment-box" placeholder="Add a comment"/>
-                  <button className="comment-btn">post</button>
-              </div> */}
+              
           </div>
           <div className="post">
               <div className="info2">
@@ -495,11 +593,7 @@ function MediaPage(props) {
                   <p className="description">This is a sample post text. @mentions, #hashtags, https://links.com are all automatically converted.</p>
                   <p className="post-time">10 minutes ago</p>
               </div>
-              {/* <div className="comment-wrapper">
-                  <img src="img/smile.PNG" className="icon" alt=""/>
-                  <input type="text" className="comment-box" placeholder="Add a comment"/>
-                  <button className="comment-btn">post</button>
-              </div> */}
+              
           </div>
           <div className="post">
               <div className="info2">
@@ -548,7 +642,10 @@ function MediaPage(props) {
                   </div>
                   <p className="post-time">2 minutes ago</p>
               </div>
-          </div>
+          </div> */}
+          </>
+         );
+        })}
       </div>
       </>
      )
@@ -760,7 +857,7 @@ function MediaPage(props) {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file.name);
     }
   };
 
@@ -883,7 +980,7 @@ function MediaPage(props) {
                 }}
                 hideCloseButton
             >
-                <ModalContent style={{ height: '50%' }}>
+                <ModalContent style={{ height: '55%' }}>
                     {(onClose) => (
                         <>
                             <ModalHeader>
@@ -903,6 +1000,7 @@ function MediaPage(props) {
                                   onChange={handleImageUpload}
                                   className="input-file"
                                 />
+                               {image && <p className="file-name">{image}</p>} 
                                 </div>
                                 <div className="post_image">
                                 <label htmlFor="post-content" className='suitcase-body-title-72bak'>What's on your mind?</label>

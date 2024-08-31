@@ -639,6 +639,10 @@
     object-fit: cover;
 }
 
+.file-name{
+    color: var(--fourth-color);
+}
+
 .post-content{
     width: 100%;
     padding: 20px;
