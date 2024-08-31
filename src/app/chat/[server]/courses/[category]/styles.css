@@ -110,7 +110,7 @@
   }
 
   .success-course-box{
-    background-color:#064d40; /* Background color similar to the image */
+    background-color:var(--success-color); /* Background color similar to the image */
     padding: 12px;
     opacity: 0.9;
     display: flex;
@@ -120,7 +120,7 @@
   }
 
   .course-box:hover {
-    background-color: #2a3a4a; /* Replace with desired hover color */
+    background-color: var(--hoverbox-color); /* Replace with desired hover color */
   }
 
   

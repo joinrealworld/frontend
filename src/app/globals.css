@@ -19,6 +19,8 @@
   --border-color:#213043;
   --text-color:#9ca3af;
   --hover-color:#b8d0ea;
+  --success-color:#064d40;
+  --hoverbox-color:#2a3a4a;
 }
 
 @media (prefers-color-scheme: dark) {

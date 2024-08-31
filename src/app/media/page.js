@@ -380,12 +380,12 @@ function MediaPage(props) {
                   <div className="reaction-wrapper">
                   <HeartIcon
                       className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10' }}
                       
                     />
+                     <p className="likes">1,112 likes</p>
                   </div>
-                  <p className="likes">1,112 likes</p>
-                  <p className="description"><span>username </span> This is a sample text. @mention friends and add #hastags with the links https://products.com.</p>
+                  <p className="description">This is a sample text. @mention friends and add #hastags with the links https://products.com.</p>
                   <p className="post-time">2 minutes ago</p>
               </div>
               {/* <div className="comment-wrapper">
@@ -410,13 +410,12 @@ function MediaPage(props) {
                   <div className="reaction-wrapper">
                   <HeartIcon
                       className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
                       
                     />
+                     <p className="likes">1,112 likes</p>
                   </div>
-                  <p className="likes">1,112 likes</p>
-                  
-                  <p className="post-time">2 minutes ago</p>
+               <p className="post-time">2 minutes ago</p>
               </div>
           </div>
           <div className="post">
@@ -434,12 +433,13 @@ function MediaPage(props) {
                   <div className="reaction-wrapper">
                   <HeartIcon
                       className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
                       
                     />
+                     <p className="likes">146,934 likes</p>
                   </div>
-                  <p className="likes">146,934 likes</p>
-                  <p className="description"><span>username </span> This is a sample text. Add Hashtags and your desired text.</p>
+                 
+                  <p className="description">This is a sample text. Add Hashtags and your desired text.</p>
                   <p className="post-time">5 minutes ago</p>
               </div>
               {/* <div className="comment-wrapper">
@@ -464,12 +464,11 @@ function MediaPage(props) {
                   <div className="reaction-wrapper">
                   <HeartIcon
                       className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
                       
                     />
+                    <p className="likes">1,112 likes</p>
                   </div>
-                  <p className="likes">1,112 likes</p>
-                  
                   <p className="post-time">2 minutes ago</p>
               </div>
           </div>
@@ -488,12 +487,12 @@ function MediaPage(props) {
                   <div className="reaction-wrapper">
                   <HeartIcon
                       className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
                       
                     />
+                    <p className="likes">939 likes</p>
                   </div>
-                  <p className="likes">939 likes</p>
-                  <p className="description"><span>username </span> This is a sample post text. @mentions, #hashtags, https://links.com are all automatically converted.</p>
+                  <p className="description">This is a sample post text. @mentions, #hashtags, https://links.com are all automatically converted.</p>
                   <p className="post-time">10 minutes ago</p>
               </div>
               {/* <div className="comment-wrapper">
@@ -518,12 +517,11 @@ function MediaPage(props) {
                   <div className="reaction-wrapper">
                   <HeartIcon
                       className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
                       
                     />
-                  </div>
-                  <p className="likes">1,112 likes</p>
-                  
+                    <p className="likes">1,112 likes</p>
+                  </div>        
                   <p className="post-time">2 minutes ago</p>
               </div>
           </div>
@@ -543,12 +541,11 @@ function MediaPage(props) {
                   <div className="reaction-wrapper">
                   <HeartIcon
                       className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", }}
+                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
                       
                     />
+                    <p className="likes">1,112 likes</p>
                   </div>
-                  <p className="likes">1,112 likes</p>
-                  
                   <p className="post-time">2 minutes ago</p>
               </div>
           </div>
@@ -904,6 +901,7 @@ function MediaPage(props) {
                                   id="post-image"
                                   type="file"
                                   onChange={handleImageUpload}
+                                  className="input-file"
                                 />
                                 </div>
                                 <div className="post_image">
@@ -916,11 +914,11 @@ function MediaPage(props) {
                                   className="post-textarea"
                                 />
                                 
-                                {image && <img src={image} alt="Preview" className="image-preview" />}
+                               
                                 </div>
                                 <div >
-                                <Button  color="default"  variant="ghost" className="next-button-mdkad" >
-                                  <span className="next-button-text-mdkad">Submit Post</span>
+                                <Button  color="default"  variant="ghost" className="submit-button-mdkad" >
+                                  <span className="next-button-text-mdkad">Submit</span>
                                 </Button>
                                 </div>
                               </form>
@@ -934,7 +932,7 @@ function MediaPage(props) {
                 
             </Modal>
         </div>
-        <div className="chat-content-83mzvcj3" id="chat-content"></div>
+        
       </div>
     </div>
   );
