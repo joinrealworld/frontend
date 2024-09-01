@@ -1341,7 +1341,20 @@ main {
     line-height: 1;
 }
 
-
+.message-input-7ajb312 {
+    background-color: var(--third-color);
+    border-color: #ffffff33;
+    border-radius: 20px;
+    height:32px;
+    border-width: 1px;
+    width: 100%;
+    color: #ffffff;
+    padding: 6px 15px;
+    font-size: 14px;
+}
+.message-input-7ajb312:focus{
+    border-color: #ffffff33 !important;
+}
 
 
 @media screen and (max-width: 1000px) {

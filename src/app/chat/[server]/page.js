@@ -22,7 +22,8 @@ import Image from 'next/image';
 const ChannelType = {
     checkList: 1,
     polls: 2,
-    media: 3
+    media: 3,
+    blackHole:4
 }
 
 const Channels = [
@@ -38,8 +39,13 @@ const Channels = [
     },
     {
         uuid: '7DE517C0-B05F-47DB-986A-0B130638C91B',
-        name: '📱|media',
+        name: '📱| media',
         type: ChannelType.media,
+    },
+    {
+        uuid: '7DE517C0-B05F-47DB-986A-0B130638C91C',
+        name: '⚫ | black-hole',
+        type: ChannelType.blackHole,
     },
     // do not need - so code commented for now
     // {
@@ -172,6 +178,9 @@ function Chat(props) {
     const [isMediaListFetch, setIsMediaListFetch] = useState(false);
     const [mediaList, setMediaList] = useState([]);
 
+    const [sendText, setSendText] = useState('');
+    const [blackHoleList, setBlackHoleList] = useState([]);
+
     const [selectedSideMenu, setSelectedSideMenu] = useState(SideMenus[0]);
     const [searchText, setSearchText] = useState('');
 
@@ -274,6 +283,13 @@ function Chat(props) {
         getProfile();
         await getServers();
         scrollToBottomChatContent();
+        setBlackHoleList((prevList) => {
+            if (Array.isArray(prevList)) {
+              return [...prevList, {'username':"Harsh Patel",'message':"Text Message"}];
+            }
+            console.error("Expected prevList to be an array, but it is not.");
+            return [{'username':"Harsh Patel",'message':"Text Message"}]; // or handle the error as needed
+          });
     }
 
     const getServers = async () => {
@@ -893,6 +909,8 @@ function Chat(props) {
         }
         else if (selectedChannel?.type == ChannelType.media) {
             router.replace('/media')
+        }else if(selectedChannel?.type == ChannelType.blackHole){
+            return renderBlackHole();
         }
         // do not need - so code commented for now
         // else if (selectedChannel?.type == ChannelType.generalChat) {
@@ -1184,6 +1202,52 @@ function Chat(props) {
         }
     }
 
+    const sendBlackHoleMessage = () =>{
+        console.log(sendText);
+        setBlackHoleList((prevList) => {
+            if (Array.isArray(prevList)) {
+              return [...prevList, {'username':"Harsh Patel",'message':sendText}];
+            }
+            return [{'username':"Harsh Patel",'message':"Text Message"}]; // or handle the error as needed
+          });
+    }
+
+    const renderBlackHole = () => {
+        $('#chat-background').css('background-color', 'black');
+        return blackHoleList.map((item, index) => {
+        return (
+            <div key={index} style={{}}>
+                <div className='message-divider-date-wrap-7naj82b'>
+                    <div className='message-divider-date-7naj82b'>
+                        {moment('09/01/2024').format('MMMM DD, YYYY')}
+                    </div>
+                </div>
+                
+                <div  className='message-wrap-83nja'>
+                            <div className="message-ac2s2">
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
+                                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                        <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{item.username}</p>
+                                        <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+                                        <p className='date-text-3kzc3'>
+                                            {dateFormat('09/01/2024')}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, marginTop: 10 }}>
+                                    <p className='message-text-3kzc3'>
+                                        <b>{item.message}</b>
+                                    </p>
+                                    
+                                </div>
+                            </div>
+                        </div>
+            </div>
+        );
+    })
+    }
+
     return (
         <div className='container-2mda3'>
             {/* START - main left */}
@@ -1406,7 +1470,7 @@ function Chat(props) {
 
                         {/* START - chat input */}
                         <div style={{ height: '10%', backgroundColor: 'var(--seventh-color)' }} className="flex flex-col">
-                            {(selectedChannel?.name === "✅┃daily-checklist") ?
+                            {(selectedChannel?.type == ChannelType.checkList) ?
                                 <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
                                     <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
                                         <div
@@ -1419,7 +1483,26 @@ function Chat(props) {
                                     </div>
 
                                 </footer>
+                                : selectedChannel?.type == ChannelType.blackHole ? 
+                                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32,  }}>
+                                            <input type="text" name="black-hole-message"
+                                            className="message-input-7ajb312" 
+                                            value={sendText}
+                                            onChange={(event) => {setSendText(event.target.value)}}
+                                           />
+                                            <Button  className='main-button-7ajb412'  size='sm' color='' 
+                                            onClick={(e) => {
+                                              sendBlackHoleMessage()
+                                            }}>
+                                                        Send
+                                                    </Button>
+                                        </div>
+                                </div>
 
+                                  </footer>
                                 : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
                                     <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
                                         <input accept="image/*" id="add-media-9"
