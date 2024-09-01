@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
@@ -910,7 +910,11 @@ function Chat(props) {
         else if (selectedChannel?.type == ChannelType.media) {
             router.replace('/media')
         }else if(selectedChannel?.type == ChannelType.blackHole){
-            return renderBlackHole();
+            return (
+                <div id='chat-background' ref={chatContainerRef} style={{ height: '400px', overflowY: 'auto' }}>
+                    {renderBlackHole()}
+                </div>
+            );
         }
         // do not need - so code commented for now
         // else if (selectedChannel?.type == ChannelType.generalChat) {
@@ -1202,14 +1206,22 @@ function Chat(props) {
         }
     }
 
+    const chatContainerRef = useRef(null);
+
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [blackHoleList]);
+
     const sendBlackHoleMessage = () =>{
-        console.log(sendText);
         setBlackHoleList((prevList) => {
             if (Array.isArray(prevList)) {
               return [...prevList, {'username':"Harsh Patel",'message':sendText}];
             }
             return [{'username':"Harsh Patel",'message':"Text Message"}]; // or handle the error as needed
           });
+          setSendText("");
     }
 
     const renderBlackHole = () => {
@@ -1241,6 +1253,7 @@ function Chat(props) {
                                     </p>
                                     
                                 </div>
+                                <div className='message-tail' />
                             </div>
                         </div>
             </div>
