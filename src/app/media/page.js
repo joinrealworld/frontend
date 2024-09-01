@@ -3,12 +3,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { User, Progress, Button, RadioGroup,useDisclosure, useRadio, cn, VisuallyHidden, Spinner,Modal, ModalBody, ModalContent, ModalHeader, ModalFooter } from "@nextui-org/react";
+import { User, Progress, Button, RadioGroup, useDisclosure, useRadio, cn, VisuallyHidden, Spinner, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter } from "@nextui-org/react";
 import Link from "next/link";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon,Plus } from 'lucide-react';
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus } from 'lucide-react';
 
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/audio.css';
@@ -56,19 +56,19 @@ function MediaPage(props) {
   const [isPreviousLoading, setIsPreviousLoading] = useState(false);
 
   const [content, setContent] = useState('');
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState('');
   const [medias, setMedias] = useState([]);
-
+  
   const router = useRouter();
   const dispatch = useDispatch();
 
   const addmediaModel = useDisclosure({
     id: 'add-media-poll',
-});
+  });
 
   useEffect(() => {
     if (props.user.isLoggedIn) {
-      
+
     }
   }, []);
 
@@ -86,35 +86,35 @@ function MediaPage(props) {
 
   const getMediaData = async () => {
     const response = await fetch(apiURL + 'api/v1/media/fetch/message', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + props.user.authToken
-        }
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      }
     });
     if (response.status >= 200 && response.status < 300) {
-        const rsp = await response.json();
-        console.log(rsp.results);
-        if (rsp.results) {
-           setMedias(rsp.results);
-        }
+      const rsp = await response.json();
+      if (rsp.results) {
+        setMedias(rsp.results);
+        setIsMediaFetch(true);
+      }
     } else {
-           toast("Error while fetching data!");
+      toast("Error while fetching data!");
     }
-}
+  }
 
   const getInitData = async () => {
     getMediaData();
-}
+  }
 
   useEffect(() => {
     if (!props.user.isLoggedIn) {
-        router.push('/login');
+      router.push('/login');
     } else {
-        // get data
-        getInitData();
+      // get data
+      getInitData();
     }
-}, []);
+  }, []);
 
 
   useEffect(() => {
@@ -411,244 +411,253 @@ function MediaPage(props) {
     if (minutes > 1) return `${minutes} Minutes ago`;
     if (minutes === 1) return `1 Minute ago`;
     return `${seconds} Seconds ago`;
-}
+  }
 
   const renderMediaContent = () => {
-     return(
-      <>
-      <div className="media-posts">
-      {medias.map((media, index) => {
-                    return (
-                      <>
-                      {media.content == null ? 
+    if(isMediaFetch){
+      return (
+        <>
+          <div className="media-posts">
+            {medias.map((media, index) => {
+              return (
+                <>
+                  {media.content == null ?
+                    <div className="post">
+                      <div className="info2">
+                        <div className="user">
+                          <div className="profile-pic"><img
+                            src='/assets/person.png'
+                            style={{ height: 36, width: 36, borderRadius: '50%' }}
+                          /></div>
+                          <p className="username">{media.user}</p>
+                        </div>
+  
+                      </div>
+                      <p className="description-text">{media.message}</p>
+                      <div className="post-content">
+                        <div className="reaction-wrapper">
+                          <HeartIcon
+                            className="heart-icon"
+                            style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}
+                            fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
+                            onClick={() => onToggleFavorite(media)}
+                          />
+                          <p className="likes">{media.likes_count} Likes</p>
+                        </div>
+                        <p className="post-time">{timeAgo(media.timestamp)}</p>
+                      </div>
+                    </div>
+                    : <div className="post">
+                      <div className="info2">
+                        <div className="user">
+                          <div className="profile-pic"><img
+                            src='/assets/person.png'
+                            style={{ height: 36, width: 36, borderRadius: '50%' }}
+                          /></div>
+                          <p className="username">{media.user} </p>
+                        </div>
+  
+                      </div>
+                      <img src={(apiURL + media.content.content)} className="post-image" alt="" />
+                      <div className="post-content">
+                        <div className="reaction-wrapper">
+                          <HeartIcon
+                            className="heart-icon"
+                            style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}
+                            fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
+                            onClick={() => onToggleFavorite(media)}
+                          />
+                          <p className="likes">{media.likes_count} Likes</p>
+                        </div>
+                        <p className="description">{media.message}</p>
+                        <p className="post-time">{timeAgo(media.timestamp)}</p>
+                      </div>
+                    </div>}
+                  {/* <div className="post">
+                <div className="info2">
+                    <div className="user">
+                        <div className="profile-pic"><img
+                                              src='/assets/person.png'
+                                              style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                          /></div>
+                        <p className="username">samwilson</p>
+                    </div>
+                    
+                </div>
+                <img src="/assets/media/post1.webp" className="post-image" alt="" />
+                <div className="post-content">
+                    <div className="reaction-wrapper">
+                    <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10' }}
+                        
+                      />
+                       <p className="likes">1,112 likes</p>
+                    </div>
+                    <p className="description">This is a sample text. @mention friends and add #hastags with the links https://products.com.</p>
+                    <p className="post-time">2 minutes ago</p>
+                </div>
+                
+            </div>
             <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">{media.user}</p>
-                  </div>
-                  
-              </div>
-              <p className="description-text">{media.message}</p>
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
-                      
-                    />
-                     <p className="likes">{media.likes_count} Likes</p>
-                  </div>
-               <p className="post-time">{timeAgo(media.timestamp)}</p>
-              </div>
+                <div className="info2">
+                    <div className="user">
+                        <div className="profile-pic"><img
+                                              src='/assets/person.png'
+                                              style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                          /></div>
+                        <p className="username">user1</p>
+                    </div>
+                    
+                </div>
+                <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
+                <div className="post-content">
+                    <div className="reaction-wrapper">
+                    <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
+                        
+                      />
+                       <p className="likes">1,112 likes</p>
+                    </div>
+                 <p className="post-time">2 minutes ago</p>
+                </div>
+            </div>
+            <div className="post">
+                <div className="info2">
+                    <div className="user">
+                        <div className="profile-pic"><img
+                                              src='/assets/person.png'
+                                              style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                          /></div>
+                        <p className="username">Zeoob</p>
+                    </div>
+                </div>
+                <img src="/assets/media/post2.png" class="post-image" alt=""/>
+                <div className="post-content">
+                    <div className="reaction-wrapper">
+                    <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
+                        
+                      />
+                       <p className="likes">146,934 likes</p>
+                    </div>
+                   
+                    <p className="description">This is a sample text. Add Hashtags and your desired text.</p>
+                    <p className="post-time">5 minutes ago</p>
+                </div>
+                
+            </div>
+            <div className="post">
+                <div className="info2">
+                    <div className="user">
+                        <div className="profile-pic"><img
+                                              src='/assets/person.png'
+                                              style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                          /></div>
+                        <p className="username">user2</p>
+                    </div>
+                    
+                </div>
+                <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
+                <div className="post-content">
+                    <div className="reaction-wrapper">
+                    <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
+                        
+                      />
+                      <p className="likes">1,112 likes</p>
+                    </div>
+                    <p className="post-time">2 minutes ago</p>
+                </div>
+            </div>
+            <div className="post">
+                <div className="info2">
+                    <div className="user">
+                        <div className="profile-pic"><img
+                                              src='/assets/person.png'
+                                              style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                          /></div>
+                        <p className="username">modern_web_channel</p>
+                    </div>
+                </div>
+                <img src="/assets/media/emptypost.webp" class="post-image" alt=""/>
+                <div className="post-content">
+                    <div className="reaction-wrapper">
+                    <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
+                        
+                      />
+                      <p className="likes">939 likes</p>
+                    </div>
+                    <p className="description">This is a sample post text. @mentions, #hashtags, https://links.com are all automatically converted.</p>
+                    <p className="post-time">10 minutes ago</p>
+                </div>
+                
+            </div>
+            <div className="post">
+                <div className="info2">
+                    <div className="user">
+                        <div className="profile-pic"><img
+                                              src='/assets/person.png'
+                                              style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                          /></div>
+                        <p className="username">user3</p>
+                    </div>
+                    
+                </div>
+                <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
+                <div className="post-content">
+                    <div className="reaction-wrapper">
+                    <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
+                        
+                      />
+                      <p className="likes">1,112 likes</p>
+                    </div>        
+                    <p className="post-time">2 minutes ago</p>
+                </div>
+            </div>
+            <div className="post">
+                <div className="info2">
+                    <div className="user">
+                        <div className="profile-pic"><img
+                                              src='/assets/person.png'
+                                              style={{ height: 36, width: 36, borderRadius: '50%' }}
+                                          /></div>
+                        <p className="username">user4</p>
+                    </div>
+                    
+                </div>
+                <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
+                <div className="post-content">
+                    <div className="reaction-wrapper">
+                    <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
+                        
+                      />
+                      <p className="likes">1,112 likes</p>
+                    </div>
+                    <p className="post-time">2 minutes ago</p>
+                </div>
+            </div> */}
+                </>
+              );
+            })}
           </div>
-          :<div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">{media.user} </p>
-                  </div>
-                  
-              </div>
-              <img src={(apiURL + media.content.content)} className="post-image" alt="" />
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10' }}
-                      
-                    />
-                     <p className="likes">{media.likes_count} Likes</p>
-                  </div>
-                  <p className="description">{media.message}</p>
-                  <p className="post-time">{timeAgo(media.timestamp)}</p>
-              </div>
-          </div>}
-        {/* <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">samwilson</p>
-                  </div>
-                  
-              </div>
-              <img src="/assets/media/post1.webp" className="post-image" alt="" />
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10' }}
-                      
-                    />
-                     <p className="likes">1,112 likes</p>
-                  </div>
-                  <p className="description">This is a sample text. @mention friends and add #hastags with the links https://products.com.</p>
-                  <p className="post-time">2 minutes ago</p>
-              </div>
-              
-          </div>
-          <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">user1</p>
-                  </div>
-                  
-              </div>
-              <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
-                      
-                    />
-                     <p className="likes">1,112 likes</p>
-                  </div>
-               <p className="post-time">2 minutes ago</p>
-              </div>
-          </div>
-          <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">Zeoob</p>
-                  </div>
-              </div>
-              <img src="/assets/media/post2.png" class="post-image" alt=""/>
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
-                      
-                    />
-                     <p className="likes">146,934 likes</p>
-                  </div>
-                 
-                  <p className="description">This is a sample text. Add Hashtags and your desired text.</p>
-                  <p className="post-time">5 minutes ago</p>
-              </div>
-              
-          </div>
-          <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">user2</p>
-                  </div>
-                  
-              </div>
-              <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
-                      
-                    />
-                    <p className="likes">1,112 likes</p>
-                  </div>
-                  <p className="post-time">2 minutes ago</p>
-              </div>
-          </div>
-          <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">modern_web_channel</p>
-                  </div>
-              </div>
-              <img src="/assets/media/emptypost.webp" class="post-image" alt=""/>
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
-                      
-                    />
-                    <p className="likes">939 likes</p>
-                  </div>
-                  <p className="description">This is a sample post text. @mentions, #hashtags, https://links.com are all automatically converted.</p>
-                  <p className="post-time">10 minutes ago</p>
-              </div>
-              
-          </div>
-          <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">user3</p>
-                  </div>
-                  
-              </div>
-              <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight:'10' }}
-                      
-                    />
-                    <p className="likes">1,112 likes</p>
-                  </div>        
-                  <p className="post-time">2 minutes ago</p>
-              </div>
-          </div>
-          <div className="post">
-              <div className="info2">
-                  <div className="user">
-                      <div className="profile-pic"><img
-                                            src='/assets/person.png'
-                                            style={{ height: 36, width: 36, borderRadius: '50%' }}
-                                        /></div>
-                      <p className="username">user4</p>
-                  </div>
-                  
-              </div>
-              <p className="description-text">This is a sample Message. @mention friends and add #hastags with the links https://products.com.</p>
-              <div className="post-content">
-                  <div className="reaction-wrapper">
-                  <HeartIcon
-                      className="heart-icon"
-                      style={{ cursor: "pointer", color: "var(--fourth-color)",marginRight:'10'  }}
-                      
-                    />
-                    <p className="likes">1,112 likes</p>
-                  </div>
-                  <p className="post-time">2 minutes ago</p>
-              </div>
-          </div> */}
-          </>
-         );
-        })}
-      </div>
-      </>
-     )
+        </>
+      )
+    }else{
+      return (
+        <Loading />
+      );
+    }
+   
     // if (isCourseDataFetch) {
     //   if (selectedCourse) {
 
@@ -713,7 +722,7 @@ function MediaPage(props) {
     //           {renderCourseContentBySection(currentMessage)}
     //           <div style={{ display: 'flex', width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
     //             {/* {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 &&
-                 
+
     //             } */}
     //             <div style={{ width: '90%' }} />
     //             <Button spinner={<Spinner color='current' size='sm' />} color="default" isLoading={isNextLoading} variant="ghost" className="next-button-mdkad" onClick={onNextStep}>
@@ -758,100 +767,8 @@ function MediaPage(props) {
     // }
   }
 
-  const renderMediaList = () => {
-          return (
-            // <div key={index} className="course-item-k3bda">
-            //   <div className={`course-item-header-acnk3 ${isSelected ? "active" : undefined}`} onClick={(e) => onSelectCourse(course)}>
-            //     <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <>
-            <div className='course-box' >
-              <div className="course-info-mc2nw">
-                <div className="course-text-info">
-                  <div className="course-name-9qncq6">Photos</div>
-                </div>
-                <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
-              </div>
-            </div>
-            <div className='course-box' >
-              <div className="course-info-mc2nw">
-                <div className="course-text-info">
-                  <div className="course-name-9qncq6">Texts</div>
-                </div>
-                <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
-              </div>
-            </div>
-
-            </> 
-          );
-       
-    // if (isMediaFetch) {
-    //   if (courses.length > 0) {
-    //     return courses.map((course, index) => {
-    //       const isSelected = selectedCourse?.uuid == course.uuid;
-    //       return (
-    //         // <div key={index} className="course-item-k3bda">
-    //         //   <div className={`course-item-header-acnk3 ${isSelected ? "active" : undefined}`} onClick={(e) => onSelectCourse(course)}>
-    //         //     <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-    //         <div key={index} className={`course-box ${course.completed === 100 ? 'success-course-box' : 'course-box'}`} onClick={(e) => onSelectCourse(course)} >
-    //           <div className="course-info-mc2nw">
-    //             <div className="course-text-info">
-    //               <div className="course-name-9qncq6">{course.name}</div>
-    //               <div className="course-name1-9qncq6">{(isSelected ? selectedCourse?.completed : course.completed)}%<span className="course-label-nja72b"> complete</span></div>
-
-    //               <Progress
-    //                 size="sm"
-    //                 radius="sm"
-    //                 aria-label="Loading..."
-    //                 value={isSelected ? selectedCourse?.completed : course.completed}
-    //                 style={{ marginTop: 4 }}
-    //                 classNames={{
-    //                   indicator: "course-progress-983bzs",
-    //                 }}
-    //                 color="success"
-    //               />
-    //               <div style={{ flexDirection: 'row', marginTop: 5, alignItems: 'center', display: 'flex', }}>
-    //                 {/* <span className="course-value-nja72b">{(course.completed * course.lessons) / 100} / {course.lessons}</span> */}
-    //                 <span className="course-value-nja72b">{course.lessons}</span>
-    //                 <span className="course-label-nja72b">Lessons</span>
-    //                 {/* <span className="course-desc-divider-nja72b">|</span>
-    //               <span className="course-value-nja72b">{selectedCourse.data?.filter(x => x.section == 'video')?.length}</span>
-    //               <span className="course-label-nja72b">Videos</span> */}
-    //               </div>
-    //             </div>
-    //             <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
-    //             {/* <div className="course-avatar">
-    //             <span>{(course.name).split('┃')[0]}</span>
-    //             </div> */}
-    //           </div>
-    //         </div>
-
-
-
-
-
-    //         //     </div>
-
-
-    //         //   </div>
-    //         // </div>
-    //       );
-    //     });
-    //   } else {
-    //     return (
-    //       <div style={{ padding: 30, paddingTop: 100, display: 'flex', justifyContent: 'center', height: '100%', }}>
-    //         <h4 style={{ color: 'var(--fourth-color)' }}>No Media available!</h4>
-    //       </div>
-    //     );
-    //   }
-    // } else {
-    //   return (
-    //     <Loading />
-    //   );
-    // }
-  }
-
   const handleClose = () => {
-    router.replace('/chat/' + serverId ); // This navigates back to the previous page in history
+    router.replace('/chat/' + serverId); // This navigates back to the previous page in history
   };
 
   const handleImageUpload = (e) => {
@@ -861,22 +778,121 @@ function MediaPage(props) {
     }
   };
 
-  const handleSubmit = () => {
-    const newPost = {
-      content,
-      image,
-      likes: 0,
-      comments: [],
-    };
-    onSubmit(newPost);
-    onClose();
+  const onToggleFavorite = async (media) => {
+    console.log(media);
+    const response = await fetch(apiURL + 'api/v1/media/like/message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        message_uuid: media?.uuid, // selected course uuid
+      })
+    });
+    const rsp = await response.json();
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp) {
+        getInitData();
+      } else {
+        handleAPIError(rsp);
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+      }
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
+    if(image == ''){
+       const response = await fetch(apiURL + 'api/v1/media/send/message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.user.authToken
+      },
+      body: JSON.stringify({
+        message: content, // selected course uuid
+      })
+    });
+    const rsp = await response.json();
+    if (response.status >= 200 && response.status < 300) {
+      if (rsp) {
+        getInitData();
+        addmediaModel.onClose();  
+        setContent('');
+        setImage('');
+      } else {
+        handleAPIError(rsp);      
+      }
+    } else {
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+      }
+    }
+    }else{
+      const imageName = image.substring(image.lastIndexOf('/') + 1);
+      const responseImage = await fetch(image);
+      const blob = await responseImage.blob();
+      const extension = imageName.split('.').pop();
+      const formData = new FormData();
+      formData.append('content', blob, imageName);
+      formData.append('channel_type', 'media');
+      formData.append('type_of_content', 'image');
+      formData.append('extension',extension );
+      const response = await fetch(apiURL + 'api/v1/content/upload', {
+        method: 'POST',
+        headers: {
+          // 'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + props.user.authToken
+        },
+        body: formData,
+      });
+      const rsp = await response.json();
+      const response2 = await fetch(apiURL + 'api/v1/media/send/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + props.user.authToken
+        },
+        body: JSON.stringify({
+          content_id: rsp.data.id,
+          message: content, // selected course uuid
+        })
+      });
+      const rsp2 = await response2.json();
+      
+      if (response2.status >= 200 && response2.status < 300) {
+        if (rsp2) {
+          getInitData();
+          addmediaModel.onClose();  
+          setContent('');
+          setImage('');
+        } else {
+          handleAPIError(rsp2);
+          
+        }
+      } else {
+        if (response2.status == 401) {
+          dispatch(props.actions.userLogout());
+        } else {
+          handleAPIError(rsp2);
+        }
+      }
+    }
   };
 
   return (
     <div className='container-93ca2aw'>
       <div className='header-3m32aaw'>
         <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
-          <Link href={'/chat/' + serverId } className="back-icon-nw3rf">
+          <Link href={'/chat/' + serverId} className="back-icon-nw3rf">
             <ArrowLeft className="arrow-left-header" style={{ color: "var(--fourth-color)", fontWeight: "600" }} />
           </Link>
           <div className="course-navigation-cnaw34">
@@ -949,88 +965,88 @@ function MediaPage(props) {
             />
           </div> */}
 
-            <div className='course-box' onClick={() => addmediaModel.onOpen()}>
-              <div className="course-info-mc2nw">
-                <div className="course-text-info">
-                  <div className="course-name-9qncq6">Create New Post</div>
-                </div>
-                <Plus style={{ color: "var(--fourth-color)" }} />
+          <div className='course-box' onClick={() => addmediaModel.onOpen()}>
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">Create New Post</div>
               </div>
+              <Plus style={{ color: "var(--fourth-color)" }} />
             </div>
+          </div>
 
         </div>
 
         <div className="right-content-83mzvcj3" id="course-content">
 
-          { renderMediaContent() }
+          {renderMediaContent()}
           <Modal
-                id="add-media-poll"
-                isOpen={addmediaModel.isOpen}
-                backdrop="opaque"
-                radius="md"
-                size='2xl'
-                onClose={() => {
-              
-                }}
-                onOpenChange={addmediaModel.onOpenChange}
-                classNames={{
-                    body: "suitcase-modal-mcan34",
-                    header: "suitcase-modal-header-mcan34 py-0",
-                    footer: "suitcase-modal-footer-mcan34 py-0",
-                }}
-                hideCloseButton
-            >
-                <ModalContent style={{ height: '55%' }}>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader>
-                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center',color: 'var(--fourth-color)' }}>
-                                    Create New Post
-                                </div>
-                                <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={(e) => { addmediaModel.onClose(); }} />
-                            </ModalHeader>
-                            <ModalBody>
-                            <div className='suitcase-model-body-content-82bma2'>
-                              <form onSubmit={handleSubmit}>
-                              <div className="post_image">
-                              <label htmlFor="post-image" className='suitcase-body-title-72bak'>Upload an image (optional):</label>
-                                <input
-                                  id="post-image"
-                                  type="file"
-                                  onChange={handleImageUpload}
-                                  className="input-file"
-                                />
-                               {image && <p className="file-name">{image}</p>} 
-                                </div>
-                                <div className="post_image">
-                                <label htmlFor="post-content" className='suitcase-body-title-72bak'>What's on your mind?</label>
-                                <textarea
-                                  id="post-content"
-                                  placeholder="Share your thoughts..."
-                                  value={content}
-                                  onChange={(e) => setContent(e.target.value)}
-                                  className="post-textarea"
-                                />
-                                
-                               
-                                </div>
-                                <div >
-                                <Button  color="default"  variant="ghost" className="submit-button-mdkad" >
-                                  <span className="next-button-text-mdkad">Submit</span>
-                                </Button>
-                                </div>
-                              </form>
-                            </div>
+            id="add-media-poll"
+            isOpen={addmediaModel.isOpen}
+            backdrop="opaque"
+            radius="md"
+            size='2xl'
+            onClose={() => {
 
-                            </ModalBody>
-                            
-                        </>
-                    )}
-                </ModalContent>
-                
-            </Modal>
+            }}
+            onOpenChange={addmediaModel.onOpenChange}
+            classNames={{
+              body: "suitcase-modal-mcan34",
+              header: "suitcase-modal-header-mcan34 py-0",
+              footer: "suitcase-modal-footer-mcan34 py-0",
+            }}
+            hideCloseButton
+          >
+            <ModalContent style={{ height: '55%' }}>
+              {(onClose) => (
+                <>
+                  <ModalHeader>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'var(--fourth-color)' }}>
+                      Create New Post
+                    </div>
+                    <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={(e) => { addmediaModel.onClose(); }} />
+                  </ModalHeader>
+                  <ModalBody>
+                    <div className='suitcase-model-body-content-82bma2'>
+                      <form onSubmit={handleSubmit}>
+                        <div className="post_image">
+                          <label htmlFor="post-image" className='suitcase-body-title-72bak'>Upload an image (optional):</label>
+                          <input
+                            id="post-image"
+                            type="file"
+                            onChange={handleImageUpload}
+                            className="input-file"
+                          />
+                          {image && <p className="file-name">{image}</p>}
+                        </div>
+                        <div className="post_image">
+                          <label htmlFor="post-content" className='suitcase-body-title-72bak'>What's on your mind?</label>
+                          <textarea
+                            id="post-content"
+                            placeholder="Share your thoughts..."
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            className="post-textarea"
+                          />
+
+
+                        </div>
+                        <div >
+                          <Button type="submit" color="default" variant="ghost" className="submit-button-mdkad" >
+                            <span className="next-button-text-mdkad">Submit</span>
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+
+                  </ModalBody>
+
+                </>
+              )}
+            </ModalContent>
+
+          </Modal>
         </div>
-        
+
       </div>
     </div>
   );

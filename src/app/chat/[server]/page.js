@@ -1348,7 +1348,7 @@ function Chat(props) {
                 <div id='chat-background' className="chat-gsdu3b">
 
                     {/* START - chat left content */}
-                    <div style={{ width: '67%', overflowX: 'hidden', overflowY: 'hidden',position: 'relative' }}>
+                    <div style={{ width: '67%', overflowX: 'hidden', overflowY: 'hidden', position: 'relative' }}>
 
 
                         {/* START - chat content */}
@@ -1371,12 +1371,12 @@ function Chat(props) {
                                 {renderMainContent()}
                             </div>
                             <div className={`popup-modal ${isModalVisible ? 'visible' : ''}`}>
-                            <div className="rectangle"></div>
-                            <XIcon className="close-btn" onClick={handleCloseModal} />
-                                    <h3 className="modal_text_title">✅┃daily-checklist</h3>
-                                    {checkList.length !== 0 ? <p style={{ opacity: 0.7, fontSize: 15, marginTop: 20 }}>No checklists available!</p> :
-                                      <ul className="modal_body" style={{ marginTop: 20 }} >
-                                         <li>
+                                <div className="rectangle"></div>
+                                <XIcon className="close-btn" onClick={handleCloseModal} />
+                                <h3 className="modal_text_title">✅┃daily-checklist</h3>
+                                {checkList.length !== 0 ? <p style={{ opacity: 0.7, fontSize: 15, marginTop: 20 }}>No checklists available!</p> :
+                                    <ul className="modal_body" style={{ marginTop: 20 }} >
+                                        <li>
                                             <input className="custom-checkbox" type="checkbox" id="list1" />
                                             <label className="modal_text_body" htmlFor="list1">List item 1</label>
                                         </li>
@@ -1396,10 +1396,10 @@ function Chat(props) {
                                             <input className="custom-checkbox" type="checkbox" id="list5" />
                                             <label className="modal_text_body" htmlFor="list5">List item 5</label>
                                         </li>
-                                       
-                                      </ul>
-                                    }
-                                </div>
+
+                                    </ul>
+                                }
+                            </div>
                         </div>
                         {/* END - chat content */}
 

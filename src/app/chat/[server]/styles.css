@@ -1193,27 +1193,32 @@ main {
     color: var(--fourth-color);
 }
 
-.clipboard-icon{
-    color:var(--ninth-color);
+.clipboard-icon {
+    color: var(--ninth-color);
     background-color: #fff;
     padding: 5px;
     border-radius: 50%;
     cursor: pointer;
 }
 
-.clipboard-icon:hover{
-    color:#fff;
+.clipboard-icon:hover {
+    color: #fff;
     background-color: var(--ninth-color);
-   
+
 }
+
 /* Add these styles in your CSS file or within a <style> tag */
 .popup-modal {
-    position: absolute; /* Positioned relative to the parent container */
-    bottom: 0; /* Start at the bottom of the parent container */
-    left: 50%; /* Center horizontally */
+    position: absolute;
+    /* Positioned relative to the parent container */
+    bottom: 0;
+    /* Start at the bottom of the parent container */
+    left: 50%;
+    /* Center horizontally */
     width: 40%;
-    height:50%;
-    transform: translate(-50%, 100%); /* Start off-screen below */
+    height: 50%;
+    transform: translate(-50%, 100%);
+    /* Start off-screen below */
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
     background-color: var(--seventh-color);
@@ -1223,7 +1228,8 @@ main {
 }
 
 .popup-modal.visible {
-    transform: translate(-50%, -50%); /* End position (centered vertically) */
+    transform: translate(-50%, -50%);
+    /* End position (centered vertically) */
     opacity: 1;
 }
 
@@ -1247,12 +1253,14 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-  }
+}
 
 .close-btn {
     position: absolute;
-    top: 15px; /* Adjust as needed */
-    right: 10px; /* Adjust as needed */
+    top: 15px;
+    /* Adjust as needed */
+    right: 10px;
+    /* Adjust as needed */
     color: var(--fourth-color);
     cursor: pointer;
     height: 28px;
@@ -1282,7 +1290,8 @@ main {
 .modal_body li {
     display: flex;
     align-items: center;
-    margin-bottom: 10px; /* Adjust as needed */
+    margin-bottom: 10px;
+    /* Adjust as needed */
 }
 
 .custom-checkbox {
@@ -1290,7 +1299,7 @@ main {
 }
 
 /* Create a custom checkbox */
-.custom-checkbox + label {
+.custom-checkbox+label {
     position: relative;
     display: inline-block;
     padding-left: 25px;
@@ -1301,7 +1310,7 @@ main {
 }
 
 /* Create the custom checkbox box */
-.custom-checkbox + label::before {
+.custom-checkbox+label::before {
     content: "";
     position: absolute;
     left: 0;
@@ -1314,19 +1323,21 @@ main {
 }
 
 /* Style the custom checkbox when checked */
-.custom-checkbox:checked + label::before {
+.custom-checkbox:checked+label::before {
     background-color: #ecc879;
 }
 
 /* Add a checkmark symbol when checked */
-.custom-checkbox:checked + label::after {
+.custom-checkbox:checked+label::after {
     content: "✓";
     position: absolute;
-    left: 4px;  /* Adjusted for better centering */
+    left: 4px;
+    /* Adjusted for better centering */
     top: 50%;
     transform: translateY(-50%);
     color: white;
-    font-size: 12px; /* Adjusted font size */
+    font-size: 12px;
+    /* Adjusted font size */
     line-height: 1;
 }
 

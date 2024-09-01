@@ -25,7 +25,7 @@
 .header-3m32aaw {
     height: 48px;
     min-height: 48px;
-    max-height:48px;
+    max-height: 48px;
     width: 100%;
     background-color: var(--primary-color);
     display: flex;
@@ -68,9 +68,9 @@
 .left-menu-6k2zzc {
     display: flex;
     min-width: 240px !important;
-    max-width:260px !important;
+    max-width: 260px !important;
     height: 100%;
-    width:100%;
+    width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     flex-direction: column;
@@ -84,7 +84,7 @@
     display: flex;
     padding-left: 19%;
     padding-right: 19%;
-    width:100%;
+    width: 100%;
     height: 100% !important;
     overflow-y: auto;
     overflow-x: hidden;
@@ -102,74 +102,80 @@
 }
 
 .course-box {
-    background-color:var(--primary-color); /* Background color similar to the image */
+    background-color: var(--primary-color);
+    /* Background color similar to the image */
     padding: 10px;
     opacity: 0.9;
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    width: 100%; /* Adjust width as needed */
+    width: 100%;
+    /* Adjust width as needed */
     border-bottom-width: 4px;
     border-bottom-color: #1d2b3a;
     margin-bottom: 0.25rem;
     margin-top: 0.5rem;
-  }
+}
 
-  .success-course-box{
-    background-color:#064d40; /* Background color similar to the image */
+.success-course-box {
+    background-color: #064d40;
+    /* Background color similar to the image */
     padding: 12px;
     opacity: 0.9;
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    width: 100%; /* Adjust width as needed */
-  }
+    width: 100%;
+    /* Adjust width as needed */
+}
 
-  .course-box:hover {
-    background-color: var(--hoverbox-color); /* Replace with desired hover color */
-  }
+.course-box:hover {
+    background-color: var(--hoverbox-color);
+    /* Replace with desired hover color */
+}
 
-  
-  .course-info-mc2nw {
+
+.course-info-mc2nw {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  
-  .course-text-info {
+}
+
+.course-text-info {
     display: flex;
-    width:85%;
+    width: 85%;
     flex-direction: column;
-  }
-  
-  .course-name-9qncq6 {
+}
+
+.course-name-9qncq6 {
     color: var(--fourth-color) !important;
     font-weight: 500;
     letter-spacing: 0.5px;
     font-size: 15px !important;
     margin-bottom: 2px;
-  }
+}
 
-  .course-name1-9qncq6 {
+.course-name1-9qncq6 {
     color: var(--fourth-color) !important;
     font-weight: 600;
     line-height: 1rem !important;
     letter-spacing: 0.5px;
     font-size: 13px !important;
-  }
-  
-  .course-description-9qncq6 {
+}
+
+.course-description-9qncq6 {
     color: var(--fifth-color) !important;
     font-size: 13px !important;
     letter-spacing: 0.7px;
     margin-top: 6px;
     font-weight: 300;
-  }
-  
-  .course-avatar {
-    width: 50px; /* Adjust size as needed */
+}
+
+.course-avatar {
+    width: 50px;
+    /* Adjust size as needed */
     height: 50px;
-  }
+}
 
 .course-item-k3bda {
     width: 100%;
@@ -204,7 +210,7 @@
 
 .course-label-nja72b {
     color: var(--text-color) !important;
-    font-size:0.75rem !important;
+    font-size: 0.75rem !important;
     letter-spacing: 0.7px;
     line-height: 1rem;
     font-weight: 300;
@@ -372,7 +378,7 @@
 }
 
 .lesson-header-23maaa {
-    height:48px;
+    height: 48px;
     max-height: 48px;
     min-height: 48px;
     width: auto;
@@ -405,7 +411,7 @@
     width: 100%;
     padding: 24px 18% 100px 18%;
     display: flex;
-    overflow-y: auto; 
+    overflow-y: auto;
     overflow-x: auto;
     align-items: center;
     flex-direction: column;
@@ -447,24 +453,24 @@
     color: #EC5800;
 }
 
-.arrow-left-header{
+.arrow-left-header {
     color: var(--fourth-color);
     background-color: var(--primary-color);
     cursor: pointer;
     height: 31px;
-  width: 31px;
-  border-radius: 50%;
-  padding: 3px;
+    width: 31px;
+    border-radius: 50%;
+    padding: 3px;
 }
 
 .arrow-left {
-  color: var(--fourth-color);
-  background-color: var(--primary-color);
-  cursor: pointer;
-  height: 2rem;
-  width: 2rem;
-  border-radius: 50%;
-  padding: 7px;
+    color: var(--fourth-color);
+    background-color: var(--primary-color);
+    cursor: pointer;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    padding: 7px;
 }
 
 .submit-button-mdkad {
@@ -500,36 +506,36 @@
     font-size: 16px !important;
 }
 
-.close-icon{
-  color: var(--fourth-color);
-  background-color: var(--primary-color);
-  cursor: pointer;
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  padding: 4px;
-  font-weight: 500;
+.close-icon {
+    color: var(--fourth-color);
+    background-color: var(--primary-color);
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    padding: 4px;
+    font-weight: 500;
 }
 
 .close-icon:hover {
     background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-.close-icon-search{
-    color:#ffffff !important;
+.close-icon-search {
+    color: #ffffff !important;
     border-radius: 50%;
     padding: 4px;
-  }
+}
 
 .close-icon-search:hover {
     background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-.heart-icon{
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  padding: 4px;
+.heart-icon {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    padding: 4px;
 }
 
 .heart-icon:hover {
@@ -579,15 +585,15 @@
     display: none !important;
 }
 
-.media-posts{
-   margin-top: -20px;
-   margin-left: 50px;
-   margin-right: 50px;
-   margin-bottom: 100px;
-   padding: 20px;
+.media-posts {
+    margin-top: -20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 100px;
+    padding: 20px;
 }
 
-.post{
+.post {
     width: 100%;
     height: auto;
     background: var(--primary-color);
@@ -595,7 +601,7 @@
     margin-top: 20px;
 }
 
-.info2{
+.info2 {
     width: 100%;
     height: 60px;
     display: flex;
@@ -604,7 +610,7 @@
     padding: 0 20px;
 }
 
-.info2 .username{
+.info2 .username {
     width: auto;
     font-weight: bold;
     color: var(--fourth-color);
@@ -612,72 +618,72 @@
     margin-left: 10px;
 }
 
-.info2 .options{
+.info2 .options {
     height: 10px;
     cursor: pointer;
 }
 
-.info2 .user{
+.info2 .user {
     display: flex;
     align-items: center;
 }
 
-.info2 .profile-pic{
+.info2 .profile-pic {
     height: 40px;
     width: 40px;
     padding: 0;
     background: none;
 }
 
-.info2 .profile-pic img{
+.info2 .profile-pic img {
     border: none;
 }
 
-.post-image{
+.post-image {
     width: 100%;
     height: 500px;
     object-fit: cover;
 }
 
-.file-name{
+.file-name {
     color: var(--fourth-color);
 }
 
-.post-content{
+.post-content {
     width: 100%;
     padding: 20px;
 }
 
-.likes{
+.likes {
     margin-top: 2px;
     font-weight: bold;
     color: var(--fourth-color)
 }
 
-.description{
+.description {
     margin: 10px 0;
     font-size: 14px;
     line-height: 20px;
     color: var(--fourth-color)
 }
 
-.description-text{
+.description-text {
     font-weight: bold;
     margin-left: 10px;
-    color:var(--fourth-color);
+    color: var(--fourth-color);
 }
 
-.description span{
+.description span {
     font-weight: bold;
     margin-right: 10px;
 }
 
-.post-time{
+.post-time {
     color: var(--fourth-color);
     font-size: 12px;
 }
 
-.comment-wrapper{
+.comment-wrapper {
     width: 100%;
     height: 50px;
     border-radius: 1px solid #dfdfdf;
@@ -686,11 +692,11 @@
     align-items: center;
 }
 
-.comment-wrapper .icon{
+.comment-wrapper .icon {
     height: 30px;
 }
 
-.comment-box{
+.comment-box {
     width: 80%;
     height: 100%;
     border: none;
@@ -699,7 +705,7 @@
 }
 
 .comment-btn,
-.action-btn{
+.action-btn {
     width: 70px;
     height: 100%;
     background: none;
@@ -711,7 +717,7 @@
     opacity: 0.5;
 }
 
-.reaction-wrapper{
+.reaction-wrapper {
     width: 100%;
     height: 50px;
     display: flex;
@@ -719,13 +725,13 @@
     align-items: center;
 }
 
-.reaction-wrapper .icon{
+.reaction-wrapper .icon {
     height: 25px;
     margin: 0;
     margin-right: 20px;
 }
 
-.reaction-wrapper .icon.save{
+.reaction-wrapper .icon.save {
     margin-left: auto;
 }
 
@@ -769,7 +775,7 @@
     margin-left: 15px;
 }
 
-.post_image{
+.post_image {
     margin-bottom: 10px;
 }
 
@@ -868,8 +874,8 @@
     margin-left: 8px;
 }
 
-.post-textarea{
-    width:100%;
+.post-textarea {
+    width: 100%;
     outline: 0;
     background: #dedede;
     border-radius: 7px;
@@ -881,8 +887,8 @@
     font-size: 15px;
 }
 
-.input-file{
-    width:100%;
+.input-file {
+    width: 100%;
     margin: 10px 0;
 }
 
@@ -972,8 +978,9 @@
             left: 2%;
             display: flex !important;
         }
+
         .lesson-content-mdak32 {
-            padding:24px 5% 24px 5%;
+            padding: 24px 5% 24px 5%;
         }
     }
 }
