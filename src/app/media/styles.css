@@ -65,6 +65,10 @@
     font-size: 15px !important;
 }
 
+.bottom-navigation-bar{
+    display: none;
+}
+
 .left-menu-6k2zzc {
     display: flex;
     min-width: 240px !important;
@@ -542,6 +546,18 @@
     background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
+
+.send-icon{
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    padding: 4px;
+}
+
+.send-icon:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
 /* 
 .next-button-text-mdkad {
 } */
@@ -655,7 +671,9 @@
 }
 
 .likes {
-    margin-top: 2px;
+    margin-top: -7px;
+    margin-left: 7px;
+    font-size: 12px;
     font-weight: bold;
     color: var(--fourth-color)
 }
@@ -909,14 +927,14 @@
     @media screen and (max-width: 870px) {
 
         .back-icon-nw3rf {
-            position: absolute;
+            position: absolute !important;
             left: 4%;
         }
 
         .header-3m32aaw {
             justify-content: center !important;
             position: relative;
-            display: none !important;
+           
         }
 
         .header-3m32aaw.visible {
@@ -930,8 +948,8 @@
         }
 
         .course-navigation-cnaw34 {
-            display: none !important;
-            margin-top: 0 !important;
+           
+            margin-left: 40px !important;
         }
 
         .lesson-header-23maaa {
@@ -981,6 +999,47 @@
 
         .lesson-content-mdak32 {
             padding: 24px 5% 24px 5%;
+        }
+
+        .right-content-83mzvcj3 {
+            display: flex;
+            padding-left: 0% !important;
+            padding-right: 0% !important;
+            width: 100%;
+            height: 100% !important;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-direction: column;
+            user-select: none;
+            background-color: var(--ninth-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .media-posts {
+            margin-top:-10px;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-bottom: 100px;
+            padding: 5px;
+        }
+
+        .close-icon {
+           margin-left: auto !important;
+           margin-right:15px !important;
+        }
+        .bottom-navigation-bar{
+            display: block;
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: var(--primary-color);
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around; /* Distributes space evenly between the icons */
+            align-items: center; /* Centers the icons vertically */
+            padding: 10px 0; /* Adds padding to the top and bottom */
+            
         }
     }
 }

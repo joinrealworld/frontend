@@ -8,7 +8,7 @@ import Link from "next/link";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus } from 'lucide-react';
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus,Home,Search,MessageCircle,Bell,UserRound,ListOrdered,Send ,Bookmark} from 'lucide-react';
 
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/audio.css';
@@ -430,8 +430,11 @@ function MediaPage(props) {
                             style={{ height: 36, width: 36, borderRadius: '50%' }}
                           /></div>
                           <p className="username">{media.user}</p>
+                         
                         </div>
-  
+                        <div style={{ marginLeft: 'auto' }}>
+                         
+                          </div>
                       </div>
                       <p className="description-text">{media.message}</p>
                       <div className="post-content">
@@ -442,9 +445,11 @@ function MediaPage(props) {
                             fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
                             onClick={() => onToggleFavorite(media)}
                           />
-                          <p className="likes">{media.likes_count} Likes</p>
+                         <Send className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
+                         <Bookmark className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
                         </div>
-                        <p className="post-time">{timeAgo(media.timestamp)}</p>
+                        <p className="likes">{media.likes_count} Likes</p>
+                        {/* <p className="post-time">{timeAgo(media.timestamp)}</p> */}
                       </div>
                     </div>
                     : <div className="post">
@@ -456,7 +461,9 @@ function MediaPage(props) {
                           /></div>
                           <p className="username">{media.user} </p>
                         </div>
-  
+                        <div style={{ marginLeft: 'auto' }}>
+                          <svg xmlns="http://www.w3.org/2000/svg" style={{ cursor: "pointer", color: "var(--fourth-color)" }} width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ellipsis"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                          </div>
                       </div>
                       <img src={(apiURL + media.content.content)} className="post-image" alt="" />
                       <div className="post-content">
@@ -467,10 +474,13 @@ function MediaPage(props) {
                             fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
                             onClick={() => onToggleFavorite(media)}
                           />
-                          <p className="likes">{media.likes_count} Likes</p>
+                          <Send className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
+                          <Bookmark className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
+                          
                         </div>
+                        <p className="likes">{media.likes_count} Likes</p>
                         <p className="description">{media.message}</p>
-                        <p className="post-time">{timeAgo(media.timestamp)}</p>
+                        {/* <p className="post-time">{timeAgo(media.timestamp)}</p> */}
                       </div>
                     </div>}
                   {/* <div className="post">
@@ -649,7 +659,9 @@ function MediaPage(props) {
                 </>
               );
             })}
+         
           </div>
+          
         </>
       )
     }else{
@@ -765,6 +777,70 @@ function MediaPage(props) {
     //     <Loading />
     //   );
     // }
+  }
+
+  const renderSideMenu = () =>{
+    return(
+      <>
+          
+          <div className='course-box' >
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">Home</div>
+              </div>
+              <Home style={{ color: "var(--fourth-color)" }} size={20} />
+            </div>
+          </div>
+          <div className='course-box' >
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">Search</div>
+              </div>
+              <Search style={{ color: "var(--fourth-color)" }}  size={20}/>
+            </div>
+          </div>
+          <div className='course-box' >
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">Messages</div>
+              </div>
+              <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
+            </div>
+          </div>
+          <div className='course-box' >
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">Notifications</div>
+              </div>
+              <Bell style={{ color: "var(--fourth-color)" }} size={20} />
+            </div>
+          </div>
+          <div className='course-box' onClick={() => addmediaModel.onOpen()}>
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">Create New Post</div>
+              </div>
+              <Plus style={{ color: "var(--fourth-color)" }} ssize={22}/>
+            </div>
+          </div>
+          <div className='course-box' >
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">Profile</div>
+              </div>
+              <UserRound style={{ color: "var(--fourth-color)" }} size={20} />
+            </div>
+          </div>
+          <div className='course-box' >
+            <div className="course-info-mc2nw">
+              <div className="course-text-info">
+                <div className="course-name-9qncq6">More</div>
+              </div>
+              <ListOrdered style={{ color: "var(--fourth-color)" }} size={20}/>
+            </div>
+          </div>
+      </>
+    )
   }
 
   const handleClose = () => {
@@ -926,59 +1002,21 @@ function MediaPage(props) {
       <div className='content-92a233a'>
 
         <div className='left-menu-6k2zzc' id="course-sidebar">
-
-          {/* <div className="search-course-o38ca3" style={{ position: 'relative' }}>
-            <SearchIcon
-              color="var(--fifth-color)"
-              size={17}
-              className="search-icon"
-              style={{ position: 'absolute', top: 21, left: 8 }}
-            />
-            <input
-              type="text"
-              name="search"
-              className="search-input-7ajb312"
-              placeholder="Search media..."
-              value={searchText}
-              autoComplete="off"
-              style={{ paddingLeft: '40px' }} // Adjust padding to make space for the search icon
-              onChange={(event) => {
-                let searchTextValue = event.target.value.trim().toLowerCase();
-                setSearchText(searchTextValue);
-                const filteredCourses = searchTextValue
-                  ? originalCourses.filter(asset => {
-                    return asset?.name?.toLowerCase().indexOf(searchTextValue) > -1;
-                  })
-                  : originalCourses;
-                setCourses(filteredCourses);
-              }}
-            />
-            <XIcon
-              color="var(--fifth-color)"
-              size={24}
-              className="close-icon-search"
-              style={{ cursor: 'pointer', position: 'absolute', top: 17.5, right: 8 }}
-              onClick={(e) => {
-                setSearchText('');
-                setCourses(originalCourses);
-              }}
-            />
-          </div> */}
-
-          <div className='course-box' onClick={() => addmediaModel.onOpen()}>
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">Create New Post</div>
-              </div>
-              <Plus style={{ color: "var(--fourth-color)" }} />
-            </div>
-          </div>
-
+         {renderSideMenu()}
         </div>
 
-        <div className="right-content-83mzvcj3" id="course-content">
+        <div className="right-content-83mzvcj3" style={{position:"relative"}}>
 
           {renderMediaContent()}
+          <div className="bottom-navigation-bar">
+          <Home style={{ color: "var(--fourth-color)" }} size={24} />
+          <Search style={{ color: "var(--fourth-color)" }} size={24} />
+          {/* <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
+          <Bell style={{ color: "var(--fourth-color)" }} size={20} /> */}
+          <Plus style={{ color: "var(--fourth-color)" }} size={26} onClick={() => addmediaModel.onOpen()} />
+          <UserRound style={{ color: "var(--fourth-color)" }} size={24} />
+          <ListOrdered style={{ color: "var(--fourth-color)" }} size={24} />
+          </div>
           <Modal
             id="add-media-poll"
             isOpen={addmediaModel.isOpen}

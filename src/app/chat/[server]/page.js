@@ -175,6 +175,7 @@ function Chat(props) {
     const [pollList, setPollList] = useState([]);
     const [isCheckListFetch, setIsCheckListFetch] = useState(false);
     const [checkList, setCheckList] = useState([]);
+    const [checkCompletedList, setCheckCompletedList] = useState([]);
     const [isMediaListFetch, setIsMediaListFetch] = useState(false);
     const [mediaList, setMediaList] = useState([]);
 
@@ -1100,22 +1101,92 @@ function Chat(props) {
         }
     }
 
+    const handleCheckboxChange = (e, item) => {
+        if (e.target.checked) {
+            setCheckCompletedList([...checkCompletedList, item]);
+        } else {
+            setCheckCompletedList(checkCompletedList.filter(i => i !== item));
+        }
+    };
+
+
     const renderChecklistMessage = (checkListData) => {
-        if (!isCheckListFetch) {
-            return (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Spinner size='md' color='default' />
-                </div>
-            );
-        }
-        if (checkListData.length == 0) {
-            return (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <p style={{ color: 'var(--fourth-color)', opacity: 0.7, fontSize: 15, marginTop: 30 }}>No checklists available!</p>
-                </div>
-            );
-        }
-        return checkListData?.map((cData, index) => {
+        // if (!isCheckListFetch) {
+        //     return (
+        //         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        //             <Spinner size='md' color='default' />
+        //         </div>
+        //     );
+        // }
+        // if (checkListData.length == 0) {
+        //     return (
+        //         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        //             <p style={{ color: 'var(--fourth-color)', opacity: 0.7, fontSize: 15, marginTop: 30 }}>No checklists available!</p>
+        //         </div>
+        //     );
+        // }
+        // return checkListData?.map((cData, index) => {
+        //     return (
+        //         <div key={index} className='message-wrap-83nja'>
+        //             <div className="chat-user-icon-ac2s2">
+        //                 {index == 0 ?
+        //                     <div className='user-info-3kzc3'>
+        //                         <div style={{ position: 'relative' }}>
+        //                             <img
+        //                                 src={cData.admin_data?.avatar ? encodeURI(apiURL.slice(0, -1) + cData.admin_data?.avatar) : "/assets/person.png"}
+        //                                 style={{ height: 40, width: 40, borderRadius: '50%', }}
+        //                             />
+        //                             <img
+        //                                 src={"/assets/queen.svg"}
+        //                                 style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
+        //                             />
+        //                         </div>
+        //                     </div>
+        //                     :
+        //                     <div style={{ alignItems: 'center' }}>
+        //                     </div>
+        //                 }
+        //             </div>
+        //             <div className="message-ac2s2">
+        //                 <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
+        //                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        //                         <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
+        //                             {cData.admin_data.first_name} {cData.admin_data.last_name}
+        //                             </p>
+        //                         <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+        //                     </div>
+        //                 </div>
+
+        //                 <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
+        //                     <p className='message-text-3kzc3'>
+        //                         {parse(cData.checklist)}
+        //                         <div style={{ display: 'flex', flexDirection: 'row', width: '100%', flexWrap: 'wrap', marginTop: 10, marginBottom: 10 }}>
+        //                             {cData.options.map((checklist, index) => {
+        //                                 return (
+        //                                     // <Tooltip
+        //                                     //     content={
+        //                                     //         <div style={{ width: 70, height: 100, backgroundColor: 'var(--third-color)' }}>
+        //                                     //             {cData.checked?.[checklist]?.map?.((checklist, index) => { return checklist.user; })?.join?.(', ')}
+        //                                     //         </div>
+        //                                     //     }
+        //                                     //     closeDelay={100}
+        //                                     // >
+        //                                     <div className='checklist-answer-923mas' key={index} style={{}} onClick={answerChecklistClick(checklist, cData)}>
+        //                                         {checklist}
+        //                                         <div style={{ marginLeft: 10 }}>{cData.checked?.[checklist]?.length ?? 0}</div>
+        //                                     </div>
+        //                                     // </Tooltip>
+        //                                 );
+        //                             })}
+        //                         </div>
+        //                     </p>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     );
+        // })
+
+        return checkCompletedList?.map((cData, index) => {
             return (
                 <div key={index} className='message-wrap-83nja'>
                     <div className="chat-user-icon-ac2s2">
@@ -1140,32 +1211,26 @@ function Chat(props) {
                     <div className="message-ac2s2">
                         <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
                             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{cData.admin_data.first_name} {cData.admin_data.last_name}</p>
+                                <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
+                                   Harsh Patel
+                                    </p>
                                 <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
                             </div>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
                             <p className='message-text-3kzc3'>
-                                {parse(cData.checklist)}
+                               {/* {cData} */}
                                 <div style={{ display: 'flex', flexDirection: 'row', width: '100%', flexWrap: 'wrap', marginTop: 10, marginBottom: 10 }}>
-                                    {cData.options.map((checklist, index) => {
-                                        return (
-                                            // <Tooltip
-                                            //     content={
-                                            //         <div style={{ width: 70, height: 100, backgroundColor: 'var(--third-color)' }}>
-                                            //             {cData.checked?.[checklist]?.map?.((checklist, index) => { return checklist.user; })?.join?.(', ')}
-                                            //         </div>
-                                            //     }
-                                            //     closeDelay={100}
-                                            // >
-                                            <div className='checklist-answer-923mas' key={index} style={{}} onClick={answerChecklistClick(checklist, cData)}>
-                                                {checklist}
-                                                <div style={{ marginLeft: 10 }}>{cData.checked?.[checklist]?.length ?? 0}</div>
+                                  
+                                
+                                            <div className='checklist-answer-923mas' key={index} style={{}} >
+                                                {cData}
+                                                
                                             </div>
-                                            // </Tooltip>
-                                        );
-                                    })}
+        
+                                        
+                                   
                                 </div>
                             </p>
                         </div>
@@ -1447,36 +1512,35 @@ function Chat(props) {
                             <div>
                                 {renderMainContent()}
                             </div>
-                            <div className={`popup-modal ${isModalVisible ? 'visible' : ''}`}>
+                            {(selectedChannel?.type == ChannelType.checkList) ?
+                            <div className={`popup-modal ${isModalVisible ? 'visible' : ''}`}  onMouseEnter={handleMouseEnter}>
                                 <div className="rectangle"></div>
                                 <XIcon className="close-btn" onClick={handleCloseModal} />
                                 <h3 className="modal_text_title">✅┃daily-checklist</h3>
                                 {checkList.length !== 0 ? <p style={{ opacity: 0.7, fontSize: 15, marginTop: 20 }}>No checklists available!</p> :
-                                    <ul className="modal_body" style={{ marginTop: 20 }} >
-                                        <li>
-                                            <input className="custom-checkbox" type="checkbox" id="list1" />
-                                            <label className="modal_text_body" htmlFor="list1">List item 1</label>
-                                        </li>
-                                        <li>
-                                            <input className="custom-checkbox" type="checkbox" id="list2" />
-                                            <label className="modal_text_body" htmlFor="list2">List item 2</label>
-                                        </li>
-                                        <li>
-                                            <input className="custom-checkbox" type="checkbox" id="list3" />
-                                            <label className="modal_text_body" htmlFor="list3">List item 3</label>
-                                        </li>
-                                        <li>
-                                            <input className="custom-checkbox" type="checkbox" id="list4" />
-                                            <label className="modal_text_body" htmlFor="list4">List item 4</label>
-                                        </li>
-                                        <li>
-                                            <input className="custom-checkbox" type="checkbox" id="list5" />
-                                            <label className="modal_text_body" htmlFor="list5">List item 5</label>
-                                        </li>
-
-                                    </ul>
+                                   <ul className="modal_body" style={{ marginTop: 20 }}>
+                                   {['List item 1', 'List item 2', 'List item 3', 'List item 4', 'List item 5'].map((item, index) => (
+                                       <li key={index}>
+                                           <input
+                                               className="custom-checkbox-x"
+                                               type="checkbox"
+                                               id={`cross${index + 1}`}
+                                            //    checked={checkList.includes(item)}
+                                            //    onChange={(e) => handleCheckboxChange(e, item)}
+                                           />
+                                           <input
+                                               className="custom-checkbox"
+                                               type="checkbox"
+                                               id={`list${index + 1}`}
+                                               checked={checkCompletedList.includes(item)}
+                                               onChange={(e) => handleCheckboxChange(e, item)}
+                                           />
+                                           <label className="modal_text_body" htmlFor={`list${index + 1}`}>{item}</label>
+                                       </li>
+                                   ))}
+                               </ul>
                                 }
-                            </div>
+                            </div> : null}
                         </div>
                         {/* END - chat content */}
 
@@ -1486,13 +1550,13 @@ function Chat(props) {
                             {(selectedChannel?.type == ChannelType.checkList) ?
                                 <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
                                     <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
-                                        <div
+                                        {/* <div
                                             className="relative"
                                             onMouseEnter={handleMouseEnter}
                                         >
                                             <ClipboardList className='clipboard-icon' size={36} />
 
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                 </footer>
