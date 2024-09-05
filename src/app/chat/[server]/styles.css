@@ -495,6 +495,13 @@ main {
     display: flex;
     justify-content: flex-end;
     padding: 3px 20px;
+}
+
+.message-wrap-83nja-float{
+    flex-direction: row;
+    display: flex;
+    justify-content: flex-end;
+    padding: 3px 20px;
     animation: float 3s ease-in-out 1;
 }
 
@@ -1242,12 +1249,12 @@ main {
 .popup-modal {
     position: absolute;
     /* Positioned relative to the parent container */
-    bottom: 5%;
+    bottom: 0;
     /* Start at the bottom of the parent container */
     left: 50%;
     /* Center horizontally */
-    width: 40%;
-    height: 50%;
+    min-width: 70%;
+    min-height: 60%;
     transform: translate(-50%, 100%);
     /* Start off-screen below */
     opacity: 1;
@@ -1259,32 +1266,76 @@ main {
 }
 
 .popup-modal.visible {
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -30%);
     /* End position (centered vertically) */
     opacity: 1;
 }
 
 .rectangle {
     position: absolute;
-    top: -15px;
+    top: -30px;
     left: 50%;
-    border: 5px solid var(--eighth-color);
-    transform: translateX(-50%);
-    width: 60%;
-    height: 30px;
+    width: 50%; /* Adjust to match the clipboard's clip width */
+    height: 50px; /* Height of the clip */
     background-color: var(--border-color);
-    border-radius: 5px;
+    border: 3px solid var(--eighth-color);
+    border-radius: 30px 30px 15px 15px; /* Round only the top corners */
+    transform: translateX(-50%);
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2); 
+    z-index: 3; /* Ensure it appears on top of the modal */
+}
+
+.rectangle-line{
+    width: 100%;
+    position: absolute;
+    top: 60%;
+    border-top: 3px solid var(--eighth-color);;
+}
+
+.dot {
+    position: absolute;
+    top: 0px; /* Center the dot vertically within the circle */
+    left: 50%; /* Center the dot horizontally within the circle */
+    width: 10px; /* Width of the dot */
+    height: 10px; /* Height of the dot */
+    background-color: var(--border-color); /* Color of the dot */
+    border-radius: 50%; /* Make it a full circle */
+    transform: translate(-50%, -50%); /* Center the dot within the circle */
+    z-index: 4;
 }
 
 .rectangle::before {
-    content: "•••••";
-    font-size: 28px;
-    color: var(--fifth-color);
+    content: "";
     position: absolute;
-    top: 50%;
+    top: -30px; /* Adjust to position the half-circle on top of the rectangle */
     left: 50%;
-    transform: translate(-50%, -50%);
+    width: 60px; /* Width of the half-circle */
+    height: 30px; /* Half the height of the previous full circle */
+    background-color: var(--border-color);
+    border-top-left-radius: 60px; /* Make the top half rounded */
+    border-top-right-radius: 60px; /* Make the top half rounded */
+    border-bottom: none; /* Remove the bottom border */
+    border-left: 3px solid var(--eighth-color);
+    border-right: 3px solid var(--eighth-color);
+    border-top: 3px solid var(--eighth-color);
+    border-bottom: 3px solid var(--eighth-color);
+    transform: translateX(-50%);
+    z-index: 3; /* Ensure the half-circle appears above the clip */
 }
+
+.rectangle::after {
+    content: "";
+    position: absolute;
+    top: 0px; /* Center the circle vertically within the half-circle */
+    left: 50%; /* Center the circle horizontally within the half-circle */
+    width: 25px; /* Width of the full circle */
+    height: 25px; /* Height of the full circle */
+    background-color: var(--eighth-color); /* Color of the full circle */
+    border-radius: 50%; /* Make it a full circle */
+    transform: translate(-50%, -50%); /* Center the full circle within the half-circle */
+    z-index: 3; /* Ensure the full circle appears above the half-circle */
+}
+
 
 .close-btn {
     position: absolute;
@@ -1323,6 +1374,7 @@ main {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    height:40px;
     /* Adjust as needed */
 }
 
@@ -1372,6 +1424,37 @@ main {
     /* Adjusted font size */
     line-height: 1;
 }
+
+.custom-checkbox-icon,.custom-checkbox-x-icon{
+    margin-top: 5px !important;
+    margin-bottom: 10px !important;
+}
+
+.custom-checkbox-icon::after {
+    content: "✓";
+    position: absolute;
+    left: 50px;
+    /* Adjusted for better centering */
+    top: 20%;
+    color: white;
+    font-size: 18px;
+    /* Adjusted font size */
+    line-height: 1;
+}
+
+.custom-checkbox-x-icon::after {
+    content: "✗"; 
+    position: absolute;
+    left: 25px;
+    /* Adjusted for better centering */
+    top: 20%;
+    color: white;
+    font-size: 18px;
+    /* Adjusted font size */
+    line-height: 1;
+}
+
+
 
 .custom-checkbox-x {
     display: none;

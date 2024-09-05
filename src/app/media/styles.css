@@ -229,9 +229,16 @@
     margin: 0px 4px 0px 0px;
 }
 
-.search-course-o38ca3 {
+.search-post-o38ca3 {
     position: relative;
+    margin-bottom: -15px;
+    display: none;
 }
+
+.search-post-o38ca3.visible{
+    display: block;
+}
+
 
 .search-input-7ajb312 {
     background-color: var(--ninth-color);
@@ -244,7 +251,7 @@
     color: #ffffff;
     padding: 6px 15px;
     font-size: 14px;
-    margin-bottom: 15px;
+   
 }
 
 /* .search-input-7ajb312:focus {
@@ -701,6 +708,53 @@
     font-size: 12px;
 }
 
+.user-info{
+     display: flex;
+     align-items: center;
+     color: var(--fourth-color);
+}
+
+.username1{
+    padding: 5px;
+    font-size: 18px;
+}
+
+.username2{
+    margin-left: 40px;
+    font-size: 14px;
+}
+
+.post-info{
+    width: 100%;
+    height: auto;
+    background: var(--primary-color);
+    border: 1px solid var(--border-color);
+    margin-top: 20px;
+}
+
+.grid-head{
+    display: flex;
+     align-items: center;
+     color: var(--fourth-color);
+     width:100%;
+     height:40px;
+     padding: 5px;
+     font-size: 16px;
+}
+
+.post-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px; /* Space between images */
+}
+
+.post-image-info {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px; /* Optional: Rounding corners of the images */
+}
+
 .comment-wrapper {
     width: 100%;
     height: 50px;
@@ -753,6 +807,42 @@
     margin-left: auto;
 }
 
+
+.modal_text_body {
+    margin-left: 15px;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--fourth-color);
+}
+
+.modal_text_body_div{
+    margin-left: 15px;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--fourth-color);
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.modal_text_div{
+    width: 400px;
+}
+
+.notification-image-info{
+   max-height: 40px;
+   border-radius: 50%;
+}
+
+.modal_body li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    height:50px;
+    background-color: var(--seventh-color);
+    /* Adjust as needed */
+}
+
 .suitcase-modal-mcan34 {
     background-color: var(--third-color);
     overflow-x: hidden;
@@ -760,6 +850,10 @@
 
 .suitcase-modal-base-mcan34 {
     background-color: red;
+}
+
+.modal-content{
+    margin-left: 18.5% !important;
 }
 
 .suitcase-model-body-content-82bma2 {
@@ -1015,12 +1109,37 @@
             border-right: 1px solid var(--border-color);
         }
 
+        .suitcase-modal-header-mcan34 {
+            height: 40px;            
+        }
+
+        .modal_text_div{
+            width: 240px;
+        }
+
+        .modal-content{
+            margin-left: 0% !important;
+            margin-bottom: 15% !important;
+            height:70% !important;
+           
+        }
+
         .media-posts {
             margin-top:-10px;
             margin-left: 10px;
             margin-right: 10px;
             margin-bottom: 100px;
             padding: 5px;
+        }
+
+        .username1{
+            padding: 2px;
+            font-size: 16px;
+        }
+        
+        .username2{
+            margin-left: 10px;
+            font-size: 14px;
         }
 
         .close-icon {

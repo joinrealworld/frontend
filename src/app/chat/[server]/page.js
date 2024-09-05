@@ -1300,7 +1300,7 @@ function Chat(props) {
                     </div>
                 </div>
                 
-                <div  className='message-wrap-83nja'>
+                <div  className='message-wrap-83nja-float'>
                             <div className="message-ac2s2">
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
                                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -1514,12 +1514,24 @@ function Chat(props) {
                             </div>
                             {(selectedChannel?.type == ChannelType.checkList) ?
                             <div className={`popup-modal ${isModalVisible ? 'visible' : ''}`}  onMouseEnter={handleMouseEnter}>
-                                <div className="rectangle"></div>
+                                <div className="rectangle">
+                                    <div class="dot"></div>
+                                    <div className='rectangle-line'></div>
+                                </div>
                                 <XIcon className="close-btn" onClick={handleCloseModal} />
                                 <h3 className="modal_text_title">✅┃daily-checklist</h3>
+                                <div style={{marginBottom:'42px'}}> 
+                                <div className='custom-checkbox-x-icon' ></div>
+                                <div className='custom-checkbox-icon'  ></div></div>
                                 {checkList.length !== 0 ? <p style={{ opacity: 0.7, fontSize: 15, marginTop: 20 }}>No checklists available!</p> :
                                    <ul className="modal_body" style={{ marginTop: 20 }}>
-                                   {['List item 1', 'List item 2', 'List item 3', 'List item 4', 'List item 5'].map((item, index) => (
+                                   {['15 secs focus on your ideal future self then review your plans to win that day',
+                                    'watch the morning POWER UP call of the day', 
+                                    'Spend 10 mins reviewing your notes and/or analyzing good copy from the swipe file or Top Players', 
+                                    'send 3-10 outreach messages OR perform 1 G work-session on client work', 
+                                    'Train',
+                                    'Review your wins and losses for the day. Planout your next day accordingly.'
+                                     ].map((item, index) => (
                                        <li key={index}>
                                            <input
                                                className="custom-checkbox-x"

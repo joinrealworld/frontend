@@ -1,14 +1,14 @@
 "use client";
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useRef} from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User, Progress, Button, RadioGroup, useDisclosure, useRadio, cn, VisuallyHidden, Spinner, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter } from "@nextui-org/react";
 import Link from "next/link";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus,Home,Search,MessageCircle,Bell,UserRound,ListOrdered,Send ,Bookmark} from 'lucide-react';
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus,Home,Search,MessageCircle,Bell,UserRound,ListOrdered,Send ,Bookmark,Grid, Settings} from 'lucide-react';
 
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/audio.css';
@@ -58,6 +58,8 @@ function MediaPage(props) {
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
   const [medias, setMedias] = useState([]);
+  const [originalMedias, setOriginalMedias] = useState([]);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
   
   const router = useRouter();
   const dispatch = useDispatch();
@@ -65,6 +67,31 @@ function MediaPage(props) {
   const addmediaModel = useDisclosure({
     id: 'add-media-poll',
   });
+
+  const notificationModel = useDisclosure({
+    id: 'notification-model',
+  });
+
+  const profileModel = useDisclosure({
+    id: 'profile-model',
+  });
+
+  const rightContentRef = useRef(null);
+
+  const scrollToTop = () => {
+    if (rightContentRef.current) {
+      rightContentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleSearch = () => {
+    scrollToTop();
+    setIsSearchVisible(!isSearchVisible);
+  };
+
+  const messagePage = () =>{
+    toast("Under Construction");
+  }
 
   useEffect(() => {
     if (props.user.isLoggedIn) {
@@ -95,7 +122,9 @@ function MediaPage(props) {
     if (response.status >= 200 && response.status < 300) {
       const rsp = await response.json();
       if (rsp.results) {
-        setMedias(rsp.results);
+        const reverseArray = rsp.results.reverse();
+        setMedias(reverseArray);
+        setOriginalMedias(reverseArray);
         setIsMediaFetch(true);
       }
     } else {
@@ -418,6 +447,47 @@ function MediaPage(props) {
       return (
         <>
           <div className="media-posts">
+          <div  className={`search-post-o38ca3 ${isSearchVisible ? 'visible' : ''}`} >
+            <SearchIcon
+              color="var(--fifth-color)"
+              size={17}
+              className="search-icon"
+              style={{ position: 'absolute', top: 21, left: 8 }}
+            />
+            <input
+              type="text"
+              name="search"
+              className="search-input-7ajb312"
+              placeholder="Search ..."
+              value={searchText}
+              autoComplete="off"
+              style={{ paddingLeft: '40px' }} // Adjust padding to make space for the search icon
+              onChange={(event) => {
+                let searchTextValue = event.target.value.trim().toLowerCase();
+                setSearchText(searchTextValue);
+                const filteredMedias = searchTextValue
+                  ? originalMedias.filter(asset => {
+                    return (
+                      asset?.message?.toLowerCase().includes(searchTextValue) ||
+                      asset?.user?.toLowerCase().includes(searchTextValue)
+                    );
+                  })
+                  : medias;
+                console.log(searchTextValue);
+                setMedias(filteredMedias);
+              }}
+            />
+            <XIcon
+              color="var(--fifth-color)"
+              size={24}
+              className="close-icon-search"
+              style={{ cursor: 'pointer', position: 'absolute', top: 17.5, right: 8 }}
+              onClick={(e) => {
+                setSearchText('');
+                setMedias(originalMedias);
+              }}
+            />
+          </div>
             {medias.map((media, index) => {
               return (
                 <>
@@ -445,8 +515,8 @@ function MediaPage(props) {
                             fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
                             onClick={() => onToggleFavorite(media)}
                           />
-                         <Send className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
-                         <Bookmark className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
+                         <Send className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
+                         <Bookmark className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
                         </div>
                         <p className="likes">{media.likes_count} Likes</p>
                         {/* <p className="post-time">{timeAgo(media.timestamp)}</p> */}
@@ -465,7 +535,7 @@ function MediaPage(props) {
                           <svg xmlns="http://www.w3.org/2000/svg" style={{ cursor: "pointer", color: "var(--fourth-color)" }} width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ellipsis"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                           </div>
                       </div>
-                      <img src={(apiURL + media.content.content)} className="post-image" alt="" />
+                      <img src="/assets/media/post1.webp" className="post-image" alt="" />
                       <div className="post-content">
                         <div className="reaction-wrapper">
                           <HeartIcon
@@ -474,8 +544,8 @@ function MediaPage(props) {
                             fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
                             onClick={() => onToggleFavorite(media)}
                           />
-                          <Send className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
-                          <Bookmark className="send-icon" style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
+                          <Send className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
+                          <Bookmark className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
                           
                         </div>
                         <p className="likes">{media.likes_count} Likes</p>
@@ -670,120 +740,14 @@ function MediaPage(props) {
       );
     }
    
-    // if (isCourseDataFetch) {
-    //   if (selectedCourse) {
-
-    //     let currentMessage = { ...selectedLesson };
-    //     // currentMessage.content = currentMessage?.content.replace(/\*\*(.*?)\*\*/g, `<b>$1</b>`);
-    //     // // Replace \n with <br>
-    //     // currentMessage.content = currentMessage?.content.replace(/\n/g, `<br />`);
-
-    //     if (Math.round(selectedCourse?.completed).toString() == '100') {
-    //       return (
-    //         <>
-    //           <div className="lesson-header-23maaa">
-    //             <ArrowLeft
-    //               id="sidebar-btn-nack3"
-    //               style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
-    //               onClick={onOpenSideMenu}
-    //             />
-    //             <div style={{ height: "2rem", width: "2rem" }}></div>
-    //             {selectedCourse &&
-    //               <>
-    //                 <h2 className="lesson-title-1mcasa">{selectedCourse?.name}</h2>
-    //                 <HeartIcon
-    //                   className="heart-icon"
-    //                   fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
-    //                   style={{ cursor: "pointer", color: "var(--fourth-color)", }}
-    //                   onClick={(e) => onToggleFavorite()}
-    //                 />
-    //               </>
-    //             }
-    //           </div>
-    //           <div style={{ padding: 30, paddingTop: 60, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', }}>
-    //             <h5 style={{ color: "var(--fourth-color)" }}>Successfully 100% completed!</h5>
-    //             <Button color="default" variant="ghost" className="next-button-mdkad" onClick={goToNextCourse}>
-    //               <span className="next-button-text-mdkad">Go To Next</span>
-    //             </Button>
-    //           </div>
-
-    //         </>
-    //       );
-    //     }
-    //     return (
-    //       <>
-    //         <div className="lesson-header-23maaa">
-    //           {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 ?
-    //             <ArrowLeft isLoading={isPreviousLoading} className="arrow-left" onClick={onPreStep} /> :
-    //             <div style={{ height: "2rem", width: "2rem" }}></div>
-    //           }
-    //           <ArrowLeft
-    //             id="sidebar-btn-nack3"
-    //             style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--third-color)", }}
-    //             onClick={onOpenSideMenu}
-    //           />
-    //           <h2 className="lesson-title-1mcasa">{selectedCourse?.name}</h2>
-    //           <HeartIcon
-    //             className="heart-icon"
-    //             fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
-    //             style={{ cursor: "pointer", color: "var(--fourth-color)", }}
-    //             onClick={(e) => onToggleFavorite()}
-    //           />
-    //         </div>
-    //         <div className="lesson-content-mdak32">
-    //           {renderCourseContentBySection(currentMessage)}
-    //           <div style={{ display: 'flex', width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-    //             {/* {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 &&
-
-    //             } */}
-    //             <div style={{ width: '90%' }} />
-    //             <Button spinner={<Spinner color='current' size='sm' />} color="default" isLoading={isNextLoading} variant="ghost" className="next-button-mdkad" onClick={onNextStep}>
-    //               <span className="next-button-text-mdkad">NEXT</span>
-    //             </Button>
-    //           </div>
-    //         </div>
-    //       </>
-    //     );
-    //   } else {
-    //     return (
-    //       <>
-    //         <div className="lesson-header-23maaa">
-    //           <ArrowLeft
-    //             id="sidebar-btn-nack3"
-    //             style={{ position: "absolute", left: "5%", cursor: "pointer", color: "var(--fourth-color)", }}
-    //             onClick={onOpenSideMenu}
-    //           />
-    //           <div style={{ height: "2rem", width: "2rem" }}></div>
-    //           {selectedCourse &&
-    //             <>
-    //               <h2 className="lesson-title-1mcasa">{selectedCourse?.name}</h2>
-    //               <HeartIcon
-    //                 className="heart-icon"
-    //                 fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
-    //                 style={{ cursor: "pointer", color: "var(--fourth-color)", }}
-    //                 onClick={(e) => onToggleFavorite()}
-    //               />
-    //             </>
-    //           }
-    //         </div>
-    //         <div style={{ padding: 30, paddingTop: 100, display: 'flex', justifyContent: 'center', height: '100%', }}>
-    //           <h5 className="var(--fourth-color)">No course content available!</h5>
-    //         </div>
-    //       </>
-    //     );
-    //   }
-    // } else {
-    //   return (
-    //     <Loading />
-    //   );
-    // }
+    
   }
 
   const renderSideMenu = () =>{
     return(
       <>
           
-          <div className='course-box' >
+          <div className='course-box' onClick={scrollToTop}>
             <div className="course-info-mc2nw">
               <div className="course-text-info">
                 <div className="course-name-9qncq6">Home</div>
@@ -791,7 +755,7 @@ function MediaPage(props) {
               <Home style={{ color: "var(--fourth-color)" }} size={20} />
             </div>
           </div>
-          <div className='course-box' >
+          <div className='course-box'  onClick={handleSearch}>
             <div className="course-info-mc2nw">
               <div className="course-text-info">
                 <div className="course-name-9qncq6">Search</div>
@@ -799,7 +763,7 @@ function MediaPage(props) {
               <Search style={{ color: "var(--fourth-color)" }}  size={20}/>
             </div>
           </div>
-          <div className='course-box' >
+          <div className='course-box' onClick={messagePage}>
             <div className="course-info-mc2nw">
               <div className="course-text-info">
                 <div className="course-name-9qncq6">Messages</div>
@@ -807,7 +771,7 @@ function MediaPage(props) {
               <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
             </div>
           </div>
-          <div className='course-box' >
+          <div className='course-box' onClick={() => notificationModel.onOpen()}>
             <div className="course-info-mc2nw">
               <div className="course-text-info">
                 <div className="course-name-9qncq6">Notifications</div>
@@ -823,7 +787,7 @@ function MediaPage(props) {
               <Plus style={{ color: "var(--fourth-color)" }} ssize={22}/>
             </div>
           </div>
-          <div className='course-box' >
+          <div className='course-box' onClick={() => profileModel.onOpen()}>
             <div className="course-info-mc2nw">
               <div className="course-text-info">
                 <div className="course-name-9qncq6">Profile</div>
@@ -831,14 +795,7 @@ function MediaPage(props) {
               <UserRound style={{ color: "var(--fourth-color)" }} size={20} />
             </div>
           </div>
-          <div className='course-box' >
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">More</div>
-              </div>
-              <ListOrdered style={{ color: "var(--fourth-color)" }} size={20}/>
-            </div>
-          </div>
+          
       </>
     )
   }
@@ -855,7 +812,6 @@ function MediaPage(props) {
   };
 
   const onToggleFavorite = async (media) => {
-    console.log(media);
     const response = await fetch(apiURL + 'api/v1/media/like/message', {
       method: 'POST',
       headers: {
@@ -882,6 +838,11 @@ function MediaPage(props) {
     }
   }
 
+  const handleCloseMediaModal = () => {
+    addmediaModel.onClose();
+    setContent("");
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
     if(image == ''){
@@ -899,7 +860,8 @@ function MediaPage(props) {
     if (response.status >= 200 && response.status < 300) {
       if (rsp) {
         getInitData();
-        addmediaModel.onClose();  
+        addmediaModel.onClose();
+        scrollToTop();  
         setContent('');
         setImage('');
       } else {
@@ -947,7 +909,8 @@ function MediaPage(props) {
       if (response2.status >= 200 && response2.status < 300) {
         if (rsp2) {
           getInitData();
-          addmediaModel.onClose();  
+          addmediaModel.onClose(); 
+          scrollToTop(); 
           setContent('');
           setImage('');
         } else {
@@ -1005,24 +968,24 @@ function MediaPage(props) {
          {renderSideMenu()}
         </div>
 
-        <div className="right-content-83mzvcj3" style={{position:"relative"}}>
+        <div className="right-content-83mzvcj3"  ref={rightContentRef} style={{position:"relative"}}>
 
           {renderMediaContent()}
           <div className="bottom-navigation-bar">
-          <Home style={{ color: "var(--fourth-color)" }} size={24} />
-          <Search style={{ color: "var(--fourth-color)" }} size={24} />
+          <Home style={{ color: "var(--fourth-color)" }} size={24} onClick={scrollToTop}/>
+          <Search style={{ color: "var(--fourth-color)" }} size={24}  onClick={handleSearch}/>
           {/* <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
           <Bell style={{ color: "var(--fourth-color)" }} size={20} /> */}
           <Plus style={{ color: "var(--fourth-color)" }} size={26} onClick={() => addmediaModel.onOpen()} />
-          <UserRound style={{ color: "var(--fourth-color)" }} size={24} />
-          <ListOrdered style={{ color: "var(--fourth-color)" }} size={24} />
+          <Bell style={{ color: "var(--fourth-color)" }} size={24} onClick={() => notificationModel.onOpen()}/>
+          <UserRound style={{ color: "var(--fourth-color)" }} size={24} onClick={() => profileModel.onOpen()}/>
           </div>
           <Modal
             id="add-media-poll"
             isOpen={addmediaModel.isOpen}
             backdrop="opaque"
             radius="md"
-            size='2xl'
+            size='xl'
             onClose={() => {
 
             }}
@@ -1034,14 +997,14 @@ function MediaPage(props) {
             }}
             hideCloseButton
           >
-            <ModalContent style={{ height: '55%' }}>
+            <ModalContent className="modal-content" style={{ height: '55%'}}>
               {(onClose) => (
                 <>
                   <ModalHeader>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'var(--fourth-color)' }}>
                       Create New Post
                     </div>
-                    <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={(e) => { addmediaModel.onClose(); }} />
+                    <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={handleCloseMediaModal} />
                   </ModalHeader>
                   <ModalBody>
                     <div className='suitcase-model-body-content-82bma2'>
@@ -1074,6 +1037,126 @@ function MediaPage(props) {
                           </Button>
                         </div>
                       </form>
+                    </div>
+
+                  </ModalBody>
+
+                </>
+              )}
+            </ModalContent>
+
+          </Modal>
+          <Modal
+            id="notification-model"
+            isOpen={notificationModel.isOpen}
+            backdrop="opaque"
+            radius="md"
+            size='xl'
+            onClose={() => {
+
+            }}
+            onOpenChange={notificationModel.onOpenChange}
+            classNames={{
+              body: "suitcase-modal-mcan34",
+              header: "suitcase-modal-header-mcan34 py-0",
+              footer: "suitcase-modal-footer-mcan34 py-0",
+            }}
+            hideCloseButton
+          >
+            <ModalContent className="modal-content" style={{ height: '50%' }}>
+              {(onClose) => (
+                <>
+                  <ModalHeader>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'var(--fourth-color)' }}>
+                      Notifications
+                    </div>
+                    <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={(e) => { notificationModel.onClose(); }} />
+                  </ModalHeader>
+                  <ModalBody>
+                    <div className='suitcase-model-body-content-82bma2'>
+                      
+                         <ul className="modal_body">
+                          <li><div className="modal_text_body_div"><div className="profile-pic" style={{marginRight:'20px'}}><img
+                                              src='/assets/person.png'
+                                              style={{ height: 30, width: 30, borderRadius: '50%' }}
+                                          /></div>
+                                          <div className="modal_text_div"><p>Sam Wilson, Peter, user3 and 7 others liked your photo.</p></div>
+                                          <img src="/assets/media/post1.webp" className="notification-image-info" alt="Post Image 1" /></div></li>
+                                          <li><div className="modal_text_body_div"><div className="profile-pic" style={{marginRight:'20px'}}><img
+                                              src='/assets/person.png'
+                                              style={{ height: 30, width: 30, borderRadius: '50%' }}
+                                          /></div>
+                                          <div className="modal_text_div"><p >User1, Zeoob, user3 and 10 others liked your photo.</p></div>
+                                          <img src="/assets/media/post2.png" className="notification-image-info" alt="Post Image 2" /></div></li>
+                          
+                         </ul>
+                        
+                        
+                    
+                    </div>
+
+                  </ModalBody>
+
+                </>
+              )}
+            </ModalContent>
+
+          </Modal>
+          <Modal
+            id="profile-model"
+            isOpen={profileModel.isOpen}
+            backdrop="opaque"
+            radius="md"
+            size='xl'
+            onClose={() => {
+
+            }}
+            onOpenChange={profileModel.onOpenChange}
+            classNames={{
+              body: "suitcase-modal-mcan34",
+              header: "suitcase-modal-header-mcan34 py-0",
+              footer: "suitcase-modal-footer-mcan34 py-0",
+            }}
+            hideCloseButton
+          >
+            <ModalContent className="modal-content" style={{ height: '70%' }}>
+              {(onClose) => (
+                <>
+                  <ModalHeader>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'var(--fourth-color)' }}>
+                      User Profile
+                    </div>
+                    <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={(e) => { profileModel.onClose(); }} />
+                  </ModalHeader>
+                  <ModalBody>
+                    <div className='suitcase-model-body-content-82bma2'>
+                    <div className="user-info">
+                        <div className="profile-pic" style={{marginRight:'20px'}}><img
+                                              src='/assets/person.png'
+                                              style={{ height: 84, width: 84, borderRadius: '50%' }}
+                                          /></div>
+                        <div style={{marginLeft:'20px'}}> <p className="username1" >samwilson624663 
+                          <Button className="edit-profile-button username2" >Edit Profile</Button></p>
+                        <p className="username1" style={{fontSize:'14px'}}>4 posts 
+                          <span className="username2" > samwilson624663@gmail.com</span></p>
+                        <p className="username1" > Sam Wilson</p></div>
+                      
+                       
+
+                    </div>
+
+                    <div className="post-info">
+                      <div className="grid-head">
+                        <Grid size={18} style={{marginRight:'10px'}}/>
+                        Posts
+                      </div>
+                     <div className="post-grid">
+                    <img src="/assets/media/post1.webp" className="post-image-info" alt="Post Image 1" />
+                    <img src="/assets/media/post2.png" className="post-image-info" alt="Post Image 2" />
+                    <img src="/assets/media/emptypost.webp" className="post-image-info" alt="Post Image 3" />
+                    <img src="/assets/media/emptypost.webp" className="post-image-info" alt="Post Image 4" />   
+                    </div>
+            </div>  
                     </div>
 
                   </ModalBody>
