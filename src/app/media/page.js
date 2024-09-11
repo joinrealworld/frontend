@@ -8,7 +8,7 @@ import Link from "next/link";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus,Home,Search,MessageCircle,Bell,UserRound,ListOrdered,Send ,Bookmark,Grid, Settings} from 'lucide-react';
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus,Home,Search,MessageCircle,Bell,UserRound,ListOrdered,Send ,Bookmark,Grid, Settings,Image} from 'lucide-react';
 
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/audio.css';
@@ -60,6 +60,8 @@ function MediaPage(props) {
   const [medias, setMedias] = useState([]);
   const [originalMedias, setOriginalMedias] = useState([]);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  const [isSubmitVisible, setIsSubmitVisible] = useState(false);
   
   const router = useRouter();
   const dispatch = useDispatch();
@@ -418,10 +420,32 @@ function MediaPage(props) {
     );
   };
 
-  const goToNextCourse = (e) => {
-    let index = Math.min(originalCourses.findIndex(c => c.uuid == selectedCourse?.uuid) + 1, originalCourses?.length);
-    router.push('?cid=' + originalCourses?.[index]?.uuid);
-  }
+  const purchaseIdentityBooster = async (authToken) => {
+    let formData = new FormData();
+    formData.append('coin', 200);
+    const response = await fetch(apiURL + 'api/v1/user/purches/identity_booster', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + authToken
+        },
+        body: formData
+    });
+    const rsp = await response.json();
+    if (response.status >= 200 && response.status < 300) {
+        if (rsp.status == 1) {
+            toast("Create New Post Plan purchased successfully!");
+            setIsSubmitVisible(true);
+        } else {
+            handleAPIError(rsp);
+        }
+    } else {
+        if (response.status == 401) {
+            dispatch(props.actions.userLogout());
+        } else {
+            handleAPIError(rsp);
+        }
+    }
+}
 
   function timeAgo(timestamp) {
     const now = new Date();
@@ -441,6 +465,21 @@ function MediaPage(props) {
     if (minutes === 1) return `1 Minute ago`;
     return `${seconds} Seconds ago`;
   }
+
+  useEffect(() => {
+    // Set an interval to increase the likes count every 5 minutes
+    const interval = setInterval(() => {
+      setMedias((prevMedias) =>
+        prevMedias.map((media) => ({
+          ...media,
+          likes_count: media.likes_count + 1,
+        }))
+      );
+    }, 10000); // 5 minutes = 300000ms
+
+    // Cleanup the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, []);
 
   const renderMediaContent = () => {
     if(isMediaFetch){
@@ -807,7 +846,7 @@ function MediaPage(props) {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file.name);
+      setImage(file);
     }
   };
 
@@ -841,6 +880,7 @@ function MediaPage(props) {
   const handleCloseMediaModal = () => {
     addmediaModel.onClose();
     setContent("");
+    setImage("");
   }
 
   const handleSubmit = async (e) => {
@@ -875,7 +915,8 @@ function MediaPage(props) {
       }
     }
     }else{
-      const imageName = image.substring(image.lastIndexOf('/') + 1);
+      console.log(image);
+      const imageName = image.name.substring(image.name.lastIndexOf('/') + 1);
       const responseImage = await fetch(image);
       const blob = await responseImage.blob();
       const extension = imageName.split('.').pop();
@@ -972,13 +1013,13 @@ function MediaPage(props) {
 
           {renderMediaContent()}
           <div className="bottom-navigation-bar">
-          <Home style={{ color: "var(--fourth-color)" }} size={24} onClick={scrollToTop}/>
-          <Search style={{ color: "var(--fourth-color)" }} size={24}  onClick={handleSearch}/>
+          <Home className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={scrollToTop}/>
+          <Search className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24}  onClick={handleSearch}/>
           {/* <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
           <Bell style={{ color: "var(--fourth-color)" }} size={20} /> */}
-          <Plus style={{ color: "var(--fourth-color)" }} size={26} onClick={() => addmediaModel.onOpen()} />
-          <Bell style={{ color: "var(--fourth-color)" }} size={24} onClick={() => notificationModel.onOpen()}/>
-          <UserRound style={{ color: "var(--fourth-color)" }} size={24} onClick={() => profileModel.onOpen()}/>
+          <Plus className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={26} onClick={() => addmediaModel.onOpen()} />
+          <Bell className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={() => notificationModel.onOpen()}/>
+          <UserRound className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={() => profileModel.onOpen()}/>
           </div>
           <Modal
             id="add-media-poll"
@@ -997,7 +1038,7 @@ function MediaPage(props) {
             }}
             hideCloseButton
           >
-            <ModalContent className="modal-content" style={{ height: '55%'}}>
+            <ModalContent className="modal-content" style={{ height: '60%'}}>
               {(onClose) => (
                 <>
                   <ModalHeader>
@@ -1008,35 +1049,69 @@ function MediaPage(props) {
                   </ModalHeader>
                   <ModalBody>
                     <div className='suitcase-model-body-content-82bma2'>
-                      <form onSubmit={handleSubmit}>
-                        <div className="post_image">
-                          <label htmlFor="post-image" className='suitcase-body-title-72bak'>Upload an image (optional):</label>
-                          <input
-                            id="post-image"
-                            type="file"
-                            onChange={handleImageUpload}
-                            className="input-file"
-                          />
-                          {image && <p className="file-name">{image}</p>}
-                        </div>
-                        <div className="post_image">
-                          <label htmlFor="post-content" className='suitcase-body-title-72bak'>What's on your mind?</label>
-                          <textarea
-                            id="post-content"
-                            placeholder="Share your thoughts..."
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            className="post-textarea"
-                          />
+                    <form onSubmit={handleSubmit}>
+                          <div className="post_image">
+                            <label htmlFor="post-image" className="suitcase-body-title-72bak">Upload an image or video (optional):</label>
+                            <div className="upload-box" onClick={() => document.getElementById('post-image').click()}>
+                              {!image ? (
+                                <div className="upload-placeholder">
+                                  <Image size="50"/>
+                                </div>
+                              ) : (
+                                <div className="uploaded-media">
+                                  {image?.type && image.type.startsWith('image/') ? (
+                                    <img src={URL.createObjectURL(image)} alt="Uploaded preview" className="uploaded-image" />
+                                  ) : (
+                                    <video src={URL.createObjectURL(image)} className="uploaded-video" controls />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <input
+                              id="post-image"
+                              type="file"
+                              onChange={handleImageUpload}
+                              className="input-file"
+                              accept="image/*, video/*"
+                              style={{ display: 'none' }} // Hide the actual input element
+                            />
+                          </div>
+                          
+                          <div className="post_image">
+                            <label htmlFor="post-content" className="suitcase-body-title-72bak">What's on your mind?</label>
+                            <textarea
+                              id="post-content"
+                              placeholder="Share your thoughts..."
+                              value={content}
+                              onChange={(e) => setContent(e.target.value)}
+                              className="post-textarea"
+                            />
+                          </div>
+                          
+                          <div>
+                            {isSubmitVisible ?  <Button type="submit" color="default" variant="ghost" className="submit-button-mdkad">
+                              <span className="next-button-text-mdkad">Submit</span>
+                            </Button> :
+                            <Button
+                            className='submit-button-mdkad'
+                            style={{ marginLeft: 0 }}
+                            spinner={<Spinner color='current' size='sm' />}
+                            size='md'
+                            color=''
+                            onClick={(e) => {
+                              purchaseIdentityBooster(props.user.authToken);
+                          }}
+                        >
+                            UNLOCK FOR 200 COINS
+                            <img alt="Avatar" src="/assets/coin.svg" width={16} height={16} />
+                        </Button>
+                             }
+                           
+                            
+                          </div>
+                        </form>
 
 
-                        </div>
-                        <div >
-                          <Button type="submit" color="default" variant="ghost" className="submit-button-mdkad" >
-                            <span className="next-button-text-mdkad">Submit</span>
-                          </Button>
-                        </div>
-                      </form>
                     </div>
 
                   </ModalBody>

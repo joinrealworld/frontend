@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList } from 'lucide-react';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList, Ticket } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
@@ -23,7 +23,8 @@ const ChannelType = {
     checkList: 1,
     polls: 2,
     media: 3,
-    blackHole:4
+    blackHole:4,
+    raffles:5
 }
 
 const Channels = [
@@ -46,6 +47,11 @@ const Channels = [
         uuid: '7DE517C0-B05F-47DB-986A-0B130638C91C',
         name: '⚫ | black-hole',
         type: ChannelType.blackHole,
+    },
+    {
+        uuid: '7DE517C0-B05F-47DB-986A-0B130638C91D',
+        name: '🎟️ | raffles',
+        type: ChannelType.raffles,
     },
     // do not need - so code commented for now
     // {
@@ -175,12 +181,15 @@ function Chat(props) {
     const [pollList, setPollList] = useState([]);
     const [isCheckListFetch, setIsCheckListFetch] = useState(false);
     const [checkList, setCheckList] = useState([]);
+    const [checkedItems, setCheckedItems] = useState([]);
     const [checkCompletedList, setCheckCompletedList] = useState([]);
     const [isMediaListFetch, setIsMediaListFetch] = useState(false);
     const [mediaList, setMediaList] = useState([]);
 
     const [sendText, setSendText] = useState('');
     const [blackHoleList, setBlackHoleList] = useState([]);
+
+    const [raffleList, setRaffleList] = useState([]);
 
     const [selectedSideMenu, setSelectedSideMenu] = useState(SideMenus[0]);
     const [searchText, setSearchText] = useState('');
@@ -209,7 +218,10 @@ function Chat(props) {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const handleMouseEnter = () => setIsModalVisible(true);
-    const handleCloseModal = () => setIsModalVisible(false);
+    const handleCloseModal = () => {
+        setCheckCompletedList(prevList => [...prevList, ...checkedItems]); // Add all checked items
+        setIsModalVisible(false); // Hide modal
+    };
 
     const [mountTheme, setMountTheme] = useState(
         JSON.parse(localStorage.getItem("theme")) || "dark"
@@ -290,6 +302,11 @@ function Chat(props) {
             }
             console.error("Expected prevList to be an array, but it is not.");
             return [{'username':"Harsh Patel",'message':"Text Message"}]; // or handle the error as needed
+          });
+          setRaffleList((prevList) => {
+            if (Array.isArray(prevList)) {
+              return [...prevList, {'username':"Harsh Patel",'number':1}];
+            }
           });
     }
 
@@ -911,9 +928,12 @@ function Chat(props) {
         else if (selectedChannel?.type == ChannelType.media) {
             router.replace('/media')
         }else if(selectedChannel?.type == ChannelType.blackHole){
+            return  renderBlackHole();
+        }
+        else if(selectedChannel?.type == ChannelType.raffles){
             return (
-                <div id='chat-background' ref={chatContainerRef} style={{ height: '400px', overflowY: 'auto' }}>
-                    {renderBlackHole()}
+                <div id='raffle-background' ref={raffleContainerRef} style={{ height: '400px', overflowY: 'auto' }}>
+                    {renderRaffle()}
                 </div>
             );
         }
@@ -1101,13 +1121,16 @@ function Chat(props) {
         }
     }
 
-    const handleCheckboxChange = (e, item) => {
-        if (e.target.checked) {
-            setCheckCompletedList([...checkCompletedList, item]);
-        } else {
-            setCheckCompletedList(checkCompletedList.filter(i => i !== item));
-        }
-    };
+    
+// Handle checking/unchecking an item
+const handleItemCheck = (e, item) => {
+    if (e.target.checked) {
+        setCheckedItems(prev => [...prev, item]);
+    } else {
+        setCheckedItems(prev => prev.filter(i => i !== item));
+    }
+};
+
 
 
     const renderChecklistMessage = (checkListData) => {
@@ -1273,34 +1296,44 @@ function Chat(props) {
 
     const chatContainerRef = useRef(null);
 
+    const raffleContainerRef = useRef(null);
+
     useEffect(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [blackHoleList]);
 
+    useEffect(() => {
+        if (raffleContainerRef.current) {
+            raffleContainerRef.current.scrollTop = raffleContainerRef.current.scrollHeight;
+        }
+    }, [raffleList]);
+
     const sendBlackHoleMessage = () =>{
-        setBlackHoleList((prevList) => {
-            if (Array.isArray(prevList)) {
-              return [...prevList, {'username':"Harsh Patel",'message':sendText}];
-            }
-            return [{'username':"Harsh Patel",'message':"Text Message"}]; // or handle the error as needed
-          });
-          setSendText("");
+        if(sendText != ""){
+            setBlackHoleList((prevList) => {
+                if (Array.isArray(prevList)) {
+                  return [...prevList, {'username':"Harsh Patel",'message':sendText}];
+                }
+                return [{'username':"Harsh Patel",'message':"Text Message"}]; // or handle the error as needed
+              });
+              setSendText("");
+        }
+       
     }
 
     const renderBlackHole = () => {
-        $('#chat-background').css('background-color', 'black');
-        return blackHoleList.map((item, index) => {
+       
         return (
-            <div key={index} style={{}}>
-                <div className='message-divider-date-wrap-7naj82b'>
+            <div id="black-hole-background" >
+                {/* <div className='message-divider-date-wrap-7naj82b'>
                     <div className='message-divider-date-7naj82b'>
                         {moment('09/01/2024').format('MMMM DD, YYYY')}
                     </div>
-                </div>
-                
-                <div  className='message-wrap-83nja-float'>
+                </div> */}
+         {blackHoleList.map((item, index) => {
+             return( <div key={index}  className='message-wrap-83nja-float' >
                             <div className="message-ac2s2">
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
                                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -1319,6 +1352,57 @@ function Chat(props) {
                                     
                                 </div>
                                 <div className='message-tail' />
+                            </div>
+                        </div>
+                       );  })}
+            </div>
+        );
+   
+    }
+
+    const sendRaffle = () => {
+        setRaffleList((prevList) => {
+            if (Array.isArray(prevList)) {
+              return [...prevList, {'username':"Chirag Lathiya",'number':2}];
+            }
+            return [{'username':"Harsh Patel",'message':"Text Message"}]; // or handle the error as needed
+          });
+    }
+
+    const renderRaffle = () => {
+        return raffleList.map((item, index) => {
+        return (
+            <div id="raffle-background" key={index} style={{}}>
+                {/* <div className='message-divider-date-wrap-7naj82b'>
+                    <div className='message-divider-date-7naj82b'>
+                        {moment('09/01/2024').format('MMMM DD, YYYY')}
+                    </div>
+                </div> */}
+                
+                <div  className='message-wrap-83nja-float-raffle'>
+                            <div className="raffle-ac2s2">
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',width:'60%' }}>
+                                        <p className='user-name-3kzc3-raffle' style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: '#f1c40f', fontWeight: '400' }}>{item.username}
+                                        <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+                                        </p>
+                                        
+                                        {/* <p className='date-text-3kzc3'>
+                                            {dateFormat('09/01/2024')}
+                                        </p> */}
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 40,alignItems: 'center' }}>
+                                    <p className='raffle-text-3kzc3' >
+                                        <b>{item.number}</b>
+                                    </p>
+                                    
+                                </div>
+                                </div>
+
+                              
+                                <div className='left-circle' ></div>
+                                <div className='right-circle' ></div>
                             </div>
                         </div>
             </div>
@@ -1495,7 +1579,7 @@ function Chat(props) {
 
                         {/* START - chat content */}
                         <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: 'auto', padding: '20px 0px' }}>
-
+                         { selectedChannel?.type == ChannelType.raffles ? null :
                             <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
                                 <div style={{ margin: '20px 20px', backgroundColor: 'var(--seventh-color)', padding: '20px 20px', borderRadius: 5 }}>
                                     <div style={{ color: 'var(--fourth-color)', fontSize: 18, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -1508,7 +1592,7 @@ function Chat(props) {
                                     <div style={{ color: 'var(--fourth-color)', fontSize: 15 }} className="mt-2">This is the start of your conversation.</div>
                                 </div>
                             </div>
-
+                         }
                             <div>
                                 {renderMainContent()}
                             </div>
@@ -1518,7 +1602,7 @@ function Chat(props) {
                                     <div class="dot"></div>
                                     <div className='rectangle-line'></div>
                                 </div>
-                                <XIcon className="close-btn" onClick={handleCloseModal} />
+                                {/* <XIcon className="close-btn" onClick={handleCloseModal} /> */}
                                 <h3 className="modal_text_title">✅┃daily-checklist</h3>
                                 <div style={{marginBottom:'42px'}}> 
                                 <div className='custom-checkbox-x-icon' ></div>
@@ -1544,14 +1628,18 @@ function Chat(props) {
                                                className="custom-checkbox"
                                                type="checkbox"
                                                id={`list${index + 1}`}
-                                               checked={checkCompletedList.includes(item)}
-                                               onChange={(e) => handleCheckboxChange(e, item)}
+                                               checked={checkedItems.includes(item)}
+                                               onChange={(e) => handleItemCheck(e, item)}
                                            />
                                            <label className="modal_text_body" htmlFor={`list${index + 1}`}>{item}</label>
                                        </li>
                                    ))}
                                </ul>
+                               
                                 }
+                                <Button onClick={handleCloseModal}  color="default" variant="ghost" className="submit-button-mdkad" >
+                            <span className="next-button-text-mdkad">Submit</span>
+                          </Button>
                             </div> : null}
                         </div>
                         {/* END - chat content */}
@@ -1592,6 +1680,42 @@ function Chat(props) {
                                 </div>
 
                                   </footer>
+                                : selectedChannel?.type == ChannelType.raffles ? 
+                                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                         {/* <Ticket  className='ticket-raffle' onMouseEnter={()=>{sendRaffle()}} /> */}
+                                         <div className="raffle-ac2s2-icon" onMouseEnter={()=>{sendRaffle()}}>
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',width:'60%' }}>
+                                       
+                                        {/* <p className='date-text-3kzc3'>
+                                            {dateFormat('09/01/2024')}
+                                        </p> */}
+                                    </div>
+                                    
+                                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 40,alignItems: 'center' }}>
+                                    <p className='raffle-text-3kzc3' >
+                                    </p>
+                                    
+                                </div>
+                                </div>
+
+                              
+                                <div className='left-circles-container'>
+
+                                    <div className='circle top'></div>
+                                    <div className='circle middle'></div>
+                                    <div className='circle bottom'></div>
+                                </div>
+                                <div className='right-circles-container'>
+                                    <div className='circle top'></div>
+                                    <div className='circle middle'></div>
+                                    <div className='circle bottom'></div>
+                                </div>
+                            </div>
+                                </div>
+
+                                  </footer> 
                                 : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
                                     <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
                                         <input accept="image/*" id="add-media-9"

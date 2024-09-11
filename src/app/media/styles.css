@@ -69,6 +69,14 @@
     display: none;
 }
 
+.home-click-animation {
+    transition: transform 0.2s ease;
+  }
+  
+.home-click-animation:active {
+    transform: scale(0.7); /* Shrink the icon slightly */
+}
+
 .left-menu-6k2zzc {
     display: flex;
     min-width: 240px !important;
@@ -1003,6 +1011,38 @@
     width: 100%;
     margin: 10px 0;
 }
+
+.upload-box {
+    margin-top: 10px;
+    width: 50%;
+    height: 100px;
+    border: 2px dashed var(--eighth-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .upload-placeholder {
+    text-align: center;
+    color: var(--eighth-color);;
+  }
+  
+  .uploaded-media {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .uploaded-image, .uploaded-video {
+    min-width: 100%;
+    max-height: 100%;
+    object-fit: fill;
+  }
 
 @media screen and (max-width: 1100px) {
     #course-content {

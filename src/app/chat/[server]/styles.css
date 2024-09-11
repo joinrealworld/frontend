@@ -478,17 +478,49 @@ main {
     margin-bottom: 0px !important;
 }
 
-@keyframes float {
+@keyframes float-infinite {
     0% {
-        transform: translateY(0px);
+      transform: translate(-50%, -50%);
+    }
+    10% {
+      transform: translate(-90%, -90%);  /* Move to top-left */
+    }
+    20% {
+      transform: translate(60%, 60%);    /* Move to bottom-right */
+    }
+    30% {
+      transform: translate(-60%, 60%);   /* Move to bottom-left */
+    }
+    40% {
+      transform: translate(60%, -60%);   /* Move to top-right */
     }
     50% {
-        transform: translateY(-10px);
+      transform: translate(-50%, 50%);   /* Center-ish, move to middle-left */
+    }
+    60% {
+      transform: translate(50%, -50%);   /* Center-ish, move to middle-right */
+    }
+    70% {
+      transform: translate(-80%, 40%);   /* Move further left and slightly down */
+    }
+    80% {
+      transform: translate(80%, -40%);   /* Move further right and slightly up */
+    }
+    90% {
+      transform: translate(-50%, 70%);   /* Move to bottom center */
     }
     100% {
-        transform: translateY(0px);
+      transform: translate(-50%, -50%);  /* Back to center */
     }
-}
+  }
+
+#black-hole-background {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+    background: black; /* Add a background for black-hole effect */
+  }
 
 .message-wrap-83nja {
     flex-direction: row;
@@ -498,11 +530,13 @@ main {
 }
 
 .message-wrap-83nja-float{
-    flex-direction: row;
-    display: flex;
-    justify-content: flex-end;
     padding: 3px 20px;
-    animation: float 3s ease-in-out 1;
+    width:40%;
+    position: absolute;
+    top: 35%;
+    left: 35%;
+    transform: translate(-50%, -50%);
+    animation: float-infinite 30s infinite ease-in-out;
 }
 
 .chat-user-icon-ac2s2 {
@@ -565,7 +599,6 @@ main {
     border-radius: 20px;
     width: 100%;
     align-self: flex-end;
-    max-width: 60%;
     position: relative
 }
 
@@ -634,6 +667,76 @@ main {
     line-height: 16px;
     margin-left: 12px;
     margin-bottom: 0px !important;
+}
+
+.message-wrap-83nja-float-raffle{
+    flex-direction: row;
+    display: flex;
+    justify-content: flex-end;
+    padding: 3px 20px;
+}
+
+.raffle-ac2s2 {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 13px 15px;
+    background-color: var(--seventh-color);
+    border-radius: 10px;
+    width: 35%;
+    min-height: 70px;
+    align-self: flex-end;
+    position: relative
+}
+
+
+.raffle-ac2s2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 70%;
+    height: 100%;
+    width: 4px;
+    background: repeating-linear-gradient(
+        to bottom,
+        var(--eighth-color), /* Dot color */
+        var(--eighth-color) 8px, /* Dot height */
+        transparent 1px, /* Gap between dots */
+        transparent 12px /* Gap height */
+    );
+    transform: translateX(-50%);
+}
+
+.left-circle{
+    position: absolute; 
+    top: 50%; 
+    left: -14px; 
+    transform: translateY(-50%); 
+    width: 28px;
+    height: 28px;
+    background-color: var(--channels);
+    border-radius: 50%
+}
+
+.right-circle{
+    position: absolute; 
+    top: 50%; 
+    right: -14px; 
+    transform: translateY(-50%); 
+    width: 28px;
+    height: 28px;
+    background-color: var(--channels);
+    border-radius: 50%
+}
+
+.raffle-text-3kzc3 {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--fourth-color);
+
+    b {
+        font-weight: 600;
+    }
 }
 
 /* coin model */
@@ -1214,6 +1317,14 @@ main {
     margin-right: 5px;
 }
 
+.user-name-3kzc3-raffle {
+    color: var(--fourth-color);
+    font-weight: 300;
+    font-size: 14px !important;
+    margin-bottom: 0px !important;
+    margin-right: 5px;
+}
+
 .user-description-3kzc3 {
     color: var(--fifth-color) !important;
     font-size: 10px !important;
@@ -1253,8 +1364,8 @@ main {
     /* Start at the bottom of the parent container */
     left: 50%;
     /* Center horizontally */
-    min-width: 70%;
-    min-height: 60%;
+    min-width: 55%;
+    min-height: 70%;
     transform: translate(-50%, 100%);
     /* Start off-screen below */
     opacity: 1;
@@ -1266,7 +1377,7 @@ main {
 }
 
 .popup-modal.visible {
-    transform: translate(-50%, -30%);
+    transform: translate(-50%, -15%);
     /* End position (centered vertically) */
     opacity: 1;
 }
@@ -1364,8 +1475,8 @@ main {
 }
 
 .modal_text_body {
-    margin-left: 5px;
-    font-size: 15px;
+    margin-left: 10px;
+    font-size: 20px;
     font-weight: 400;
     color: var(--fourth-color);
 }
@@ -1374,7 +1485,7 @@ main {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
-    height:40px;
+    height:50px;
     /* Adjust as needed */
 }
 
@@ -1386,7 +1497,7 @@ main {
 .custom-checkbox+label {
     position: relative;
     display: inline-block;
-    padding-left: 25px;
+    padding-left: 35px;
     cursor: pointer;
     font-size: 15px;
     line-height: 20px;
@@ -1400,9 +1511,9 @@ main {
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 15px;
-    height: 15px;
-    background-color: #ddd;
+    width: 20px;
+    height: 20px;
+    background-color: var(--fourth-color);
     border-radius: 4px;
 }
 
@@ -1415,29 +1526,29 @@ main {
 .custom-checkbox:checked+label::after {
     content: "✓";
     position: absolute;
-    left: 3px;
+    left: 5px;
     /* Adjusted for better centering */
     top: 50%;
     transform: translateY(-50%);
     color: white;
-    font-size: 12px;
+    font-size: 16px;
     /* Adjusted font size */
     line-height: 1;
 }
 
 .custom-checkbox-icon,.custom-checkbox-x-icon{
-    margin-top: 5px !important;
-    margin-bottom: 10px !important;
+    margin-top: 20px !important;
+    
 }
 
 .custom-checkbox-icon::after {
     content: "✓";
     position: absolute;
-    left: 50px;
+    left: 65px;
     /* Adjusted for better centering */
-    top: 20%;
+    top: 15%;
     color: white;
-    font-size: 18px;
+    font-size: 22px;
     /* Adjusted font size */
     line-height: 1;
 }
@@ -1447,9 +1558,9 @@ main {
     position: absolute;
     left: 25px;
     /* Adjusted for better centering */
-    top: 20%;
+    top: 15%;
     color: white;
-    font-size: 18px;
+    font-size: 22px;
     /* Adjusted font size */
     line-height: 1;
 }
@@ -1470,6 +1581,7 @@ main {
     font-size: 15px;
     line-height: 20px;
     vertical-align: middle;
+    margin-right: 10px;
     margin-left: 10px; /* Adjust the spacing between the two checkboxes */
 }
 
@@ -1480,9 +1592,9 @@ main {
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 15px;
-    height: 15px;
-    background-color: #ddd;
+    width: 20px;
+    height: 20px;
+    background-color: var(--fourth-color);;
     border-radius: 4px;
 }
 
@@ -1499,7 +1611,7 @@ main {
     top: 50%;
     transform: translateY(-50%);
     color: white;
-    font-size: 12px; /* Adjusted font size */
+    font-size: 15px; /* Adjusted font size */
     line-height: 1;
 }
 
@@ -1516,6 +1628,100 @@ main {
 }
 .message-input-7ajb312:focus{
     border-color: #ffffff33 !important;
+}
+
+.submit-button-mdkad {
+    outline: 0 !important;
+    background: #b78727 !important;
+    width: fit-content !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    padding: 5px !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    -webkit-transition: all 0.3 ease !important;
+    transition: all 0.4s ease-in-out !important;
+    cursor: pointer !important;
+}
+
+.submit-button-mdkad:hover,
+.submit-button-mdkad:active,
+.submit-button-mdkad:focus {
+    background: #b78727 !important;
+    color: #dedede !important;
+    box-shadow: 0 0 10px 0 #b78727 !important;
+    font-size: 16px !important;
+}
+
+.ticket-raffle{
+    color: var(--eighth-color);
+    width:200px;
+    height: 70px;
+}
+
+.raffle-ac2s2-icon {
+    display: flex;
+    flex-direction: column;
+    padding: 13px 15px;
+    background-color: var(--eighth-color);
+    width: 25%;
+    min-height: 50px;
+    position: relative
+}
+
+
+.raffle-ac2s2-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 70%;
+    height: 100%;
+    width: 4px;
+    background: repeating-linear-gradient(
+        to bottom,
+        var(--seventh-color), /* Dot color */
+        var(--seventh-color) 8px, /* Dot height */
+        transparent 1px, /* Gap between dots */
+        transparent 12px /* Gap height */
+    );
+    transform: translateX(-50%);
+}
+
+.left-circles-container, .right-circles-container {
+    position: absolute;
+    top: 50%;
+    height: 100%;
+    transform: translateY(-50%);
+}
+
+.left-circles-container {
+    left: -6px; /* Adjust according to your needs */
+}
+
+.right-circles-container {
+    right: 6px; /* Adjust according to your needs */
+}
+
+.circle {
+    width: 12px;
+    height: 12px;
+    background-color: var(--seventh-color);
+    border-radius: 50%;
+    position: absolute;
+}
+
+.circle.top {
+    top: 10%; /* Adjust to position at the top */
+}
+
+.circle.middle {
+    top: 50%; /* Center position */
+    transform: translateY(-50%);
+}
+
+.circle.bottom {
+    bottom: 10%; /* Adjust to position at the bottom */
 }
 
 
