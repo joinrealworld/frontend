@@ -480,44 +480,17 @@ main {
 
 @keyframes float-infinite {
     0% {
-      transform: translate(-50%, -50%);
-    }
-    10% {
-      transform: translate(-90%, -90%);  /* Move to top-left */
-    }
-    20% {
-      transform: translate(60%, 60%);    /* Move to bottom-right */
-    }
-    30% {
-      transform: translate(-60%, 60%);   /* Move to bottom-left */
-    }
-    40% {
-      transform: translate(60%, -60%);   /* Move to top-right */
-    }
-    50% {
-      transform: translate(-50%, 50%);   /* Center-ish, move to middle-left */
-    }
-    60% {
-      transform: translate(50%, -50%);   /* Center-ish, move to middle-right */
-    }
-    70% {
-      transform: translate(-80%, 40%);   /* Move further left and slightly down */
-    }
-    80% {
-      transform: translate(80%, -40%);   /* Move further right and slightly up */
-    }
-    90% {
-      transform: translate(-50%, 70%);   /* Move to bottom center */
+        transform: translate(-50%, -50%);
     }
     100% {
-      transform: translate(-50%, -50%);  /* Back to center */
+        transform: translate(-50%, -50%);
     }
   }
 
 #black-hole-background {
     position: relative;
     width: 100%;
-    height: 450px;
+    height: 82vh;
     overflow: hidden;
     background: black; /* Add a background for black-hole effect */
   }
@@ -531,149 +504,26 @@ main {
 
 .message-wrap-83nja-float{
     padding: 3px 20px;
-    width:40%;
+    width: fit-content; /* Adjusts width based on content */ 
+    white-space: nowrap;
     position: absolute;
-    top: 35%;
-    left: 35%;
-    transform: translate(-50%, -50%);
-    animation: float-infinite 30s infinite ease-in-out;
+    animation: float-infinite 10s infinite ease-in-out;
 }
 
-.chat-user-icon-ac2s2 {
-    display: flex;
-    width: 60px;
-    border-radius: 5px;
-}
-
-.poll-answer-923mas {
-    padding: 7px 12px;
-    color: var(--fourth-color);
-    background-color: var(--third-color);
-    margin-right: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.checklist-answer-923mas {
-    display: flex;
-    flex-direction: 'row';
-    align-items: 'center';
-    margin-top: 10px;
-    padding: 7px 12px;
-    color: var(--fourth-color);
-    background-color: var(--third-color);
-    margin-right: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.add-media-3ca22 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 23px;
-    letter-spacing: 0px;
-    line-height: 18px;
-    color: var(--fourth-color);
-    font-weight: 200;
-    background-color: var(--third-color);
-    padding: 6.5px 8.5px;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.message-datetime-zkn22d:hover {
-    display: flex;
-}
-
-.message-ac2s2 {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 13px 10px;
-    background-color: var(--seventh-color);
-    border-radius: 20px;
+#raffle-background {
+    position: relative;
     width: 100%;
-    align-self: flex-end;
-    position: relative
-}
+    height: 82vh;
+    overflow: hidden;
+  }
 
-.message-tail{
-        content: '""';
-        position: absolute;
-        bottom: 5px;
-        right:-15px;
-        width: 0; 
-        height: 0;
-        border-radius: 50%;
-        border-left: 15px solid var(--seventh-color);
-        border-right: 15px solid transparent;
-        border-top: 15px solid var(--seventh-color);
-        border-bottom: 15px solid transparent;
-        transform: rotate(270deg);
-}
-
-.message-divider-date-wrap-7naj82b {
-    flex-direction: row;
-    display: flex;
-    justify-content:flex-end;
-    padding: 18px 20px;
-}
-
-.message-divider-date-7naj82b {
-    display: flex;
-    flex-direction: column;
-    padding: 3px 10px;
-    background-color: var(--seventh-color);
-    border-radius: 4px;
-    width: auto;
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--fourth-color);
-    line-height: 22px;
-}
-
-.message-text-3kzc3 {
-    font-size: 15px;
-    font-weight: 300;
-    color: var(--fourth-color);
-    line-height: 22px;
-
-    b {
-        font-weight: 600;
-    }
-}
-
-.options-text-3kzc3 {
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--fourth-color);
-    line-height: 22px;
-    margin-bottom: 0px !important;
-
-    b {
-        font-weight: 600;
-    }
-}
-
-.date-text-3kzc3 {
-    font-size: 9.5px;
-    font-weight: 100;
-    color: var(--fourth-color);
-    line-height: 16px;
-    margin-left: 12px;
-    margin-bottom: 0px !important;
-}
-
-.message-wrap-83nja-float-raffle{
-    flex-direction: row;
-    display: flex;
-    justify-content: flex-end;
+  .message-wrap-83nja-float-raffle{
     padding: 3px 20px;
+    width: fit-content; /* Adjusts width based on content */ 
+    white-space: nowrap;
+    position: absolute;
+    animation: float-infinite 10s infinite ease-in-out;
+
 }
 
 .raffle-ac2s2 {
@@ -738,6 +588,138 @@ main {
         font-weight: 600;
     }
 }
+
+.chat-user-icon-ac2s2 {
+    display: flex;
+    width: 60px;
+    border-radius: 5px;
+}
+
+.poll-answer-923mas {
+    padding: 7px 12px;
+    color: var(--fourth-color);
+    background-color: var(--third-color);
+    margin-right: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.checklist-answer-923mas {
+    display: flex;
+    flex-direction: 'row';
+    align-items: 'center';
+    margin-top: 10px;
+    padding: 7px 12px;
+    color: var(--fourth-color);
+    background-color: var(--third-color);
+    margin-right: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.add-media-3ca22 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    letter-spacing: 0px;
+    line-height: 18px;
+    color: var(--fourth-color);
+    font-weight: 200;
+    background-color: var(--third-color);
+    padding: 6.5px 8.5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.message-datetime-zkn22d:hover {
+    display: flex;
+}
+
+.message-ac2s2 {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: var(--seventh-color);
+    border-radius: 20px;
+    width: fit-content;
+    align-self: flex-end;
+    position: relative
+}
+
+.message-tail{
+        content: '""';
+        position: absolute;
+        bottom: 3px;
+        right:-10px;
+        width: 0; 
+        height: 0;
+        border-radius: 50%;
+        border-left: 8px solid var(--seventh-color);
+        border-right: 12px solid transparent;
+        border-top: 12px solid var(--seventh-color);
+        border-bottom: 12px solid transparent;
+        transform: rotate(270deg);
+}
+
+.message-divider-date-wrap-7naj82b {
+    flex-direction: row;
+    display: flex;
+    justify-content:flex-end;
+    padding: 18px 20px;
+}
+
+.message-divider-date-7naj82b {
+    display: flex;
+    flex-direction: column;
+    padding: 3px 10px;
+    background-color: var(--seventh-color);
+    border-radius: 4px;
+    width: auto;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--fourth-color);
+    line-height: 22px;
+}
+
+.message-text-3kzc3 {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--fourth-color);
+    line-height: 22px;
+
+    b {
+        font-weight: 600;
+    }
+}
+
+.options-text-3kzc3 {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--fourth-color);
+    line-height: 22px;
+    margin-bottom: 0px !important;
+
+    b {
+        font-weight: 600;
+    }
+}
+
+.date-text-3kzc3 {
+    font-size: 9.5px;
+    font-weight: 100;
+    color: var(--fourth-color);
+    line-height: 16px;
+    margin-left: 12px;
+    margin-bottom: 0px !important;
+}
+
+
 
 /* coin model */
 .coin-modal-mcan34 {
@@ -1616,7 +1598,7 @@ main {
 }
 
 .message-input-7ajb312 {
-    background-color: var(--third-color);
+    background-color: #000;
     border-color: #ffffff33;
     border-radius: 20px;
     height:32px;
@@ -1723,6 +1705,29 @@ main {
 .circle.bottom {
     bottom: 10%; /* Adjust to position at the bottom */
 }
+
+.custom-checkboxlist {
+    width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 14px;
+    color: #000;
+    background-color: #fff;
+  }
+  
+  .custom-checkboxlist.yes::before {
+    content: '✓'; /* Checkmark for true */
+    color: green; /* Optional: color for the checkmark */
+ 
+  }
+  
+  .custom-checkboxlist.cross::before {
+    content: '✗'; /* X mark for cross */
+    color: red; /* Optional: color for the X mark */
+  }
 
 
 @media screen and (max-width: 1000px) {

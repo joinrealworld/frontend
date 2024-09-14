@@ -467,18 +467,23 @@ function MediaPage(props) {
   }
 
   useEffect(() => {
-    // Set an interval to increase the likes count every 5 minutes
-    const interval = setInterval(() => {
-      setMedias((prevMedias) =>
-        prevMedias.map((media) => ({
-          ...media,
-          likes_count: media.likes_count + 1,
-        }))
-      );
-    }, 10000); // 5 minutes = 300000ms
+    const updateLikes = () => {
+      setMedias((prevMedias) => {
+        // Pick a random media and update its likes
+        return prevMedias.map((media) => {
+          // Randomly select whether to update this media's likes
+          if (Math.random() < 0.5) {
+            const randomLikesIncrease = Math.floor(Math.random() * 101); // Increase likes by a random number between 0-100
+            return { ...media, likes_count: media.likes_count + randomLikesIncrease };
+          }
+          return media;
+        });
+      });
+    };
 
-    // Cleanup the interval when the component unmounts
-    return () => clearInterval(interval);
+    const intervalId = setInterval(updateLikes, 5000); // Update every 10 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on component unmount
   }, []);
 
   const renderMediaContent = () => {
