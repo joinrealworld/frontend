@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList, Ticket,Fullscreen } from 'lucide-react';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList, Ticket, Fullscreen } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
@@ -24,7 +24,8 @@ const ChannelType = {
     polls: 2,
     media: 3,
     blackHole: 4,
-    raffles: 5
+    raffles: 5,
+    support: 6
 }
 
 const Channels = [
@@ -53,6 +54,11 @@ const Channels = [
         name: '🎟️ | raffles',
         type: ChannelType.raffles,
     },
+    {
+        uuid: '7DE517C0-B05F-47DB-986A-0B130638C91E',
+        name: '❔| support',
+        type: ChannelType.support,
+    },
     // do not need - so code commented for now
     // {
     //     uuid: 'C97FEF69-BB37-46A1-BE13-4B0360DE218E',
@@ -75,6 +81,32 @@ const SideMenus = [
     //     Value: 3,
     //     Icon: () => <InboxIcon color="var(--fourth-color)" size={20} />
     // },
+];
+
+const dummyMessages = [
+    { 'username': "Harsh Patel", 'message': "Hello, how are you?" },
+    { 'username': "Amit Shah", 'message': "Just finished my work." },
+    { 'username': "Priya Desai", 'message': "Did you watch the game?" },
+    { 'username': "Rohan Gupta", 'message': "Let's catch up this weekend!" },
+    { 'username': "Megha Jain", 'message': "Just got my new laptop!" },
+    { 'username': "Sonali Rao", 'message': "Let's start the project next week." },
+    { 'username': "Aditya Khanna", 'message': "Can you share the document?" },
+    { 'username': "Vikas Saxena", 'message': "Lunch tomorrow?" },
+    { 'username': "Pooja Nair", 'message': "Got your message, will reply soon." }
+];
+
+const dummyNumbers = [
+    { 'username': "Harsh Patel", 'number': 1 },
+    { 'username': "Amit Shah", 'number': 2 },
+    { 'username': "Priya Desai", 'number': 3 },
+    { 'username': "Rohan Gupta", 'number': 4 },
+    { 'username': "Megha Jain", 'number': 5 },
+    { 'username': "Sonali Rao", 'number': 6 },
+    { 'username': "Aditya Khanna", 'number': 7 },
+    { 'username': "Vikas Saxena", 'number': 8 },
+    { 'username': "Pooja Nair", 'number': 9 },
+    { 'username': "Lcd Nair", 'number': 10 },
+
 ];
 
 const ChatData = [
@@ -119,48 +151,49 @@ const ChatData = [
             },
         ]
     },
-    {
-        date: moment().toDate(),
-        data: [
-            {
-                user: {
-                    image: "https://assets.therealworld.ag/avatars/4JRrQgW5keC-CVQWSpZn4kL3YKQoTv5JYilOgoe7Fr?max_side=64",
-                    name: "Professor Michael G",
-                    isVerified: true,
-                },
-                content: "The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
-                timestamp: '1713071095885',
-            },
-            {
-                user: {
-                    image: "https://assets.therealworld.ag/avatars/tf0dRUZHDWAy0qggot0uMhMf3ere4MU7LPb8raDlyH?max_side=64",
-                    name: "Professor Silard",
-                    isVerified: true,
-                },
-                content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ",
-                timestamp: '1713071095885',
-            },
-            {
-                user: {
-                    image: "https://assets.therealworld.ag/avatars/01HRQMEYQJ3TYMDT2M3H9WJZEH?max_side=64",
-                    name: "Prof. Adam",
-                    isVerified: true,
-                },
-                content: "It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.",
-                timestamp: '1713071095885',
-            },
-            {
-                user: {
-                    image: "https://assets.therealworld.ag/avatars/01HKK69AV9FMVG9RBGWXR11A9H?max_side=64",
-                    name: "DARK-MATTER",
-                    isVerified: true,
-                },
-                content: "Nice to meet you!",
-                timestamp: '1713071095885',
-            },
-        ]
-    }
+    // {
+    //     date: moment().toDate(),
+    //     data: [
+    //         {
+    //             user: {
+    //                 image: "https://assets.therealworld.ag/avatars/4JRrQgW5keC-CVQWSpZn4kL3YKQoTv5JYilOgoe7Fr?max_side=64",
+    //                 name: "Professor Michael G",
+    //                 isVerified: true,
+    //             },
+    //             content: "The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.",
+    //             timestamp: '1713071095885',
+    //         },
+    //         {
+    //             user: {
+    //                 image: "https://assets.therealworld.ag/avatars/tf0dRUZHDWAy0qggot0uMhMf3ere4MU7LPb8raDlyH?max_side=64",
+    //                 name: "Professor Silard",
+    //                 isVerified: true,
+    //             },
+    //             content: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ",
+    //             timestamp: '1713071095885',
+    //         },
+    //         {
+    //             user: {
+    //                 image: "https://assets.therealworld.ag/avatars/01HRQMEYQJ3TYMDT2M3H9WJZEH?max_side=64",
+    //                 name: "Prof. Adam",
+    //                 isVerified: true,
+    //             },
+    //             content: "It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.",
+    //             timestamp: '1713071095885',
+    //         },
+    //         {
+    //             user: {
+    //                 image: "https://assets.therealworld.ag/avatars/01HKK69AV9FMVG9RBGWXR11A9H?max_side=64",
+    //                 name: "DARK-MATTER",
+    //                 isVerified: true,
+    //             },
+    //             content: "Nice to meet you!",
+    //             timestamp: '1713071095885',
+    //         },
+    //     ]
+    // }
 ]
+
 
 const IDENTITY_BOOSTER_COIN_PRICE = 20;
 
@@ -186,10 +219,16 @@ function Chat(props) {
     const [isMediaListFetch, setIsMediaListFetch] = useState(false);
     const [mediaList, setMediaList] = useState([]);
 
-    const [sendText, setSendText] = useState('');
-    const [blackHoleList, setBlackHoleList] = useState([]);
+    const [checkedMediaRules, setCheckedMediaRules] = useState({});
+    const canvasRef = useRef(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [context, setContext] = useState(null);
 
-    const [raffleList, setRaffleList] = useState([]);
+
+    const [sendText, setSendText] = useState('');
+    const [blackHoleList, setBlackHoleList] = useState(dummyMessages);
+
+    const [raffleList, setRaffleList] = useState(dummyNumbers);
 
     const [selectedSideMenu, setSelectedSideMenu] = useState(SideMenus[0]);
     const [searchText, setSearchText] = useState('');
@@ -224,90 +263,98 @@ function Chat(props) {
     const containerWidth = window.innerWidth * 1;
     const blackbackgroundColor = selectedChannel?.type === ChannelType.blackHole ? 'black' : 'var(--seventh-color)';
     const blackChatbackgroundColor = selectedChannel?.type === ChannelType.blackHole ? 'black' : 'var(--third-color)';
-    const overflowBlackHole = selectedChannel?.type === ChannelType.blackHole ? 'hidden' :selectedChannel?.type === ChannelType.raffles ? 'hidden' : 'auto';
-    const widthBlackHole = selectedChannel?.type === ChannelType.blackHole ?  '100%' :selectedChannel?.type === ChannelType.raffles ? "100%" : '67%';
+    const overflowBlackHole = selectedChannel?.type === ChannelType.blackHole ? 'hidden' : selectedChannel?.type === ChannelType.raffles ? 'hidden' : 'auto';
+    const widthBlackHole = selectedChannel?.type === ChannelType.blackHole ? '100%' : selectedChannel?.type === ChannelType.raffles ? "100%" : '67%';
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [timeLeft, setTimeLeft] = useState(24 * 60 * 60);
 
+    const [selectedMessage, setSelectedMessage] = useState(null);
+
     const handleMouseEnter = () => setIsModalVisible(true);
-    
+
     // Update positions when a new message is added
     useEffect(() => {
         const interval = setInterval(() => {
-            setPositions((prevPositions) => 
+            setPositions((prevPositions) =>
                 prevPositions.map((pos, index) => {
                     let { top, left } = pos;
-    
+
                     // If velocity is undefined, set default values with reduced speed
                     let velocityX = velocities[index]?.velocityX || 0.05;  // Reduced speed
                     let velocityY = velocities[index]?.velocityY || 0.05;
-    
+
                     // Calculate new position
                     let newTop = top + velocityY;
                     let newLeft = left + velocityX;
-    
+
                     // Bounce off top/bottom
                     if (newTop < padding / containerHeight * 100 || newTop > 100 - padding / containerHeight * 100) {
                         velocityY = -velocityY;
                     }
-    
+
                     // Bounce off left/right
                     if (newLeft < padding / containerWidth * 100 || newLeft > 100 - padding / containerWidth * 100) {
                         velocityX = -velocityX;
                     }
-    
+
                     // Update velocity for next frame
                     velocities[index] = { velocityX, velocityY };
-    
+
                     return { top: newTop, left: newLeft };
                 })
             );
         }, 50); // Adjust for smoother motion
-        
+
         return () => clearInterval(interval);
     }, [positions, velocities]);
-    
+
     // Effect to initialize new positions and velocities
     useEffect(() => {
+        const initializePositionsAndVelocities = (list, existingPositions) => {
+            return list.slice(existingPositions.length).map(() => {
+                const randomTop = Math.random() * (containerHeight - 2 * padding) + padding;
+                const randomLeft = Math.random() * (containerWidth - 2 * padding) + padding;
+
+                const newPosition = {
+                    top: (randomTop / containerHeight) * 100,
+                    left: (randomLeft / containerWidth) * 100
+                };
+
+                const newVelocity = {
+                    velocityX: Math.random() * 0.1 + 0.02,
+                    velocityY: Math.random() * 0.1 + 0.02
+                };
+
+                return { newPosition, newVelocity };
+            });
+        };
+
         if (positions.length < blackHoleList.length) {
-            const randomTop = Math.random() * (containerHeight - 2 * padding) + padding;
-            const randomLeft = Math.random() * (containerWidth - 2 * padding) + padding;
-            const newMessageIndex = blackHoleList.length - 1;
-    
-            const newPosition = {
-                top: (randomTop / containerHeight) * 100,
-                left: (randomLeft / containerWidth) * 100
-            };
-    
-            // Initialize velocities with smaller values for slower movement
-            const newVelocity = {
-                velocityX: Math.random() * 0.1 + 0.02, // Smaller values for slower speed
-                velocityY: Math.random() * 0.1 + 0.02
-            };
-    
-            setPositions((prevPositions) => [...prevPositions, newPosition]);
-            setVelocities((prevVelocities) => [...prevVelocities, newVelocity]);
+            const newItems = initializePositionsAndVelocities(blackHoleList, positions);
+            setPositions((prevPositions) => [
+                ...prevPositions,
+                ...newItems.map(item => item.newPosition)
+            ]);
+            setVelocities((prevVelocities) => [
+                ...prevVelocities,
+                ...newItems.map(item => item.newVelocity)
+            ]);
         }
+
         if (positions.length < raffleList.length) {
-            const randomTop = Math.random() * (containerHeight - 2 * padding) + padding;
-            const randomLeft = Math.random() * (containerWidth - 2 * padding) + padding;
-            const newMessageIndex = blackHoleList.length - 1;
-    
-            const newPosition = {
-                top: (randomTop / containerHeight) * 100,
-                left: (randomLeft / containerWidth) * 100
-            };
-    
-            // Initialize velocities with smaller values for slower movement
-            const newVelocity = {
-                velocityX: Math.random() * 0.1 + 0.02, // Smaller values for slower speed
-                velocityY: Math.random() * 0.1 + 0.02
-            };
-    
-            setPositions((prevPositions) => [...prevPositions, newPosition]);
-            setVelocities((prevVelocities) => [...prevVelocities, newVelocity]);
+            const newItems = initializePositionsAndVelocities(raffleList, positions);
+            setPositions((prevPositions) => [
+                ...prevPositions,
+                ...newItems.map(item => item.newPosition)
+            ]);
+            setVelocities((prevVelocities) => [
+                ...prevVelocities,
+                ...newItems.map(item => item.newVelocity)
+            ]);
         }
-    }, [blackHoleList,raffleList]);
+    }, [blackHoleList, raffleList, positions, velocities, containerHeight, containerWidth, padding]);
+
+
 
     const [mountTheme, setMountTheme] = useState(
         JSON.parse(localStorage.getItem("theme")) || "dark"
@@ -328,6 +375,10 @@ function Chat(props) {
 
     const onlineCountModel = useDisclosure({
         id: 'online-count-modal',
+    });
+
+    const mediaContractModel = useDisclosure({
+        id: 'media-contract-modal',
     });
 
     useEffect(() => {
@@ -383,13 +434,6 @@ function Chat(props) {
         getProfile();
         await getServers();
         scrollToBottomChatContent();
-        // setBlackHoleList((prevList) => {
-        //     if (Array.isArray(prevList)) {
-        //         return [...prevList, { 'username': "Harsh Patel", 'message': "Text Message" }];
-        //     }
-        //     console.error("Expected prevList to be an array, but it is not.");
-        //     return [{ 'username': "Harsh Patel", 'message': "Text Message" }]; // or handle the error as needed
-        // });
         // setRaffleList((prevList) => {
         //     if (Array.isArray(prevList)) {
         //         return [...prevList, { 'username': "Harsh Patel", 'number': 1 }];
@@ -540,11 +584,6 @@ function Chat(props) {
             setIsPollListFetch(false);
             setPollList([]);
             await getPollsData();
-        }
-        else if (channel?.type == ChannelType.media) {
-            setIsMediaListFetch(false);
-            setMediaList([]);
-            // await getMediaData();
         }
         // do not need - so code commented for now
         // else if (channel?.type == ChannelType.generalChat) {
@@ -885,6 +924,97 @@ function Chat(props) {
         setIsLoadingAddPoll(false);
     }
 
+    const handleMediaRulesCheck = (item) => {
+        setCheckedMediaRules((prevCheckedItems) => ({
+            ...prevCheckedItems,
+            [item]: prevCheckedItems[item] === 'true' ? 'false' : 'true'
+        }));
+    };
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Set the drawing color to white and other properties
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round'; // Optional: makes lines smooth
+
+        // Function to get mouse position relative to the canvas
+        const getMousePos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        };
+
+        const handleMouseDown = (e) => {
+            const { x, y } = getMousePos(e);
+            setIsDrawing(true);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        };
+
+        const handleMouseMove = (e) => {
+            if (!isDrawing) return;
+            const { x, y } = getMousePos(e);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        };
+
+        const handleMouseUp = () => {
+            if (isDrawing) {
+                setIsDrawing(false);
+                ctx.closePath();
+            }
+        };
+
+        const handleMouseLeave = () => {
+            if (isDrawing) {
+                setIsDrawing(false);
+                ctx.closePath();
+            }
+        };
+
+        // Attach event listeners
+        canvas.addEventListener('mousedown', handleMouseDown);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseup', handleMouseUp);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+
+        // Cleanup event listeners on component unmount
+        return () => {
+            canvas.removeEventListener('mousedown', handleMouseDown);
+            canvas.removeEventListener('mousemove', handleMouseMove);
+            canvas.removeEventListener('mouseup', handleMouseUp);
+            canvas.removeEventListener('mouseleave', handleMouseLeave);
+        };
+    }, [isDrawing]); // Dependency array can be expanded if needed
+
+    const clearSignature = () => {
+        setCheckedMediaRules([]);
+        const canvas = canvasRef.current;
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+    };
+
+    const saveSignature = () => {
+        const canvas = canvasRef.current;
+        router.replace('/media');
+        // if (canvas) {
+        //   const signatureData = canvas.toDataURL();
+        //   console.log(signatureData); // You can send this data URL to your server or use it as needed
+        // }
+    };
+
     const renderSideMenuOption = () => {
         if (selectedSideMenu?.Value == 1) {
             if (!isCategoryUsersFetch) {
@@ -1005,6 +1135,18 @@ function Chat(props) {
         }
     }
 
+    const [content, setContent] = useState(null);
+
+    useEffect(() => {
+        if (selectedChannel?.type == ChannelType.media) {
+            mediaContractModel.onOpen();
+            setIsDrawing(true);
+            // Alternatively, you might want to redirect here
+            // router.replace('/media');
+        } else {
+        }
+    }, [selectedChannel]);
+
     const renderMainContent = () => {
         if (selectedChannel?.type == ChannelType.checkList) {
             return renderChecklistMessage(checkList);
@@ -1012,13 +1154,17 @@ function Chat(props) {
         else if (selectedChannel?.type == ChannelType.polls) {
             return renderPolls(pollList);
         }
-        else if (selectedChannel?.type == ChannelType.media) {
-            router.replace('/media')
-        } else if (selectedChannel?.type == ChannelType.blackHole) {
+        // else if (selectedChannel?.type == ChannelType.media) {
+        //     router.replace('/media')
+        // } 
+        else if (selectedChannel?.type == ChannelType.blackHole) {
             return renderBlackHole();
         }
         else if (selectedChannel?.type == ChannelType.raffles) {
             return renderRaffle();
+        }
+        else if (selectedChannel?.type == ChannelType.support) {
+            return (selectedMessage ? renderSelectedMessage() : renderSupport())
         }
         // do not need - so code commented for now
         // else if (selectedChannel?.type == ChannelType.generalChat) {
@@ -1223,7 +1369,7 @@ function Chat(props) {
         setCheckCompletedList(prevList => {
             // Create a map from the previous list for quick lookup
             const prevListMap = new Map(prevList.map(entry => [entry.item, entry.type]));
-    
+
             // Combine previous list and new items, updating types if necessary
             const updatedList = [
                 ...prevList.filter(entry => {
@@ -1236,7 +1382,7 @@ function Chat(props) {
                     return !prevListMap.has(newEntry.item) || prevListMap.get(newEntry.item) !== newEntry.type;
                 })
             ];
-    
+
             return updatedList;
         });
 
@@ -1322,52 +1468,52 @@ function Chat(props) {
         //         </div>
         //     );
         // })
-            
-      return  <div  className='message-wrap-83nja'>
-       {checkCompletedList.length == 0 ? null : 
-       <div className="chat-user-icon-ac2s2">
-            <div className='user-info-3kzc3'>
-                <div style={{ position: 'relative' }}>
-                    <img
-                        src="/assets/person.png"
-                        style={{ height: 40, width: 40, borderRadius: '50%' }}
-                    />
-                    <img
-                        src={"/assets/queen.svg"}
-                        style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
-                    />
-                </div>
-            </div>
-        </div>}
-        {checkCompletedList.length == 0 ? null :
-        <div className="message-ac2s2">
-        
-            <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10,marginBottom:10 }}>
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
-                        Harsh Patel
-                    </p>
-                    <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
-                </div>
-            </div>
-            {checkCompletedList?.map((cData, index) => (
-                <div key={index} style={{ display: 'flex',alignItems: 'center', marginLeft: 10 ,marginBottom:10}}>
-                    <div
-                        className={`custom-checkboxlist ${cData.type === 'true' ? 'yes' : cData.type === 'cross' ? 'cross' : ''}`}
-                        type="radio"
-                        style={{ marginRight: 10 }} 
-                        disabled
-                    ></div>
-                    <p className='message-text-3kzc3' style={{ margin: 0 }}>
-                        {cData.item}
-                    </p>
-                </div>
-            ))}
-        </div>}
-    </div>
-    
-            
-        
+
+        return <div className='message-wrap-83nja'>
+            {checkCompletedList.length == 0 ? null :
+                <div className="chat-user-icon-ac2s2">
+                    <div className='user-info-3kzc3'>
+                        <div style={{ position: 'relative' }}>
+                            <img
+                                src="/assets/person.png"
+                                style={{ height: 40, width: 40, borderRadius: '50%' }}
+                            />
+                            <img
+                                src={"/assets/queen.svg"}
+                                style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
+                            />
+                        </div>
+                    </div>
+                </div>}
+            {checkCompletedList.length == 0 ? null :
+                <div className="message-ac2s2">
+
+                    <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10, marginBottom: 10 }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                            <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
+                                Harsh Patel
+                            </p>
+                            <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+                        </div>
+                    </div>
+                    {checkCompletedList?.map((cData, index) => (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
+                            <div
+                                className={`custom-checkboxlist ${cData.type === 'true' ? 'yes' : cData.type === 'cross' ? 'cross' : ''}`}
+                                type="radio"
+                                style={{ marginRight: 10 }}
+                                disabled
+                            ></div>
+                            <p className='message-text-3kzc3' style={{ margin: 0 }}>
+                                {cData.item}
+                            </p>
+                        </div>
+                    ))}
+                </div>}
+        </div>
+
+
+
     }
 
     const onSelectEmoji = async (emoji) => {
@@ -1440,7 +1586,7 @@ function Chat(props) {
     };
 
     // Timer functionality
-     useEffect(() => {
+    useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft(prevTime => {
                 if (prevTime === 1) {
@@ -1471,30 +1617,30 @@ function Chat(props) {
                         {moment('09/01/2024').format('MMMM DD, YYYY')}
                     </div>
                 </div> */}
-                 <div style={{
-                position: 'absolute',
-                top: 0,
-                right: 10,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                zIndex: 999,
-            }}>
-                {/* Timer */}
                 <div style={{
-                    backgroundColor: '#333',
-                    color: '#fff',
-                    padding: '5px 10px',
-                    borderRadius: '5px',
-                    fontSize: '14px',
+                    position: 'absolute',
+                    top: 0,
+                    right: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    zIndex: 999,
                 }}>
-                    {formatTime(timeLeft)}
-                </div>
+                    {/* Timer */}
+                    <div style={{
+                        backgroundColor: '#333',
+                        color: '#fff',
+                        padding: '5px 10px',
+                        borderRadius: '5px',
+                        fontSize: '14px',
+                    }}>
+                        {formatTime(timeLeft)}
+                    </div>
 
-                {/* Fullscreen Button */}
-                {/* {isFullscreen ? <Fullscreen style={{color:"var(--fourth-color)"}}/>:<Fullscreen style={{color:"var(--fourth-color)"}}/>} */}
-                <Fullscreen onClick={toggleFullscreen} style={{color:"var(--fourth-color)",cursor: 'pointer'}}/>
-                {/* <button
+                    {/* Fullscreen Button */}
+                    {/* {isFullscreen ? <Fullscreen style={{color:"var(--fourth-color)"}}/>:<Fullscreen style={{color:"var(--fourth-color)"}}/>} */}
+                    <Fullscreen onClick={toggleFullscreen} style={{ color: "var(--fourth-color)", cursor: 'pointer' }} />
+                    {/* <button
                     onClick={toggleFullscreen}
                     style={{
                         backgroundColor: isFullscreen ? '#f1c40f' : '#2980b9',
@@ -1507,7 +1653,7 @@ function Chat(props) {
                 >
                     {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
                 </button> */}
-            </div>
+                </div>
                 {blackHoleList.map((item, index) => {
                     const { top, left } = positions[index] || { top: 50, left: 50 };
                     return (<div key={index} className='message-wrap-83nja-float' style={{
@@ -1546,14 +1692,14 @@ function Chat(props) {
     const sendRaffle = () => {
         setRaffleList((prevList) => {
             if (Array.isArray(prevList)) {
-                return [...prevList, { 'username': "Chirag Lathiya", 'number': 1 }];
+                return [...prevList, { 'username': "Chirag Lathiya", 'number': 11 }];
             }
             return [{ 'username': "Harsh Patel", 'message': "Text Message" }]; // or handle the error as needed
         });
     }
 
     const renderRaffle = () => {
-        return(<div id='raffle-background' >
+        return (<div id='raffle-background' >
             <div style={{
                 position: 'absolute',
                 top: 0,
@@ -1573,37 +1719,38 @@ function Chat(props) {
                 }}>
                     {formatTime(timeLeft)}
                 </div>
-                <Fullscreen onClick={toggleFullscreen} style={{color:"var(--fourth-color)",cursor: 'pointer'}}/>
-                
+                <Fullscreen onClick={toggleFullscreen} style={{ color: "var(--fourth-color)", cursor: 'pointer' }} />
+
             </div>
-         {raffleList.map((item, index) => {
-            const { top, left } = positions[index] || { top: 50, left: 50 };
-            return (
-               
-                    
-                    <div key={index}  className='message-wrap-83nja-float-raffle' style={{
+            {raffleList.map((item, index) => {
+                const { top, left } = positions[index] || { top: 50, left: 50 };
+                return (
+
+
+                    <div key={index} className='message-wrap-83nja-float-raffle' style={{
                         top: `${top}%`,
                         left: `${left}%`,
-                        transform: 'translate(-50%, -50%)'}}>
-                           <div style={{ position: "relative", display: "inline-block", width: "60px", height: "50px" }}>
-                                <Image 
-                                    src="/assets/rafflenew.png"
-                                    style={{height:"100%"}}
-                                    width={60}
-                                    height={50}
-                                />
-                                <span style={{
-                                    position: "absolute",
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                    fontSize: "24px",
-                                    fontWeight: "bold",
-                                    color: "#000", // Or any color that contrasts with the image
-                                }}>
-                                    {item.number}
-                                </span>
-                                </div>
+                        transform: 'translate(-50%, -50%)'
+                    }}>
+                        <div style={{ position: "relative", display: "inline-block", width: "60px", height: "50px" }}>
+                            <Image
+                                src="/assets/rafflenew.png"
+                                style={{ height: "100%" }}
+                                width={60}
+                                height={50}
+                            />
+                            <span style={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                fontSize: "24px",
+                                fontWeight: "bold",
+                                color: "#000", // Or any color that contrasts with the image
+                            }}>
+                                {item.number}
+                            </span>
+                        </div>
                         {/* <div className="raffle-ac2s2">
                             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '60%' }}>
@@ -1626,11 +1773,59 @@ function Chat(props) {
                             <div className='right-circle' ></div>
                         </div> */}
                     </div>
-               
-            );
-        })}
+
+                );
+            })}
         </div>)
     }
+
+    const handleClick = (message) => {
+        setSelectedMessage(message); // Update state with the clicked message
+    };
+
+    const renderSupport = () => {
+        return (
+            <div className='message-wrap-83nja'>
+                {ChatData.map((chat, index) => (
+                    <div key={index} className="chat-day">
+                        <h4>{moment(chat.date).format('MMMM Do, YYYY')}</h4>
+                        {chat.data.map((message, idx) => (
+                            <div className="message" key={idx} onClick={() => handleClick(message)}>
+                                <img src={message.user.image} alt={message.user.name} className="avatar" />
+                                <div className="message-content">
+                                    <div className="message-header">
+                                        <strong>{message.user.name}</strong> {message.user.isVerified && <span>✔️</span>}
+                                        <small>{moment(parseInt(message.timestamp)).fromNow()}</small>
+                                    </div>
+                                    {/* <p>{message.content}</p> */}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ))}
+
+            </div>
+
+        )
+    }
+
+    const renderSelectedMessage = () => {
+        return (
+            <div className='message-wrap-83nja'>
+                <div className="message">
+                    <img src={selectedMessage.user.image} alt={selectedMessage.user.name} className="avatar" />
+                    <div className="message-content">
+                        <div className="message-header">
+                            <strong>{selectedMessage.user.name}</strong>
+                            {selectedMessage.user.isVerified && <span>✔️</span>}
+                            <small>{moment(parseInt(selectedMessage.timestamp)).fromNow()}</small>
+                        </div>
+                        <p>{selectedMessage.content}</p>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className='container-2mda3'>
@@ -1800,7 +1995,7 @@ function Chat(props) {
 
 
                         {/* START - chat content */}
-                        <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: overflowBlackHole, padding: '20px 0px',backgroundColor:blackChatbackgroundColor }}>
+                        <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: overflowBlackHole, padding: '20px 0px', backgroundColor: blackChatbackgroundColor }}>
                             {selectedChannel?.type == ChannelType.raffles ? null :
                                 selectedChannel?.type == ChannelType.blackHole ? null :
                                     <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
@@ -1878,7 +2073,7 @@ function Chat(props) {
 
 
                         {/* START - chat input */}
-                        <div style={{ height: '10%', backgroundColor: blackbackgroundColor}} className="flex flex-col">
+                        <div style={{ height: '10%', backgroundColor: blackbackgroundColor }} className="flex flex-col">
                             {(selectedChannel?.type == ChannelType.checkList) ?
                                 <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
                                     <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
@@ -1893,7 +2088,7 @@ function Chat(props) {
 
                                 </footer>
                                 : selectedChannel?.type == ChannelType.blackHole ?
-                                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)',backgroundColor:'#000'}}>
+                                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: '#000' }}>
                                         <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
 
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
@@ -1913,28 +2108,28 @@ function Chat(props) {
 
                                     </footer>
                                     : selectedChannel?.type == ChannelType.raffles ?
-                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)',backgroundColor:"var(--channels)" }}>
+                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "var(--channels)" }}>
                                             <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
-                                            <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}>
-                                <Image 
-                                    src="/assets/rafflenew.png"
-                                    style={{height:"100%"}}
-                                    width={250}
-                                    height={70}
-                                    onMouseEnter={() => { sendRaffle() }} 
-                                />
-                                <span style={{
-                                    position: "absolute",
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                    fontSize: "18px",
-                                    fontWeight: "bold",
-                                    color: "#000", // Or any color that contrasts with the image
-                                }}>
-                                   Admit One
-                                </span>
-                                </div>
+                                                <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}>
+                                                    <Image
+                                                        src="/assets/rafflenew.png"
+                                                        style={{ height: "100%" }}
+                                                        width={250}
+                                                        height={70}
+                                                        onMouseEnter={() => { sendRaffle() }}
+                                                    />
+                                                    <span style={{
+                                                        position: "absolute",
+                                                        top: "50%",
+                                                        left: "50%",
+                                                        transform: "translate(-50%, -50%)",
+                                                        fontSize: "18px",
+                                                        fontWeight: "bold",
+                                                        color: "#000", // Or any color that contrasts with the image
+                                                    }}>
+                                                        Admit One
+                                                    </span>
+                                                </div>
                                                 {/* <Image src="/assets/rafflenew.png"
                                                     style={{ height: "70px" }}
                                                     width={150}
@@ -1967,48 +2162,48 @@ function Chat(props) {
 
                     {/* START - chat right content */}
                     {selectedChannel?.type === ChannelType.blackHole ?
-                    null :
-                    selectedChannel?.type === ChannelType.raffles ?
-                    null :
-                    <div style={{ width: '33%', overflowX: 'hidden', backgroundColor: 'var(--seventh-color)', }}>
+                        null :
+                        selectedChannel?.type === ChannelType.raffles ?
+                            null :
+                            <div style={{ width: '33%', overflowX: 'hidden', backgroundColor: 'var(--seventh-color)', }}>
 
-                    <div style={{ display: 'flex', alignItems: 'center', marginTop: 15, marginLeft: 20 }}>
-                        {/* <img alt="Avatar" src={selectedServer?.category_pic} width={46} height={46} /> */}
-                        {/* zzz */}
-                        <img alt="Avatar" src={`/assets/server${selectedServer?.id}selected.svg`} width={46} height={46} />
-                        <div className="channels-footer-details-23mas">
-                            <span className="username-312c02qena">{selectedServer?.name}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', marginTop: 15, marginLeft: 20 }}>
+                                    {/* <img alt="Avatar" src={selectedServer?.category_pic} width={46} height={46} /> */}
+                                    {/* zzz */}
+                                    <img alt="Avatar" src={`/assets/server${selectedServer?.id}selected.svg`} width={46} height={46} />
+                                    <div className="channels-footer-details-23mas">
+                                        <span className="username-312c02qena">{selectedServer?.name}</span>
 
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <div style={{ backgroundColor: '#36d399', width: 11, height: 11, borderRadius: '50%', marginRight: 6 }} />
-                                <span style={{ cursor: 'pointer' }} className="tag-kla3mca2" onClick={() => onlineCountModel.onOpen()}>{selectedServer?.online_users} online</span>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ backgroundColor: '#36d399', width: 11, height: 11, borderRadius: '50%', marginRight: 6 }} />
+                                            <span style={{ cursor: 'pointer' }} className="tag-kla3mca2" onClick={() => onlineCountModel.onOpen()}>{selectedServer?.online_users} online</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex h-8 font-medium border-grey-400 mt-2 border-b px-2">
+                                    {SideMenus.map((option, index) => {
+                                        let isSelected = selectedSideMenu.Value == option.Value;
+                                        return (
+                                            <button
+                                                key={index}
+                                                type="button"
+                                                className="relative flex flex-1 cursor-pointer items-center justify-center"
+                                                style={isSelected ? { borderBottomColor: 'var(--fifth-color)', borderBottomWidth: 3 } : {}}
+                                                onClick={(e) => setSelectedSideMenu(option)}
+                                            >
+                                                {option.Icon()}
+                                            </button >
+                                        );
+                                    })}
+                                </div>
+
+                                <div style={{ overflowX: 'hidden', overflowY: 'scroll' }}>
+                                    {renderSideMenuOption()}
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="flex h-8 font-medium border-grey-400 mt-2 border-b px-2">
-                        {SideMenus.map((option, index) => {
-                            let isSelected = selectedSideMenu.Value == option.Value;
-                            return (
-                                <button
-                                    key={index}
-                                    type="button"
-                                    className="relative flex flex-1 cursor-pointer items-center justify-center"
-                                    style={isSelected ? { borderBottomColor: 'var(--fifth-color)', borderBottomWidth: 3 } : {}}
-                                    onClick={(e) => setSelectedSideMenu(option)}
-                                >
-                                    {option.Icon()}
-                                </button >
-                            );
-                        })}
-                    </div>
-
-                    <div style={{ overflowX: 'hidden', overflowY: 'scroll' }}>
-                        {renderSideMenuOption()}
-                    </div>
-                </div>
                     }
-                   
+
                     {/* END - chat right content */}
 
                 </div>
@@ -2732,6 +2927,82 @@ function Chat(props) {
                                         </div>
                                     </div>
 
+
+                                </div>
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+
+            <Modal
+                id="media-contract-modal"
+                isOpen={mediaContractModel.isOpen}
+                backdrop="opaque"
+                radius="md"
+                size='2xl'
+                onClose={() => {
+
+                }}
+                onOpenChange={mediaContractModel.onOpenChange}
+                classNames={{
+                    body: "online-count-modal-mcan34",
+                    header: "online-count-modal-header-mcan34 py-0",
+                    footer: "online-count-modal-footer-mcan34 py-0",
+                }}
+                hideCloseButton
+            >
+                <ModalContent style={{ height: '67%' }}>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader>
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                    <p className='online-count-modal-title-mcan34'>Media Channel Agreement</p>
+                                </div>
+                                <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={(e) => { mediaContractModel.onClose() }} />
+                            </ModalHeader>
+                            <ModalBody onMouseEnter={() => setIsDrawing(false)}>
+                                <div className='online-count-model-body-content-82bma2'>
+                                    <p className='online-count-body-title-72bak-media'>I Will Keep My Posts ...</p>
+                                    <ul className="modal_body-media" style={{ marginTop: 10 }}>
+                                        {[
+                                            'Short and sweet',
+                                            'About progression',
+                                            'About victories',
+                                            'About inspiration',
+                                            'Or about anything relating to our values',
+                                        ].map((item, index) => (
+                                            <li key={index}>
+                                                {/* True checkbox */}
+                                                <input
+                                                    className="custom-checkbox-modal"
+                                                    type="checkbox"
+                                                    id={`list${index + 1}`}
+                                                    name={`checkbox-group-${index}`} // Group the checkboxes
+                                                    checked={checkedMediaRules[item] === 'true'}
+                                                    onChange={() => handleMediaRulesCheck(item, 'true')}
+                                                />
+                                                <label className="modal_text_body" htmlFor={`list${index + 1}`}>{item}</label>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="signature-box" style={{ marginTop: 20 }}>
+                                        <p className="signature-title">Sign Here:</p>
+                                        <canvas
+                                            ref={canvasRef}
+
+                                            width={400}
+                                            height={70}
+                                            style={{ border: '1px solid var(--fourth-color)', borderRadius: 4, color: "var(--fourth-color)" }}
+                                        />
+                                        <Button onClick={clearSignature} color="default" variant="ghost" className="clear-button-mdkad" style={{ marginTop: 10 }}>
+                                            <span className="next-button-text-mdkad">Clear</span>
+                                        </Button>
+                                        <Button onClick={saveSignature} color="default" variant="ghost" className="clear-button-mdkad" style={{ marginTop: 10, marginLeft: 20 }}>
+                                            <span className="next-button-text-mdkad">Continue</span>
+                                        </Button>
+                                        {/* <button onClick={saveSignature} style={{ marginTop: 10 ,color:"var(--fourth-color)"}}>Save Signature</button> */}
+                                    </div>
 
                                 </div>
                             </ModalBody>

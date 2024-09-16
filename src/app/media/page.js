@@ -1,14 +1,14 @@
 "use client";
 
 
-import React, { useState, useEffect ,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User, Progress, Button, RadioGroup, useDisclosure, useRadio, cn, VisuallyHidden, Spinner, Modal, ModalBody, ModalContent, ModalHeader, ModalFooter } from "@nextui-org/react";
 import Link from "next/link";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus,Home,Search,MessageCircle,Bell,UserRound,ListOrdered,Send ,Bookmark,Grid, Settings,Image} from 'lucide-react';
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, Plus, Home, Search, MessageCircle, Bell, UserRound, ListOrdered, Send, Bookmark, Grid, Settings, Image, ListChecks } from 'lucide-react';
 
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/audio.css';
@@ -62,7 +62,7 @@ function MediaPage(props) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
-  
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -78,6 +78,10 @@ function MediaPage(props) {
     id: 'profile-model',
   });
 
+  const mediaContractModel = useDisclosure({
+    id: 'media-contract-modal',
+  });
+
   const rightContentRef = useRef(null);
 
   const scrollToTop = () => {
@@ -91,7 +95,7 @@ function MediaPage(props) {
     setIsSearchVisible(!isSearchVisible);
   };
 
-  const messagePage = () =>{
+  const messagePage = () => {
     toast("Under Construction");
   }
 
@@ -424,28 +428,28 @@ function MediaPage(props) {
     let formData = new FormData();
     formData.append('coin', 200);
     const response = await fetch(apiURL + 'api/v1/user/purches/identity_booster', {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + authToken
-        },
-        body: formData
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: formData
     });
     const rsp = await response.json();
     if (response.status >= 200 && response.status < 300) {
-        if (rsp.status == 1) {
-            toast("Create New Post Plan purchased successfully!");
-            setIsSubmitVisible(true);
-        } else {
-            handleAPIError(rsp);
-        }
+      if (rsp.status == 1) {
+        toast("Create New Post Plan purchased successfully!");
+        setIsSubmitVisible(true);
+      } else {
+        handleAPIError(rsp);
+      }
     } else {
-        if (response.status == 401) {
-            dispatch(props.actions.userLogout());
-        } else {
-            handleAPIError(rsp);
-        }
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        handleAPIError(rsp);
+      }
     }
-}
+  }
 
   function timeAgo(timestamp) {
     const now = new Date();
@@ -467,71 +471,79 @@ function MediaPage(props) {
   }
 
   useEffect(() => {
-    const updateLikes = () => {
+    const intervalIds = [];
+
+    const updateLikesForMedia = (index) => {
       setMedias((prevMedias) => {
-        // Pick a random media and update its likes
-        return prevMedias.map((media) => {
-          // Randomly select whether to update this media's likes
-          if (Math.random() < 0.5) {
-            const randomLikesIncrease = Math.floor(Math.random() * 101); // Increase likes by a random number between 0-100
-            return { ...media, likes_count: media.likes_count + randomLikesIncrease };
-          }
-          return media;
-        });
+        const newMedias = [...prevMedias];
+        // Increment this media's likes by a random number between 1 and 5
+        const incrementValue = Math.floor(Math.random() * 5) + 1;
+        newMedias[index] = { ...newMedias[index], likes_count: newMedias[index].likes_count + incrementValue };
+        return newMedias;
       });
     };
 
-    const intervalId = setInterval(updateLikes, 5000); // Update every 10 seconds
+    medias.forEach((_, index) => {
+      const interval = setInterval(() => {
+        if (Math.random() < 0.5) {
+          updateLikesForMedia(index); // Randomly decide to update likes for this media
+        }
+      }, Math.floor(Math.random() * 2000) + 2000); // Random interval between 2 and 4 seconds
+      intervalIds.push(interval);
+    });
 
-    return () => clearInterval(intervalId); // Cleanup on component unmount
-  }, []);
+    return () => {
+      // Cleanup all intervals when the component unmounts
+      intervalIds.forEach((id) => clearInterval(id));
+    };
+  }, [medias]);
 
   const renderMediaContent = () => {
-    if(isMediaFetch){
+    if (isMediaFetch) {
       return (
         <>
           <div className="media-posts">
-          <div  className={`search-post-o38ca3 ${isSearchVisible ? 'visible' : ''}`} >
-            <SearchIcon
-              color="var(--fifth-color)"
-              size={17}
-              className="search-icon"
-              style={{ position: 'absolute', top: 21, left: 8 }}
-            />
-            <input
-              type="text"
-              name="search"
-              className="search-input-7ajb312"
-              placeholder="Search ..."
-              value={searchText}
-              autoComplete="off"
-              style={{ paddingLeft: '40px' }} // Adjust padding to make space for the search icon
-              onChange={(event) => {
-                let searchTextValue = event.target.value.trim().toLowerCase();
-                setSearchText(searchTextValue);
-                const filteredMedias = searchTextValue
-                  ? originalMedias.filter(asset => {
-                    return (
-                      asset?.message?.toLowerCase().includes(searchTextValue) ||
-                      asset?.user?.toLowerCase().includes(searchTextValue)
-                    );
-                  })
-                  : medias;
-                console.log(searchTextValue);
-                setMedias(filteredMedias);
-              }}
-            />
-            <XIcon
-              color="var(--fifth-color)"
-              size={24}
-              className="close-icon-search"
-              style={{ cursor: 'pointer', position: 'absolute', top: 17.5, right: 8 }}
-              onClick={(e) => {
-                setSearchText('');
-                setMedias(originalMedias);
-              }}
-            />
-          </div>
+            <div className={`search-post-o38ca3 ${isSearchVisible ? 'visible' : ''}`} >
+              <SearchIcon
+                color="var(--fifth-color)"
+                size={17}
+                className="search-icon"
+                style={{ position: 'absolute', top: 21, left: 8 }}
+              />
+              <input
+                type="text"
+                name="search"
+                className="search-input-7ajb312"
+                placeholder="Search ..."
+                value={searchText}
+                autoComplete="off"
+                style={{ paddingLeft: '40px' }} // Adjust padding to make space for the search icon
+                onChange={(event) => {
+                  let searchTextValue = event.target.value.trim().toLowerCase();
+                  setSearchText(searchTextValue);
+                  const filteredMedias = searchTextValue
+                    ? originalMedias.filter(asset => {
+                      return (
+                        asset?.message?.toLowerCase().includes(searchTextValue) ||
+                        asset?.user?.toLowerCase().includes(searchTextValue)
+                      );
+                    })
+                    : medias;
+                  console.log(searchTextValue);
+                  setMedias(filteredMedias);
+                }}
+              />
+              <XIcon
+                color="var(--fifth-color)"
+                size={24}
+                className="close-icon-search"
+                style={{ cursor: 'pointer', position: 'absolute', top: 17.5, right: 8 }}
+                onClick={(e) => {
+                  setSearchText('');
+                  setMedias(originalMedias);
+                }}
+              />
+            </div>
             {medias.map((media, index) => {
               return (
                 <>
@@ -544,11 +556,11 @@ function MediaPage(props) {
                             style={{ height: 36, width: 36, borderRadius: '50%' }}
                           /></div>
                           <p className="username">{media.user}</p>
-                         
+
                         </div>
                         <div style={{ marginLeft: 'auto' }}>
-                         
-                          </div>
+
+                        </div>
                       </div>
                       <p className="description-text">{media.message}</p>
                       <div className="post-content">
@@ -559,8 +571,8 @@ function MediaPage(props) {
                             fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
                             onClick={() => onToggleFavorite(media)}
                           />
-                         <Send className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
-                         <Bookmark className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
+                          <Send className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }} />
+                          <Bookmark className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }} />
                         </div>
                         <p className="likes">{media.likes_count} Likes</p>
                         {/* <p className="post-time">{timeAgo(media.timestamp)}</p> */}
@@ -576,8 +588,8 @@ function MediaPage(props) {
                           <p className="username">{media.user} </p>
                         </div>
                         <div style={{ marginLeft: 'auto' }}>
-                          <svg xmlns="http://www.w3.org/2000/svg" style={{ cursor: "pointer", color: "var(--fourth-color)" }} width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ellipsis"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                          </div>
+                          <svg xmlns="http://www.w3.org/2000/svg" style={{ cursor: "pointer", color: "var(--fourth-color)" }} width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ellipsis"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>
+                        </div>
                       </div>
                       <img src="/assets/media/post1.webp" className="post-image" alt="" />
                       <div className="post-content">
@@ -588,9 +600,9 @@ function MediaPage(props) {
                             fill={(media.likes_count > 0) ? "var(--fourth-color)" : "transparent"}
                             onClick={() => onToggleFavorite(media)}
                           />
-                          <Send className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }}/>
-                          <Bookmark className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}/>
-                          
+                          <Send className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10' }} />
+                          <Bookmark className="send-icon" onClick={messagePage} style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }} />
+
                         </div>
                         <p className="likes">{media.likes_count} Likes</p>
                         <p className="description">{media.message}</p>
@@ -773,73 +785,73 @@ function MediaPage(props) {
                 </>
               );
             })}
-         
+
           </div>
-          
+
         </>
       )
-    }else{
+    } else {
       return (
         <Loading />
       );
     }
-   
-    
+
+
   }
 
-  const renderSideMenu = () =>{
-    return(
+  const renderSideMenu = () => {
+    return (
       <>
-          
-          <div className='course-box' onClick={scrollToTop}>
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">Home</div>
-              </div>
-              <Home style={{ color: "var(--fourth-color)" }} size={20} />
+
+        <div className='course-box' onClick={scrollToTop}>
+          <div className="course-info-mc2nw">
+            <div className="course-text-info">
+              <div className="course-name-9qncq6">Home</div>
             </div>
+            <Home style={{ color: "var(--fourth-color)" }} size={20} />
           </div>
-          <div className='course-box'  onClick={handleSearch}>
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">Search</div>
-              </div>
-              <Search style={{ color: "var(--fourth-color)" }}  size={20}/>
+        </div>
+        <div className='course-box' onClick={handleSearch}>
+          <div className="course-info-mc2nw">
+            <div className="course-text-info">
+              <div className="course-name-9qncq6">Search</div>
             </div>
+            <Search style={{ color: "var(--fourth-color)" }} size={20} />
           </div>
-          <div className='course-box' onClick={messagePage}>
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">Messages</div>
-              </div>
-              <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
+        </div>
+        <div className='course-box' onClick={messagePage}>
+          <div className="course-info-mc2nw">
+            <div className="course-text-info">
+              <div className="course-name-9qncq6">Messages</div>
             </div>
+            <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
           </div>
-          <div className='course-box' onClick={() => notificationModel.onOpen()}>
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">Notifications</div>
-              </div>
-              <Bell style={{ color: "var(--fourth-color)" }} size={20} />
+        </div>
+        <div className='course-box' onClick={() => notificationModel.onOpen()}>
+          <div className="course-info-mc2nw">
+            <div className="course-text-info">
+              <div className="course-name-9qncq6">Notifications</div>
             </div>
+            <Bell style={{ color: "var(--fourth-color)" }} size={20} />
           </div>
-          <div className='course-box' onClick={() => addmediaModel.onOpen()}>
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">Create New Post</div>
-              </div>
-              <Plus style={{ color: "var(--fourth-color)" }} ssize={22}/>
+        </div>
+        <div className='course-box' onClick={() => addmediaModel.onOpen()}>
+          <div className="course-info-mc2nw">
+            <div className="course-text-info">
+              <div className="course-name-9qncq6">Create New Post</div>
             </div>
+            <Plus style={{ color: "var(--fourth-color)" }} ssize={22} />
           </div>
-          <div className='course-box' onClick={() => profileModel.onOpen()}>
-            <div className="course-info-mc2nw">
-              <div className="course-text-info">
-                <div className="course-name-9qncq6">Profile</div>
-              </div>
-              <UserRound style={{ color: "var(--fourth-color)" }} size={20} />
+        </div>
+        <div className='course-box' onClick={() => profileModel.onOpen()}>
+          <div className="course-info-mc2nw">
+            <div className="course-text-info">
+              <div className="course-name-9qncq6">Profile</div>
             </div>
+            <UserRound style={{ color: "var(--fourth-color)" }} size={20} />
           </div>
-          
+        </div>
+
       </>
     )
   }
@@ -890,36 +902,37 @@ function MediaPage(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
-    if(image == ''){
-       const response = await fetch(apiURL + 'api/v1/media/send/message', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + props.user.authToken
-      },
-      body: JSON.stringify({
-        message: content, // selected course uuid
-      })
-    });
-    const rsp = await response.json();
-    if (response.status >= 200 && response.status < 300) {
-      if (rsp) {
-        getInitData();
-        addmediaModel.onClose();
-        scrollToTop();  
-        setContent('');
-        setImage('');
+    if (image == '') {
+      const response = await fetch(apiURL + 'api/v1/media/send/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + props.user.authToken
+        },
+        body: JSON.stringify({
+          message: content, // selected course uuid
+        })
+      });
+      const rsp = await response.json();
+      if (response.status >= 200 && response.status < 300) {
+        if (rsp) {
+          getInitData();
+          addmediaModel.onClose();
+          toast('"' + content + '" post has been successfully published');
+          scrollToTop();
+          setContent('');
+          setImage('');
+        } else {
+          handleAPIError(rsp);
+        }
       } else {
-        handleAPIError(rsp);      
+        if (response.status == 401) {
+          dispatch(props.actions.userLogout());
+        } else {
+          handleAPIError(rsp);
+        }
       }
     } else {
-      if (response.status == 401) {
-        dispatch(props.actions.userLogout());
-      } else {
-        handleAPIError(rsp);
-      }
-    }
-    }else{
       console.log(image);
       const imageName = image.name.substring(image.name.lastIndexOf('/') + 1);
       const responseImage = await fetch(image);
@@ -929,7 +942,7 @@ function MediaPage(props) {
       formData.append('content', blob, imageName);
       formData.append('channel_type', 'media');
       formData.append('type_of_content', 'image');
-      formData.append('extension',extension );
+      formData.append('extension', extension);
       const response = await fetch(apiURL + 'api/v1/content/upload', {
         method: 'POST',
         headers: {
@@ -951,17 +964,18 @@ function MediaPage(props) {
         })
       });
       const rsp2 = await response2.json();
-      
+
       if (response2.status >= 200 && response2.status < 300) {
         if (rsp2) {
           getInitData();
-          addmediaModel.onClose(); 
-          scrollToTop(); 
+          addmediaModel.onClose();
+          toast('"' + content + '" post has been successfully published');
+          scrollToTop();
           setContent('');
           setImage('');
         } else {
           handleAPIError(rsp2);
-          
+
         }
       } else {
         if (response2.status == 401) {
@@ -1005,26 +1019,27 @@ function MediaPage(props) {
             }
           </div>
         </div>
+        <ListChecks onClick={() => mediaContractModel.onOpen()} className="modal-contract" />
         <XIcon className="close-icon" onClick={handleClose} />
       </div>
 
       <div className='content-92a233a'>
 
         <div className='left-menu-6k2zzc' id="course-sidebar">
-         {renderSideMenu()}
+          {renderSideMenu()}
         </div>
 
-        <div className="right-content-83mzvcj3"  ref={rightContentRef} style={{position:"relative"}}>
+        <div className="right-content-83mzvcj3" ref={rightContentRef} style={{ position: "relative" }}>
 
           {renderMediaContent()}
           <div className="bottom-navigation-bar">
-          <Home className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={scrollToTop}/>
-          <Search className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24}  onClick={handleSearch}/>
-          {/* <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
+            <Home className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={scrollToTop} />
+            <Search className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={handleSearch} />
+            {/* <MessageCircle style={{ color: "var(--fourth-color)" }} size={20} />
           <Bell style={{ color: "var(--fourth-color)" }} size={20} /> */}
-          <Plus className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={26} onClick={() => addmediaModel.onOpen()} />
-          <Bell className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={() => notificationModel.onOpen()}/>
-          <UserRound className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={() => profileModel.onOpen()}/>
+            <Plus className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={26} onClick={() => addmediaModel.onOpen()} />
+            <Bell className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={() => notificationModel.onOpen()} />
+            <UserRound className="home-click-animation" style={{ color: "var(--fourth-color)" }} size={24} onClick={() => profileModel.onOpen()} />
           </div>
           <Modal
             id="add-media-poll"
@@ -1043,7 +1058,7 @@ function MediaPage(props) {
             }}
             hideCloseButton
           >
-            <ModalContent className="modal-content" style={{ height: '60%'}}>
+            <ModalContent className="modal-content" style={{ height: '60%' }}>
               {(onClose) => (
                 <>
                   <ModalHeader>
@@ -1054,67 +1069,67 @@ function MediaPage(props) {
                   </ModalHeader>
                   <ModalBody>
                     <div className='suitcase-model-body-content-82bma2'>
-                    <form onSubmit={handleSubmit}>
-                          <div className="post_image">
-                            <label htmlFor="post-image" className="suitcase-body-title-72bak">Upload an image or video (optional):</label>
-                            <div className="upload-box" onClick={() => document.getElementById('post-image').click()}>
-                              {!image ? (
-                                <div className="upload-placeholder">
-                                  <Image size="50"/>
-                                </div>
-                              ) : (
-                                <div className="uploaded-media">
-                                  {image?.type && image.type.startsWith('image/') ? (
-                                    <img src={URL.createObjectURL(image)} alt="Uploaded preview" className="uploaded-image" />
-                                  ) : (
-                                    <video src={URL.createObjectURL(image)} className="uploaded-video" controls />
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            <input
-                              id="post-image"
-                              type="file"
-                              onChange={handleImageUpload}
-                              className="input-file"
-                              accept="image/*, video/*"
-                              style={{ display: 'none' }} // Hide the actual input element
-                            />
+                      <form onSubmit={handleSubmit}>
+                        <div className="post_image">
+                          <label htmlFor="post-image" className="suitcase-body-title-72bak">Upload an image or video (optional):</label>
+                          <div className="upload-box" onClick={() => document.getElementById('post-image').click()}>
+                            {!image ? (
+                              <div className="upload-placeholder">
+                                <Image size="50" />
+                              </div>
+                            ) : (
+                              <div className="uploaded-media">
+                                {image?.type && image.type.startsWith('image/') ? (
+                                  <img src={URL.createObjectURL(image)} alt="Uploaded preview" className="uploaded-image" />
+                                ) : (
+                                  <video src={URL.createObjectURL(image)} className="uploaded-video" controls />
+                                )}
+                              </div>
+                            )}
                           </div>
-                          
-                          <div className="post_image">
-                            <label htmlFor="post-content" className="suitcase-body-title-72bak">What's on your mind?</label>
-                            <textarea
-                              id="post-content"
-                              placeholder="Share your thoughts..."
-                              value={content}
-                              onChange={(e) => setContent(e.target.value)}
-                              className="post-textarea"
-                            />
-                          </div>
-                          
-                          <div>
-                            {isSubmitVisible ?  <Button type="submit" color="default" variant="ghost" className="submit-button-mdkad">
-                              <span className="next-button-text-mdkad">Submit</span>
-                            </Button> :
+                          <input
+                            id="post-image"
+                            type="file"
+                            onChange={handleImageUpload}
+                            className="input-file"
+                            accept="image/*, video/*"
+                            style={{ display: 'none' }} // Hide the actual input element
+                          />
+                        </div>
+
+                        <div className="post_image">
+                          <label htmlFor="post-content" className="suitcase-body-title-72bak">What's on your mind?</label>
+                          <textarea
+                            id="post-content"
+                            placeholder="Share your thoughts..."
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            className="post-textarea"
+                          />
+                        </div>
+
+                        <div>
+                          {isSubmitVisible ? <Button type="submit" color="default" variant="ghost" className="submit-button-mdkad">
+                            <span className="next-button-text-mdkad">Submit</span>
+                          </Button> :
                             <Button
-                            className='submit-button-mdkad'
-                            style={{ marginLeft: 0 }}
-                            spinner={<Spinner color='current' size='sm' />}
-                            size='md'
-                            color=''
-                            onClick={(e) => {
-                              purchaseIdentityBooster(props.user.authToken);
-                          }}
-                        >
-                            UNLOCK FOR 200 COINS
-                            <img alt="Avatar" src="/assets/coin.svg" width={16} height={16} />
-                        </Button>
-                             }
-                           
-                            
-                          </div>
-                        </form>
+                              className='submit-button-mdkad'
+                              style={{ marginLeft: 0 }}
+                              spinner={<Spinner color='current' size='sm' />}
+                              size='md'
+                              color=''
+                              onClick={(e) => {
+                                purchaseIdentityBooster(props.user.authToken);
+                              }}
+                            >
+                              Post FOR 200 COINS
+                              <img alt="Avatar" src="/assets/coin.svg" width={16} height={16} />
+                            </Button>
+                          }
+
+
+                        </div>
+                      </form>
 
 
                     </div>
@@ -1154,25 +1169,25 @@ function MediaPage(props) {
                   </ModalHeader>
                   <ModalBody>
                     <div className='suitcase-model-body-content-82bma2'>
-                      
-                         <ul className="modal_body">
-                          <li><div className="modal_text_body_div"><div className="profile-pic" style={{marginRight:'20px'}}><img
-                                              src='/assets/person.png'
-                                              style={{ height: 30, width: 30, borderRadius: '50%' }}
-                                          /></div>
-                                          <div className="modal_text_div"><p>Sam Wilson, Peter, user3 and 7 others liked your photo.</p></div>
-                                          <img src="/assets/media/post1.webp" className="notification-image-info" alt="Post Image 1" /></div></li>
-                                          <li><div className="modal_text_body_div"><div className="profile-pic" style={{marginRight:'20px'}}><img
-                                              src='/assets/person.png'
-                                              style={{ height: 30, width: 30, borderRadius: '50%' }}
-                                          /></div>
-                                          <div className="modal_text_div"><p >User1, Zeoob, user3 and 10 others liked your photo.</p></div>
-                                          <img src="/assets/media/post2.png" className="notification-image-info" alt="Post Image 2" /></div></li>
-                          
-                         </ul>
-                        
-                        
-                    
+
+                      <ul className="modal_body">
+                        <li><div className="modal_text_body_div"><div className="profile-pic" style={{ marginRight: '20px' }}><img
+                          src='/assets/person.png'
+                          style={{ height: 30, width: 30, borderRadius: '50%' }}
+                        /></div>
+                          <div className="modal_text_div"><p>Sam Wilson, Peter, user3 and 7 others liked your photo.</p></div>
+                          <img src="/assets/media/post1.webp" className="notification-image-info" alt="Post Image 1" /></div></li>
+                        <li><div className="modal_text_body_div"><div className="profile-pic" style={{ marginRight: '20px' }}><img
+                          src='/assets/person.png'
+                          style={{ height: 30, width: 30, borderRadius: '50%' }}
+                        /></div>
+                          <div className="modal_text_div"><p >User1, Zeoob, user3 and 10 others liked your photo.</p></div>
+                          <img src="/assets/media/post2.png" className="notification-image-info" alt="Post Image 2" /></div></li>
+
+                      </ul>
+
+
+
                     </div>
 
                   </ModalBody>
@@ -1210,33 +1225,33 @@ function MediaPage(props) {
                   </ModalHeader>
                   <ModalBody>
                     <div className='suitcase-model-body-content-82bma2'>
-                    <div className="user-info">
-                        <div className="profile-pic" style={{marginRight:'20px'}}><img
-                                              src='/assets/person.png'
-                                              style={{ height: 84, width: 84, borderRadius: '50%' }}
-                                          /></div>
-                        <div style={{marginLeft:'20px'}}> <p className="username1" >samwilson624663 
+                      <div className="user-info">
+                        <div className="profile-pic" style={{ marginRight: '20px' }}><img
+                          src='/assets/person.png'
+                          style={{ height: 84, width: 84, borderRadius: '50%' }}
+                        /></div>
+                        <div style={{ marginLeft: '20px' }}> <p className="username1" >samwilson624663
                           <Button className="edit-profile-button username2" >Edit Profile</Button></p>
-                        <p className="username1" style={{fontSize:'14px'}}>4 posts 
-                          <span className="username2" > samwilson624663@gmail.com</span></p>
-                        <p className="username1" > Sam Wilson</p></div>
-                      
-                       
+                          <p className="username1" style={{ fontSize: '14px' }}>4 posts
+                            <span className="username2" > samwilson624663@gmail.com</span></p>
+                          <p className="username1" > Sam Wilson</p></div>
 
-                    </div>
 
-                    <div className="post-info">
-                      <div className="grid-head">
-                        <Grid size={18} style={{marginRight:'10px'}}/>
-                        Posts
+
                       </div>
-                     <div className="post-grid">
-                    <img src="/assets/media/post1.webp" className="post-image-info" alt="Post Image 1" />
-                    <img src="/assets/media/post2.png" className="post-image-info" alt="Post Image 2" />
-                    <img src="/assets/media/emptypost.webp" className="post-image-info" alt="Post Image 3" />
-                    <img src="/assets/media/emptypost.webp" className="post-image-info" alt="Post Image 4" />   
-                    </div>
-            </div>  
+
+                      <div className="post-info">
+                        <div className="grid-head">
+                          <Grid size={18} style={{ marginRight: '10px' }} />
+                          Posts
+                        </div>
+                        <div className="post-grid">
+                          <img src="/assets/media/post1.webp" className="post-image-info" alt="Post Image 1" />
+                          <img src="/assets/media/post2.png" className="post-image-info" alt="Post Image 2" />
+                          <img src="/assets/media/emptypost.webp" className="post-image-info" alt="Post Image 3" />
+                          <img src="/assets/media/emptypost.webp" className="post-image-info" alt="Post Image 4" />
+                        </div>
+                      </div>
                     </div>
 
                   </ModalBody>
@@ -1245,6 +1260,81 @@ function MediaPage(props) {
               )}
             </ModalContent>
 
+          </Modal>
+
+          <Modal
+            id="media-contract-modal"
+            isOpen={mediaContractModel.isOpen}
+            backdrop="opaque"
+            radius="md"
+            size='2xl'
+            onClose={() => {
+
+            }}
+            onOpenChange={mediaContractModel.onOpenChange}
+            classNames={{
+              body: "online-count-modal-mcan34",
+              header: "online-count-modal-header-mcan34 py-0",
+              footer: "online-count-modal-footer-mcan34 py-0",
+            }}
+            hideCloseButton
+          >
+            <ModalContent style={{ height: '67%' }}>
+              {(onClose) => (
+                <>
+                  <ModalHeader>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                      <p className='online-count-modal-title-mcan34'>Media Channel Agreement</p>
+                    </div>
+                    <XIcon color='var(--fourth-color)' style={{ cursor: 'pointer' }} onClick={(e) => { mediaContractModel.onClose() }} />
+                  </ModalHeader>
+                  <ModalBody >
+                    <div className='online-count-model-body-content-82bma2'>
+                      <p className='online-count-body-title-72bak-media'>I Will Keep My Posts ...</p>
+                      <ul className="modal_body-media" style={{ marginTop: 10 }}>
+                        {[
+                          'Short and sweet',
+                          'About progression',
+                          'About victories',
+                          'About inspiration',
+                          'Or about anything relating to our values',
+                        ].map((item, index) => (
+                          <li key={index}>
+                            {/* True checkbox */}
+                            <input
+                              className="custom-checkbox-modal"
+                              type="checkbox"
+                              id={`list${index + 1}`}
+                              name={`checkbox-group-${index}`} // Group the checkboxes
+                            // checked={checkedMediaRules[item] === 'true'}
+                            // onChange={() => handleMediaRulesCheck(item, 'true')}
+                            />
+                            <label className="modal_text_body" htmlFor={`list${index + 1}`}>{item}</label>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="signature-box" style={{ marginTop: 20 }}>
+                        <p className="signature-title">Sign:-</p>
+                        <canvas
+                          // ref={canvasRef}
+                          width={400}
+                          height={70}
+                          style={{ border: '1px solid var(--fourth-color)', borderRadius: 4, color: "var(--fourth-color)" }}
+                        />
+                        {/* <Button  onClick={clearSignature} color="default" variant="ghost" className="clear-button-mdkad" style={{marginTop:10}}>
+                                              <span className="next-button-text-mdkad">Clear</span>
+                                                 </Button>
+                                            <Button  onClick={saveSignature} color="default" variant="ghost" className="clear-button-mdkad" style={{marginTop:10,marginLeft:20}}>
+                                              <span className="next-button-text-mdkad">Continue</span>
+                                                 </Button> */}
+                        {/* <button onClick={saveSignature} style={{ marginTop: 10 ,color:"var(--fourth-color)"}}>Save Signature</button> */}
+                      </div>
+
+                    </div>
+                  </ModalBody>
+                </>
+              )}
+            </ModalContent>
           </Modal>
         </div>
 
