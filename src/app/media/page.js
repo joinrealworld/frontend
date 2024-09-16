@@ -63,6 +63,8 @@ function MediaPage(props) {
 
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
 
+  const [signatureData, setSignatureData] = useState('');
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -116,6 +118,13 @@ function MediaPage(props) {
       getCourseDataById(searchParams?.cid);
     }
   }, [searchParams?.cid]);
+
+  useEffect(() => {
+    const savedSignature = localStorage.getItem('signature');
+    if (savedSignature) {
+      setSignatureData(savedSignature);
+    }
+  }, []);
 
   const getMediaData = async () => {
     const response = await fetch(apiURL + 'api/v1/media/fetch/message', {
@@ -1315,12 +1324,19 @@ function MediaPage(props) {
                       </ul>
                       <div className="signature-box" style={{ marginTop: 20 }}>
                         <p className="signature-title">Sign:-</p>
-                        <canvas
+                        {signatureData ? (
+                          <div style={{ border: '1px solid var(--fourth-color)',width:400,height:70, borderRadius: 4, color: "var(--fourth-color)" }}>
+                          <img src={signatureData} alt="Signature" />
+                          </div>
+                        ) : (
+                          <p>No signature available</p>
+                        )}
+                        {/* <canvas
                           // ref={canvasRef}
                           width={400}
                           height={70}
                           style={{ border: '1px solid var(--fourth-color)', borderRadius: 4, color: "var(--fourth-color)" }}
-                        />
+                        /> */}
                         {/* <Button  onClick={clearSignature} color="default" variant="ghost" className="clear-button-mdkad" style={{marginTop:10}}>
                                               <span className="next-button-text-mdkad">Clear</span>
                                                  </Button>

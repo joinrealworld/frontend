@@ -267,8 +267,11 @@ function Chat(props) {
     const widthBlackHole = selectedChannel?.type === ChannelType.blackHole ? '100%' : selectedChannel?.type === ChannelType.raffles ? "100%" : '67%';
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [timeLeft, setTimeLeft] = useState(24 * 60 * 60);
+    const [messageSent, setMessageSent] = useState(false);
 
     const [selectedMessage, setSelectedMessage] = useState(null);
+
+    const [raffleSent, setRaffleSent] = useState(false);
 
     const handleMouseEnter = () => setIsModalVisible(true);
 
@@ -1008,11 +1011,12 @@ function Chat(props) {
 
     const saveSignature = () => {
         const canvas = canvasRef.current;
-        router.replace('/media');
-        // if (canvas) {
-        //   const signatureData = canvas.toDataURL();
-        //   console.log(signatureData); // You can send this data URL to your server or use it as needed
-        // }
+       // router.replace('/media');
+        if (canvas) {
+            const signatureData = canvas.toDataURL();
+            localStorage.setItem('signature', signatureData);
+            router.replace('/media');
+          }
     };
 
     const renderSideMenuOption = () => {
@@ -1565,6 +1569,7 @@ function Chat(props) {
 
     const sendBlackHoleMessage = () => {
         if (sendText != "") {
+            setMessageSent(true);
             setBlackHoleList((prevList) => {
                 if (Array.isArray(prevList)) {
                     return [...prevList, { 'username': "Harsh Patel", 'message': sendText }];
@@ -1575,6 +1580,13 @@ function Chat(props) {
         }
 
     }
+
+    const showToast = () => {
+        if (messageSent) {
+            setSendText("");
+            toast("You can send only one message per day");
+        }
+    };
 
     const toggleFullscreen = () => {
         if (!isFullscreen) {
@@ -1690,6 +1702,7 @@ function Chat(props) {
     }
 
     const sendRaffle = () => {
+        setRaffleSent(true);
         setRaffleList((prevList) => {
             if (Array.isArray(prevList)) {
                 return [...prevList, { 'username': "Chirag Lathiya", 'number': 11 }];
@@ -1697,6 +1710,12 @@ function Chat(props) {
             return [{ 'username': "Harsh Patel", 'message': "Text Message" }]; // or handle the error as needed
         });
     }
+
+    const showToastRaffle = () => {
+        if(raffleSent){
+            toast("You can submit only one raffle per day");
+        }
+    };
 
     const renderRaffle = () => {
         return (<div id='raffle-background' >
@@ -2097,12 +2116,16 @@ function Chat(props) {
                                                     value={sendText}
                                                     onChange={(event) => { setSendText(event.target.value) }}
                                                 />
+                                                <div onMouseEnter={showToast}> 
                                                 <Button className='main-button-7ajb412' size='sm' color=''
                                                     onClick={(e) => {
                                                         sendBlackHoleMessage()
-                                                    }}>
+                                                    }}
+                                                    disabled={messageSent}
+                                                    >
                                                     Post
                                                 </Button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -2110,13 +2133,14 @@ function Chat(props) {
                                     : selectedChannel?.type == ChannelType.raffles ?
                                         <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "var(--channels)" }}>
                                             <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
-                                                <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}>
+                                                <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}  >
                                                     <Image
                                                         src="/assets/rafflenew.png"
                                                         style={{ height: "100%" }}
                                                         width={250}
                                                         height={70}
-                                                        onMouseEnter={() => { sendRaffle() }}
+                                                        onMouseEnter={raffleSent ? showToastRaffle : sendRaffle}
+                                                        
                                                     />
                                                     <span style={{
                                                         position: "absolute",
