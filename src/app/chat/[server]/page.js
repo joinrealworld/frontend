@@ -109,6 +109,24 @@ const dummyNumbers = [
 
 ];
 
+const currentUser = {
+    id: "1", // Example of a hardcoded current user ID for testing
+    name: "John Doe",
+    image: "https://example.com/avatar.jpg",
+    isVerified: true
+};
+
+const dummyadminMessage =[{
+    user: {
+        id: "2", // Fake admin ID
+        name: "Admin",
+        image: "/assets/person.png",
+        isVerified: true
+    },
+    timestamp: new Date().getTime(),
+    content: "Hello, how can I assist you today?"
+}];
+
 const ChatData = [
     {
         date: moment().subtract(3, 'days').toDate(),
@@ -269,6 +287,8 @@ function Chat(props) {
     const [timeLeft, setTimeLeft] = useState(24 * 60 * 60);
     const [messageSent, setMessageSent] = useState(false);
 
+    const [adminMessages, setAdminMessages] = useState(dummyadminMessage);
+    const [sendMessage,setSendMessage] = useState("");
     const [selectedMessage, setSelectedMessage] = useState(null);
 
     const [raffleSent, setRaffleSent] = useState(false);
@@ -1802,49 +1822,117 @@ function Chat(props) {
         setSelectedMessage(message); // Update state with the clicked message
     };
 
+    const sendNewMessage = () => {
+        if (sendMessage.trim() === '') return;
+
+        const newMessage = {
+            user: {
+                id: "2", // Fake admin ID
+                name: "Admin",
+                image: "/assets/person.png",
+                isVerified: true
+            },
+            timestamp: new Date().getTime(),
+            content: sendMessage // The content of the new message
+        };
+
+        // Add new message to the adminMessages array
+        setAdminMessages([...adminMessages, newMessage]);
+
+        // Clear the input field and disable the button momentarily
+        setSendMessage('');
+    };
+
     const renderSupport = () => {
         return (
-            <div className='message-wrap-83nja'>
+            <div className='whatsapp-chat-list'>
                 {ChatData.map((chat, index) => (
                     <div key={index} className="chat-day">
-                        <h4>{moment(chat.date).format('MMMM Do, YYYY')}</h4>
+                        {/* Grouped by Day */}
+                        <h4 className="chat-date">{moment(chat.date).format('MMMM Do, YYYY')}</h4>
                         {chat.data.map((message, idx) => (
-                            <div className="message" key={idx} onClick={() => handleClick(message)}>
-                                <img src={message.user.image} alt={message.user.name} className="avatar" />
-                                <div className="message-content">
-                                    <div className="message-header">
-                                        <strong>{message.user.name}</strong> {message.user.isVerified && <span>✔️</span>}
-                                        <small>{moment(parseInt(message.timestamp)).fromNow()}</small>
+                            <div 
+                                className="chat-item" 
+                                key={idx} 
+                                onClick={() => handleClick(message)}
+                            >
+                                <img 
+                                    src={message.user.image} 
+                                    alt={message.user.name} 
+                                    className="avatar" 
+                                />
+                                <div className="chat-content">
+                                    <div className="chat-header">
+                                        <strong>{message.user.name}</strong> 
+                                        {/* {message.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                                        <small className="timestamp">
+                                            {moment(parseInt(message.timestamp)).fromNow()}
+                                        </small>
                                     </div>
-                                    {/* <p>{message.content}</p> */}
+                                    <p className="message-preview">
+                                        {message.content.length > 20 
+                                            ? message.content.slice(0, 20) + "..." 
+                                            : message.content
+                                        }
+                                    </p>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ))}
-
             </div>
-
         )
     }
+    
 
     const renderSelectedMessage = () => {
+        const isSender = selectedMessage.user.id === currentUser.id; // Check if the message is sent by the current user
+    
         return (
-            <div className='message-wrap-83nja'>
-                <div className="message">
-                    <img src={selectedMessage.user.image} alt={selectedMessage.user.name} className="avatar" />
+            <div className='chat-window'>
+            {/* Current User Message (Sent) */}
+            <div className="whatsapp-chat received">
+                <div className="message-bubble received">
+                    <img 
+                        src={selectedMessage.user.image} 
+                        alt={selectedMessage.user.name} 
+                        className="avatar" 
+                    />
                     <div className="message-content">
                         <div className="message-header">
                             <strong>{selectedMessage.user.name}</strong>
-                            {selectedMessage.user.isVerified && <span>✔️</span>}
-                            <small>{moment(parseInt(selectedMessage.timestamp)).fromNow()}</small>
+                            {/* {selectedMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                            <small className="timestamp">{moment(parseInt(selectedMessage.timestamp)).fromNow()}</small>
                         </div>
                         <p>{selectedMessage.content}</p>
                     </div>
                 </div>
             </div>
+
+            {/* Admin Reply (Received) */}
+            {adminMessages.map((message, index) => (
+            <div key={index} className="whatsapp-chat sent">
+                <div className="message-bubble sent">
+                    <img 
+                        src={message.user.image} 
+                        alt={message.user.name} 
+                        className="avatar" 
+                    />
+                    <div className="message-content">
+                        <div className="message-header">
+                            <strong>{message.user.name}</strong>
+                            {/* {adminMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                            <small className="timestamp">{moment(parseInt(message.timestamp)).fromNow()}</small>
+                        </div>
+                        <p>{message.content}</p>
+                    </div>
+                </div>
+            </div>
+              ))}
+        </div>
         );
     };
+    
 
     return (
         <div className='container-2mda3'>
@@ -2161,6 +2249,29 @@ function Chat(props) {
                                                     onMouseEnter={() => { sendRaffle() }} /> */}
                                             </div>
 
+                                        </footer>
+                                        : (selectedChannel?.type == ChannelType.support) && selectedMessage ?
+                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)'}}>
+                                            <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+    
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
+                                                    <input type="text" name="support-message"
+                                                        className="message-input-support"
+                                                        value={sendMessage}
+                                                        onChange={(event) => { setSendMessage(event.target.value) }}
+                                                    />
+                                                  
+                                                    <Button className='main-button-7ajb412' size='sm' color=''
+                                                        onClick={(e) => {
+                                                            sendNewMessage()
+                                                        }}
+                                                        >
+                                                        Send
+                                                    </Button>
+                                                  
+                                                </div>
+                                            </div>
+    
                                         </footer>
                                         : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
                                             <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
