@@ -1962,9 +1962,15 @@ main {
     margin-bottom: 10px;
 }
 
-.whatsapp-chat.received {
+.message-user-info{
+    color:var(--fourth-color);
     display: flex;
-    justify-content: flex-start; /* Align received messages to the left */
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.whatsapp-chat.received {
+   
     margin-bottom: 10px;
 }
 
@@ -1986,6 +1992,7 @@ main {
     max-width: 60%;
     display: flex;
     align-items: center;
+    margin-bottom: 2px;
 }
 
 .avatar {

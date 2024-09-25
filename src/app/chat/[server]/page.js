@@ -110,7 +110,7 @@ const dummyNumbers = [
 ];
 
 const currentUser = {
-    id: "1", // Example of a hardcoded current user ID for testing
+    id: "2", // Example of a hardcoded current user ID for testing
     name: "John Doe",
     image: "https://example.com/avatar.jpg",
     isVerified: true
@@ -244,7 +244,7 @@ function Chat(props) {
 
 
     const [sendText, setSendText] = useState('');
-    const [blackHoleList, setBlackHoleList] = useState(dummyMessages);
+    const [blackHoleList, setBlackHoleList] = useState([]);
 
     const [raffleList, setRaffleList] = useState(dummyNumbers);
 
@@ -287,6 +287,7 @@ function Chat(props) {
     const [timeLeft, setTimeLeft] = useState(24 * 60 * 60);
     const [messageSent, setMessageSent] = useState(false);
 
+    const [supportList, setSupportList] = useState([]);
     const [adminMessages, setAdminMessages] = useState(dummyadminMessage);
     const [sendMessage,setSendMessage] = useState("");
     const [selectedMessage, setSelectedMessage] = useState(null);
@@ -579,6 +580,48 @@ function Chat(props) {
         }
     }
 
+    const getBlackHoleData = async () => {
+        const response = await fetch(apiURL + 'api/v1/blackhall/fetch/message', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        const rsp = await response.json();
+        
+        if (response.status >= 200 && response.status < 300) {
+            const filteredData = rsp.data.filter(item => item !== null);
+            setBlackHoleList(filteredData);
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                toast("Error while fetching data!");
+            }
+        }
+    }
+
+    const getSupportData = async () => {
+        const response = await fetch(apiURL + 'api/v1/support/support_list', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        const rsp = await response.json();
+       
+        if (response.status >= 200 && response.status < 300) {
+            setSupportList(rsp.payload);
+        
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                toast("Error while fetching data!");
+            }
+        }
+    }
+
     useEffect(() => {
         localStorage.setItem("theme", JSON.stringify(mountTheme));
     }, [mountTheme]);
@@ -607,6 +650,10 @@ function Chat(props) {
             setIsPollListFetch(false);
             setPollList([]);
             await getPollsData();
+        }else if (channel?.type == ChannelType.blackHole){
+            await getBlackHoleData();
+        }else if (channel?.type == ChannelType.support){
+            await getSupportData();
         }
         // do not need - so code commented for now
         // else if (channel?.type == ChannelType.generalChat) {
@@ -1587,16 +1634,33 @@ function Chat(props) {
         }
     }, [raffleList]);
 
-    const sendBlackHoleMessage = () => {
+    const sendBlackHoleMessage = async () => {
         if (sendText != "") {
             setMessageSent(true);
-            setBlackHoleList((prevList) => {
-                if (Array.isArray(prevList)) {
-                    return [...prevList, { 'username': "Harsh Patel", 'message': sendText }];
+            const response = await fetch(apiURL + 'api/v1/blackhall/send/message', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + props.user.authToken
+                },
+                body: JSON.stringify({
+                    "data": {
+                      "content_uuid": sendText,   // Ensure `sendText` has a value
+                      "description": "This is a feedback"
+                    }
+                  })
+              });
+              if (response.status >= 200 && response.status < 300) {
+                getBlackHoleData();
+                setSendText("");
+            } else {
+                if (response.status == 401) {
+                  dispatch(props.actions.userLogout());
+                } else {
+                  handleAPIError(rsp);
                 }
-                return [{ 'username': "Harsh Patel", 'message': "Text Message" }]; // or handle the error as needed
-            });
-            setSendText("");
+              }
+            
         }
 
     }
@@ -1707,7 +1771,7 @@ function Chat(props) {
                             </p> */}
                             <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, marginRight: 5 }}>
                                 <p className='message-text-3kzc3'>
-                                    <b>{item.message}</b>
+                                    <b>{item.content_uuid}</b>
                                 </p>
 
                             </div>
@@ -1818,8 +1882,15 @@ function Chat(props) {
         </div>)
     }
 
-    const handleClick = (message) => {
-        setSelectedMessage(message); // Update state with the clicked message
+    const handleClick = async (chat_id) => {
+        const response1 = await fetch(apiURL + 'api/v1/support/fetch_message?support_chat_id='+ chat_id, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        const rsp1 = await response1.json();
+        setSelectedMessage(rsp1.payload); // Update state with the clicked message
     };
 
     const sendNewMessage = () => {
@@ -1846,38 +1917,38 @@ function Chat(props) {
     const renderSupport = () => {
         return (
             <div className='whatsapp-chat-list'>
-                {ChatData.map((chat, index) => (
+                {supportList.map((chat, index) => (
                     <div key={index} className="chat-day">
                         {/* Grouped by Day */}
-                        <h4 className="chat-date">{moment(chat.date).format('MMMM Do, YYYY')}</h4>
-                        {chat.data.map((message, idx) => (
+                        <h4 className="chat-date">{moment(chat.created_at).format('MMMM Do, YYYY')}</h4>
+                        
                             <div 
                                 className="chat-item" 
-                                key={idx} 
-                                onClick={() => handleClick(message)}
+                                key={index} 
+                                onClick={() => handleClick(chat.uuid)}
                             >
                                 <img 
-                                    src={message.user.image} 
-                                    alt={message.user.name} 
+                                    src={chat.user.avatar ? chat.user.avatar : "/assets/person.png"} 
+                                    alt={chat.user.first_name} 
                                     className="avatar" 
                                 />
                                 <div className="chat-content">
                                     <div className="chat-header">
-                                        <strong>{message.user.name}</strong> 
+                                        <strong>{chat.user.first_name} {chat.user.last_name}</strong> 
                                         {/* {message.user.isVerified && <span className="verified-icon">✔️</span>} */}
-                                        <small className="timestamp">
+                                        {/* <small className="timestamp">
                                             {moment(parseInt(message.timestamp)).fromNow()}
-                                        </small>
+                                        </small> */}
                                     </div>
-                                    <p className="message-preview">
+                                    {/* <p className="message-preview">
                                         {message.content.length > 20 
                                             ? message.content.slice(0, 20) + "..." 
                                             : message.content
                                         }
-                                    </p>
+                                    </p> */}
                                 </div>
                             </div>
-                        ))}
+                        
                     </div>
                 ))}
             </div>
@@ -1886,28 +1957,39 @@ function Chat(props) {
     
 
     const renderSelectedMessage = () => {
-        const isSender = selectedMessage.user.id === currentUser.id; // Check if the message is sent by the current user
+        const isSender = selectedMessage.user.id == currentUser.id; // Check if the message is sent by the current user
     
         return (
             <div className='chat-window'>
             {/* Current User Message (Sent) */}
             <div className="whatsapp-chat received">
-                <div className="message-bubble received">
+                {/* Display user info only once */}
+                <div className="message-user-info">
                     <img 
-                        src={selectedMessage.user.image} 
-                        alt={selectedMessage.user.name} 
+                        src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"} 
+                        alt={selectedMessage.user.first_name} 
                         className="avatar" 
                     />
-                    <div className="message-content">
-                        <div className="message-header">
-                            <strong>{selectedMessage.user.name}</strong>
-                            {/* {selectedMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
-                            <small className="timestamp">{moment(parseInt(selectedMessage.timestamp)).fromNow()}</small>
+                    <strong>{selectedMessage.user.first_name} {selectedMessage.user.last_name}</strong>
+                    {/* Uncomment below to show the verified icon if needed */}
+                    {/* {selectedMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                </div>
+
+                {/* Loop through and display the list of messages */}
+                <div className="message-list">
+                    {selectedMessage.messages.map((message, index) => (
+                        <div className="message-bubble received" key={index}>
+                            <div className="message-content">
+                                <div className="message-header">
+                                    <small className="timestamp">{moment(message.timestamp).fromNow()}</small>
+                                </div>
+                                <p>{message.content}</p>
+                            </div>
                         </div>
-                        <p>{selectedMessage.content}</p>
-                    </div>
+                    ))}
                 </div>
             </div>
+
 
             {/* Admin Reply (Received) */}
             {adminMessages.map((message, index) => (
