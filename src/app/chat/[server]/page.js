@@ -1652,6 +1652,8 @@ function Chat(props) {
               });
               if (response.status >= 200 && response.status < 300) {
                 getBlackHoleData();
+                const currentTime = Date.now();
+                localStorage.setItem('blackHolePostTime', currentTime);
                 setSendText("");
             } else {
                 if (response.status == 401) {
@@ -1680,6 +1682,37 @@ function Chat(props) {
         }
         setIsFullscreen(!isFullscreen);
     };
+
+    useEffect(() => {
+        // On component mount, check if a post was already sent
+        const storedTime = localStorage.getItem('blackHolePostTime');
+        if (storedTime) {
+            const currentTime = Date.now();
+            const timeElapsed = Math.floor((currentTime - storedTime) / 1000);
+            const remainingTime = 24 * 60 * 60 - timeElapsed;
+
+            if (remainingTime > 0) {
+                setMessageSent(true); // Disable message sending
+                setTimeLeft(remainingTime); // Set remaining time
+            } else {
+                localStorage.removeItem('blackHolePostTime'); // Clear old time if expired
+            }
+        }
+
+        // Timer that counts down every second
+        const timer = setInterval(() => {
+            setTimeLeft(prevTime => {
+                if (prevTime <= 1) {
+                    setMessageSent(false); // Reset messageSent state
+                    localStorage.removeItem('blackHolePostTime'); // Clear time when 24 hours expire
+                    return 0;
+                }
+                return prevTime - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer); // Cleanup on unmount
+    }, []);
 
     // Timer functionality
     useEffect(() => {
