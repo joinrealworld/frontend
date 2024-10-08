@@ -22,19 +22,32 @@ import Image from 'next/image';
 const ChannelType = {
     checkList: 1,
     polls: 2,
-    generalChat: 3
+    generalChat: 3,
+    streaming: 4,
+    clans: 5,
+    feedback: 6,
 }
 
 const Channels = [
     {
-        uuid: 'E5E9C573-2C12-4F0D-82D0-CC4C304C65D7',
+        uuid: '8385ae4e-65c5-4287-a8cf-b4c64fec4ee4',
         name: '✅┃daily-checklist',
         type: ChannelType.checkList,
     },
     {
-        uuid: '7DE517C0-B05F-47DB-986A-0B130638C91A',
+        uuid: '4ebafc15-3f53-49ec-9f11-7395e7669108',
         name: '📊┃polls',
         type: ChannelType.polls,
+    },
+    {
+        uuid: '65720aef-5446-43f3-91fc-86fc3f19b6e6',
+        name: '🎞️┃streaming',
+        type: ChannelType.streaming,
+    },
+    {
+        uuid: '2ca63800-92ac-45ba-b856-bd9de193212a',
+        name: '🗄️┃clans',
+        type: ChannelType.clans,
     },
     // do not need - so code commented for now
     // {
@@ -43,6 +56,12 @@ const Channels = [
     //     type: ChannelType.generalChat,
     // },
 ]
+
+const FeedbackChannel = {
+    uuid: '3ca33a20-01ac-45ba-b852-bd9de921212a',
+    name: '🗄️┃feedbacks',
+    type: ChannelType.feedback,
+}
 
 const SideMenus = [
     {
@@ -159,11 +178,9 @@ function Chat(props) {
     const [channels, setChannels] = useState(Channels);
     const [selectedChannel, setSelectedChannel] = useState(Channels[0]);
 
-    const [isPollListFetch, setIsPollListFetch] = useState(false);
     const [isPollAnswerLoading, setIsPollAnswerLoading] = useState({ uuid: null });
-    const [pollList, setPollList] = useState([]);
-    const [isCheckListFetch, setIsCheckListFetch] = useState(false);
-    const [checkList, setCheckList] = useState([]);
+    const [isChatDataFetch, setIsChatDataFetch] = useState(false);
+    const [chatData, setChatData] = useState([]);
 
     const [selectedSideMenu, setSelectedSideMenu] = useState(SideMenus[0]);
     const [searchText, setSearchText] = useState('');
@@ -174,6 +191,8 @@ function Chat(props) {
     const [pollQuestion, setPollQuestion] = useState('');
     const [pollOptions, setPollOptions] = useState(['', '']);
     const [isLoadingAddPoll, setIsLoadingAddPoll] = useState(false);
+
+    const [isLoadingRandomVideoClick, setIsLoadingRandomVideoClick] = useState(false);
 
     const [isLoadingSuitcaseClick, setIsLoadingSuitcaseClick] = useState(false);
     const [isLoadingChangeWallpaper, setIsLoadingChangeWallpaper] = useState({ isLoading: false, itemId: null });
@@ -215,8 +234,10 @@ function Chat(props) {
             router.push('/login');
         } else {
             // get data
+            if (props.user?.user?.is_admin) {
+                setChannels([...Channels, FeedbackChannel]);
+            }
             getInitData();
-
             setChatBackground();
         }
     }, []);
@@ -310,8 +331,8 @@ function Chat(props) {
         });
         const rsp = await response.json();
         if (response.status >= 200 && response.status < 300) {
-            setIsCheckListFetch(true);
-            setCheckList(rsp.payload);
+            setIsChatDataFetch(true);
+            setChatData(rsp.payload);
         } else {
             if (response.status == 401) {
                 dispatch(props.actions.userLogout());
@@ -364,9 +385,148 @@ function Chat(props) {
                         });
                     }
                 });
-                setPollList(groupedData);
-                setIsPollListFetch(true);
+                setChatData(groupedData);
+                setIsChatDataFetch(true);
                 setIsPollAnswerLoading({ uuid: null });
+                scrollToBottomChatContent();
+            } else {
+                toast("Error while fetching data!");
+            }
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                toast("Error while fetching data!");
+            }
+        }
+    }
+
+    const getStreamingData = async () => {
+        const response = await fetch(apiURL + 'api/v1/streams/live-streams', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        const rsp = await response.json();
+        if (response.status >= 200 && response.status < 300) {
+            if (rsp && typeof rsp == 'object') {
+                setChatData(rsp);
+                setIsChatDataFetch(true);
+                scrollToBottomChatContent();
+            } else {
+                toast("Error while fetching data!");
+            }
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                toast("Error while fetching data!");
+            }
+        }
+    }
+
+    const getClansData = async () => {
+        let data = [
+            {
+                "title": "NBC",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "USA Network",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "CNBC",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "E!",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "Eurosport",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "BBC One",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "BBC Two",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "Sky Sport",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "CBC",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            },
+            {
+                "title": "Cincinnati Reds vs San Francisco Giants",
+                "url": "https://www.twitch.tv/embed/streameast/chat?darkpopout&parent=the.streameast.app"
+            }
+        ];
+
+        setChatData(data);
+        setIsChatDataFetch(true);
+        scrollToBottomChatContent();
+
+        // zzz
+        // const response = await fetch(apiURL + 'api/v1/polls/poll-list/' + selectedServer?.uuid, {
+        //     method: 'GET',
+        //     headers: {
+        //         'Authorization': 'Bearer ' + props.user.authToken
+        //     }
+        // });
+        // const rsp = await response.json();
+        // if (response.status >= 200 && response.status < 300) {
+        //     if (rsp.payload && typeof rsp.payload == 'object') {
+        //         let groupedData = [];
+        //         rsp.payload.sort((a, b) => {
+        //             return new Date(a.created_at) - new Date(b.created_at);
+        //         })
+        //         rsp.payload.map(item => {
+        //             let index = groupedData.findIndex(s => moment(s.created_at).startOf('date').isSame(moment(item.created_at).startOf('date')));
+        //             if (index > -1) {
+        //                 groupedData[index].data.push(item);
+        //             } else {
+        //                 groupedData.push({
+        //                     created_at: item.created_at,
+        //                     data: [item]
+        //                 });
+        //             }
+        //         });
+        //         setChatData(groupedData);
+        //         setIsChatDataFetch(true);
+        //         setIsPollAnswerLoading({ uuid: null });
+        //         scrollToBottomChatContent();
+        //     } else {
+        //         toast("Error while fetching data!");
+        //     }
+        // } else {
+        //     if (response.status == 401) {
+        //         dispatch(props.actions.userLogout());
+        //     } else {
+        //         toast("Error while fetching data!");
+        //     }
+        // }
+    }
+
+    const getFeedbackData = async () => {
+        const response = await fetch(apiURL + 'api/v1/feedback/fetch', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        const rsp = await response.json();
+        if (response.status >= 200 && response.status < 300) {
+            if (rsp.payload && typeof rsp.payload == 'object') {
+                setChatData(rsp.payload);
+                setIsChatDataFetch(true);
                 scrollToBottomChatContent();
             } else {
                 toast("Error while fetching data!");
@@ -399,15 +559,22 @@ function Chat(props) {
     const onChannelSelected = (channel) => async () => {
         if (channel.uuid == selectedChannel?.uuid) return;
         setSelectedChannel(channel);
+        setIsChatDataFetch(false);
+        setChatData([]);
         if (channel?.type == ChannelType.checkList) {
-            setIsCheckListFetch(false);
-            setCheckList([]);
             await getCheckListData();
         }
         else if (channel?.type == ChannelType.polls) {
-            setIsPollListFetch(false);
-            setPollList([]);
             await getPollsData();
+        }
+        else if (channel?.type == ChannelType.streaming) {
+            await getStreamingData();
+        }
+        else if (channel?.type == ChannelType.clans) {
+            await getClansData();
+        }
+        else if (channel?.type == ChannelType.feedback) {
+            await getFeedbackData();
         }
         // do not need - so code commented for now
         // else if (channel?.type == ChannelType.generalChat) {
@@ -500,6 +667,55 @@ function Chat(props) {
         getWallpapersSoundData();
     }
 
+    const getRandomVideoData = async (authToken) => {
+        try {
+            setIsLoadingRandomVideoClick(true);
+            const response = await fetch(apiURL + 'api/v1/channel/random/button?master_category_uuid=' + props?.params?.server, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + authToken
+                }
+            });
+            const rsp = await response.json();
+            console.log(response.status);
+            console.log(rsp);
+            if (response.status >= 200 && response.status < 300) {
+                if (rsp.status == 1 && rsp.payload && typeof rsp.payload === 'object') {
+                    if (rsp.payload?.category_uuid && rsp.payload?.course_id && rsp.payload?.content_uuid) {
+                        router.push(rsp.payload?.master_categroy_uuid + `/courses/${rsp.payload?.category_uuid}?cid=${rsp.payload?.course_id}&lid=${rsp.payload?.content_uuid}`);
+                        setIsLoadingRandomVideoClick(false);
+                    }
+                } else {
+                    handleAPIError(rsp);
+                    setIsLoadingRandomVideoClick(false);
+                }
+            } else {
+                if (response.status == 401) {
+                    dispatch(props.actions.userLogout());
+                } else {
+                    handleAPIError(rsp);
+                }
+                setIsLoadingRandomVideoClick(false);
+            }
+        } catch (error) {
+            console.log(error);
+            setIsLoadingRandomVideoClick(false);
+        }
+    }
+
+    const onRandomVideoClick = (e) => {
+        getRandomVideoData(props.user.authToken);
+    }
+
+    const onFeedbackVideoClick = (item) => {
+        setIsLoadingRandomVideoClick(true);
+        setTimeout(() => {
+            // zzz
+            router.push(props?.params?.server + '/courses/5ff78efe-3ed2-4bc6-b64d-35cab5b3f792?cid=' + item.course + '&lid=' + item?.content?.uuid);
+            setIsLoadingRandomVideoClick(false);
+        }, 1500);
+    }
+
     const purchaseIdentityBooster = async (authToken) => {
         setIsLoadingPurchaseEmoji(true);
         let formData = new FormData();
@@ -547,9 +763,11 @@ function Chat(props) {
                 setChatBackgroundWallpapers(rsp.payload);
                 onSuccess();
             } else {
+                setIsLoadingSuitcaseClick(false);
                 handleAPIError(rsp);
             }
         } else {
+            setIsLoadingSuitcaseClick(false);
             if (response.status == 401) {
                 dispatch(props.actions.userLogout());
             } else {
@@ -645,9 +863,11 @@ function Chat(props) {
                 setSoundClickData(rsp.payload);
                 onSuccess();
             } else {
+                setIsLoadingSuitcaseClick(false);
                 handleAPIError(rsp);
             }
         } else {
+            setIsLoadingSuitcaseClick(false);
             if (response.status == 401) {
                 dispatch(props.actions.userLogout());
             } else {
@@ -773,7 +993,7 @@ function Chat(props) {
                                         />
                                         {user.is_online && <div style={{ position: 'absolute', bottom: 0, backgroundColor: '#36d399', width: 9, height: 9, borderRadius: '50%', marginRight: 6 }} />}
                                         {/* random generate "isQueen" show or not */}
-                                        {user.email_verified || user.is_admin || Math.round(Math.random()) > 0 ?
+                                        {user.is_admin || Math.round(Math.random()) > 0 ?
                                             <img
                                                 src={"/assets/queen.svg"}
                                                 style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
@@ -785,7 +1005,7 @@ function Chat(props) {
                                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 12 }}>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <p className='user-name-3kzc3'>{user.first_name} {user.last_name} {user.selected_emoji}</p>
-                                            {user.email_verified || user.is_admin && <BadgeCheckIcon color={'#9e9e9e'} size={16} />}
+                                            {user.is_admin && <BadgeCheckIcon color={'#9e9e9e'} size={16} />}
                                         </div>
                                         <p className='user-description-3kzc3'>{user.bio}</p>
                                     </div>
@@ -870,10 +1090,19 @@ function Chat(props) {
 
     const renderMainContent = () => {
         if (selectedChannel?.type == ChannelType.checkList) {
-            return renderChecklistMessage(checkList);
+            return renderChecklistMessage(chatData);
         }
         else if (selectedChannel?.type == ChannelType.polls) {
-            return renderPolls(pollList);
+            return renderPolls(chatData);
+        }
+        else if (selectedChannel?.type == ChannelType.streaming) {
+            return renderStreaming(chatData);
+        }
+        else if (selectedChannel?.type == ChannelType.clans) {
+            return renderClans(chatData);
+        }
+        else if (selectedChannel?.type == ChannelType.feedback) {
+            return renderFeedbacks(chatData);
         }
         // do not need - so code commented for now
         // else if (selectedChannel?.type == ChannelType.generalChat) {
@@ -960,7 +1189,7 @@ function Chat(props) {
     }
 
     const renderPolls = (pollsData) => {
-        if (!isPollListFetch) {
+        if (!isChatDataFetch) {
             return (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Spinner size='md' color='default' />
@@ -1027,6 +1256,165 @@ function Chat(props) {
         });
     }
 
+    const onStreamingClick = (video) => () => {
+        window.open(video.url);
+    }
+
+    const renderStreaming = (streamingData) => {
+        if (!isChatDataFetch) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Spinner size='md' color='default' />
+                </div>
+            );
+        }
+        if (streamingData.length == 0) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p style={{ color: 'var(--fourth-color)', opacity: 0.7, fontSize: 15, marginTop: 30 }}>No streams available!</p>
+                </div>
+            );
+        }
+        return streamingData.map((course, index) => {
+            return (
+                <div key={index} className='stream-wrap-83nja'>
+                    <li className="stream-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer' }} onClick={onStreamingClick(course)}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                            <span className="f1-bold--xs" style={{ minWidth: 35, width: 'unset' }}>NBA</span>
+                            <span className="team-color-icon" style={{ background: '#00D2BE' }}></span>
+                            <span className="f1--xs MacBaslik">
+                                <span className="d-md-inline f1-capitalize">
+                                    {course.title}
+                                </span>
+                            </span>
+                        </div>
+                        <span className="f1-podium-right">
+                            {/* zzz */}
+                            {index > 5 ?
+                                <div className='stream-live-wrap'>
+                                    <span className="stream-live" style={{ color: '#ce2b2b' }}>• LIVE</span>
+                                </div>
+                                :
+                                <div className='stream-live-wrap'>
+                                    {/* zzz */}
+                                    <span className="stream-live">Today {moment().format('hh:mm A')}</span>
+                                </div>
+                            }
+                            <i className="icon icon-chevron-right f1-color--warmRed"></i>
+                        </span>
+                    </li>
+                </div>
+            );
+        });
+    }
+
+
+
+    const renderClans = (clansData) => {
+        if (!isChatDataFetch) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Spinner size='md' color='default' />
+                </div>
+            );
+        }
+        if (clansData.length == 0) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p style={{ color: 'var(--fourth-color)', opacity: 0.7, fontSize: 15, marginTop: 30 }}>No clans available!</p>
+                </div>
+            );
+        }
+        return clansData.map((clan, index) => {
+            return (
+                <div key={index} className='stream-wrap-83nja'>
+                    <li className="stream-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer' }} onClick={onStreamingClick(clan)}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                            <span className="f1-bold--xs" style={{ minWidth: 35, width: 'unset' }}>NBA</span>
+                            <span className="team-color-icon" style={{ background: '#00D2BE' }}></span>
+                            <span className="f1--xs MacBaslik">
+                                <span className="d-md-inline f1-capitalize">
+                                    {clan.title}
+                                </span>
+                            </span>
+                        </div>
+                        <span className="f1-podium-right">
+                            {/* zzz */}
+
+                            <i className="icon icon-chevron-right f1-color--warmRed"></i>
+                        </span>
+                    </li>
+                </div>
+            );
+        });
+    }
+
+
+    const renderFeedbacks = (data) => {
+        if (!isChatDataFetch) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Spinner size='md' color='default' />
+                </div>
+            );
+        }
+        if (data.length == 0) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p style={{ color: 'var(--fourth-color)', opacity: 0.7, fontSize: 15, marginTop: 30 }}>No feedbacks available!</p>
+                </div>
+            );
+        }
+        return data.map((item, index) => {
+            return (
+                <div key={index} className='feedback-wrap-83nja'>
+                    <div className="feedback-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer' }} onClick={onStreamingClick(item)}>
+                        <div style={{ display: 'flex', flexDirection: 'column', }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', marginTop: 12 }}>
+                                <img
+                                    key={index}
+                                    size='sm'
+                                    style={{
+                                        height: 32, width: 32, borderRadius: '50%'
+                                    }}
+                                    src={item?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + item?.user?.avatar) : "/assets/person.png"}
+                                />
+                                <div style={{ display: 'flex', flexDirection: 'column', }}>
+                                    <span style={{ flex: 1, color: 'var(--fourth-color)', fontSize: 13.5, letterSpacing: 0.6, fontWeight: '500', marginLeft: 12 }}>
+                                        {item?.user?.first_name + ' ' + item?.user?.last_name}
+                                        <span style={{ fontSize: 13, opacity: 0.5, fontWeight: '100', marginLeft: 4 }}>
+                                            gave feedback for video of
+                                        </span>
+                                        <span style={{ marginLeft: 4 }}>
+                                            🍼┃tutorials
+                                        </span>
+                                        <span style={{ fontSize: 13, opacity: 0.5, fontWeight: '100', marginLeft: 4 }}>
+                                            course.
+                                        </span>
+                                    </span>
+                                    <span style={{ flex: 1, color: 'var(--fourth-color)', opacity: 0.6, fontSize: 9, fontWeight: '300', marginLeft: 12 }}>
+                                        {moment(item.created_at).format('DD MMM, YYYY')}
+                                    </span>
+                                </div>
+                            </div>
+                            <span className="f1--xs MacBaslik" style={{ marginTop: 20 }}>
+                                <span style={{ color: 'var(--fourth-color)', fontSize: 13, letterSpacing: 0.6, fontWeight: '300', marginLeft: 4 }}>
+                                    {item.description}
+                                </span>
+                            </span>
+                        </div>
+                        <span className="f1-podium-right">
+                            <div className='feedback-live-wrap' onClick={(e) => onFeedbackVideoClick(item)}>
+                                <PlayCircleIcon size={30} className="refresh" />
+                                <span className="feedback-icon-text">Play</span>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            );
+        });
+    }
+
     const answerChecklist = async (authToken, bodyData) => {
         const response = await fetch(apiURL + 'api/v1/checklist/submit', {
             method: 'POST',
@@ -1060,7 +1448,7 @@ function Chat(props) {
     }
 
     const renderChecklistMessage = (checkListData) => {
-        if (!isCheckListFetch) {
+        if (!isChatDataFetch) {
             return (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Spinner size='md' color='default' />
@@ -1110,19 +1498,10 @@ function Chat(props) {
                                 <div style={{ display: 'flex', flexDirection: 'row', width: '100%', flexWrap: 'wrap', marginTop: 10, marginBottom: 10 }}>
                                     {cData.options.map((checklist, index) => {
                                         return (
-                                            // <Tooltip
-                                            //     content={
-                                            //         <div style={{ width: 70, height: 100, backgroundColor: 'var(--third-color)' }}>
-                                            //             {cData.checked?.[checklist]?.map?.((checklist, index) => { return checklist.user; })?.join?.(', ')}
-                                            //         </div>
-                                            //     }
-                                            //     closeDelay={100}
-                                            // >
                                             <div className='checklist-answer-923mas' key={index} style={{}} onClick={answerChecklistClick(checklist, cData)}>
                                                 {checklist}
                                                 <div style={{ marginLeft: 10 }}>{cData.checked?.[checklist]?.length ?? 0}</div>
                                             </div>
-                                            // </Tooltip>
                                         );
                                     })}
                                 </div>
@@ -1162,6 +1541,33 @@ function Chat(props) {
                     dispatch(props.actions.userLogout());
                 }
             }
+        }
+    }
+
+    const renderChatInput = () => {
+        if (selectedChannel?.type !== ChannelType.streaming && selectedChannel?.type !== ChannelType.clans && selectedChannel?.type !== ChannelType.feedback) {
+            return (
+                <div style={{ height: '10%', backgroundColor: 'var(--seventh-color)' }} className="flex flex-col">
+                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                        <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
+                            <input accept="image/*" id="add-media-9"
+                                type="file" style={{ display: 'none' }} />
+                            {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
+                                <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
+                                    +
+                                </label>
+                                :
+                                null}
+                            <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                            </div>
+                            {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                        <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                    </form> */}
+                        </div>
+                    </footer>
+                </div>
+            );
         }
     }
 
@@ -1300,6 +1706,13 @@ function Chat(props) {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <div className="flex justify-between items-center">
+                            {isLoadingRandomVideoClick ?
+                                <Spinner size='sm' color='default' style={{ marginRight: '2.5rem' }} />
+                                :
+                                <div style={{ cursor: "pointer", marginRight: '2rem' }} onClick={onRandomVideoClick}>
+                                    <PlayCircleIcon size={21} className="refresh" />
+                                </div>
+                            }
                             {isLoadingSuitcaseClick ?
                                 <Spinner size='sm' color='default' style={{ marginRight: '2.5rem' }} />
                                 :
@@ -1333,20 +1746,24 @@ function Chat(props) {
 
 
                         {/* START - chat content */}
-                        <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: 'auto', padding: '20px 0px' }}>
+                        <div id='chat-content' style={{ flex: 1, height: '100%', paddingBottom: 50, overflowX: 'hidden', overflowY: 'auto', padding: '20px 0px' }}>
 
-                            <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
-                                <div style={{ margin: '20px 20px', backgroundColor: 'var(--seventh-color)', padding: '20px 20px', borderRadius: 5 }}>
-                                    <div style={{ color: 'var(--fourth-color)', fontSize: 18, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <svg style={{ marginRight: 5 }} width="24" height="24" viewBox="0 0 24 24" className="icon-2W8DHg" aria-hidden="true" role="img">
-                                            <path fill="currentColor" fillRule="evenodd" clipRule="evenodd"
-                                                d="M5.88657 21C5.57547 21 5.3399 20.7189 5.39427 20.4126L6.00001 17H2.59511C2.28449 17 2.04905 16.7198 2.10259 16.4138L2.27759 15.4138C2.31946 15.1746 2.52722 15 2.77011 15H6.35001L7.41001 9H4.00511C3.69449 9 3.45905 8.71977 3.51259 8.41381L3.68759 7.41381C3.72946 7.17456 3.93722 7 4.18011 7H7.76001L8.39677 3.41262C8.43914 3.17391 8.64664 3 8.88907 3H9.87344C10.1845 3 10.4201 3.28107 10.3657 3.58738L9.76001 7H15.76L16.3968 3.41262C16.4391 3.17391 16.6466 3 16.8891 3H17.8734C18.1845 3 18.4201 3.28107 18.3657 3.58738L17.76 7H21.1649C21.4755 7 21.711 7.28023 21.6574 7.58619L21.4824 8.58619C21.4406 8.82544 21.2328 9 20.9899 9H17.41L16.35 15H19.7549C20.0655 15 20.301 15.2802 20.2474 15.5862L20.0724 16.5862C20.0306 16.8254 19.8228 17 19.5799 17H16L15.3632 20.5874C15.3209 20.8261 15.1134 21 14.8709 21H13.8866C13.5755 21 13.3399 20.7189 13.3943 20.4126L14 17H8.00001L7.36325 20.5874C7.32088 20.8261 7.11337 21 6.87094 21H5.88657ZM9.41045 9L8.35045 15H14.3504L15.4104 9H9.41045Z">
-                                            </path>
-                                        </svg> {selectedChannel?.name}
+                            {selectedChannel.type == ChannelType.checkList || selectedChannel.type == ChannelType.polls ?
+                                <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
+                                    <div style={{ margin: '20px 20px', backgroundColor: 'var(--seventh-color)', padding: '20px 20px', borderRadius: 5 }}>
+                                        <div style={{ color: 'var(--fourth-color)', fontSize: 18, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <svg style={{ marginRight: 5 }} width="24" height="24" viewBox="0 0 24 24" className="icon-2W8DHg" aria-hidden="true" role="img">
+                                                <path fill="currentColor" fillRule="evenodd" clipRule="evenodd"
+                                                    d="M5.88657 21C5.57547 21 5.3399 20.7189 5.39427 20.4126L6.00001 17H2.59511C2.28449 17 2.04905 16.7198 2.10259 16.4138L2.27759 15.4138C2.31946 15.1746 2.52722 15 2.77011 15H6.35001L7.41001 9H4.00511C3.69449 9 3.45905 8.71977 3.51259 8.41381L3.68759 7.41381C3.72946 7.17456 3.93722 7 4.18011 7H7.76001L8.39677 3.41262C8.43914 3.17391 8.64664 3 8.88907 3H9.87344C10.1845 3 10.4201 3.28107 10.3657 3.58738L9.76001 7H15.76L16.3968 3.41262C16.4391 3.17391 16.6466 3 16.8891 3H17.8734C18.1845 3 18.4201 3.28107 18.3657 3.58738L17.76 7H21.1649C21.4755 7 21.711 7.28023 21.6574 7.58619L21.4824 8.58619C21.4406 8.82544 21.2328 9 20.9899 9H17.41L16.35 15H19.7549C20.0655 15 20.301 15.2802 20.2474 15.5862L20.0724 16.5862C20.0306 16.8254 19.8228 17 19.5799 17H16L15.3632 20.5874C15.3209 20.8261 15.1134 21 14.8709 21H13.8866C13.5755 21 13.3399 20.7189 13.3943 20.4126L14 17H8.00001L7.36325 20.5874C7.32088 20.8261 7.11337 21 6.87094 21H5.88657ZM9.41045 9L8.35045 15H14.3504L15.4104 9H9.41045Z">
+                                                </path>
+                                            </svg> {selectedChannel?.name}
+                                        </div>
+                                        <div style={{ color: 'var(--fourth-color)', fontSize: 15 }} className="mt-2">This is the start of your conversation.</div>
                                     </div>
-                                    <div style={{ color: 'var(--fourth-color)', fontSize: 15 }} className="mt-2">This is the start of your conversation.</div>
                                 </div>
-                            </div>
+                                :
+                                null
+                            }
 
                             <div>
                                 {renderMainContent()}
@@ -1355,28 +1772,7 @@ function Chat(props) {
                         {/* END - chat content */}
 
 
-                        {/* START - chat input */}
-                        <div style={{ height: '10%', backgroundColor: 'var(--seventh-color)' }} className="flex flex-col">
-                            <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                                <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
-                                    <input accept="image/*" id="add-media-9"
-                                        type="file" style={{ display: 'none' }} />
-                                    {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
-                                        <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
-                                            +
-                                        </label>
-                                        :
-                                        null}
-                                    <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                        <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                                    </div>
-                                    {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                        <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                                    </form> */}
-                                </div>
-                            </footer>
-                        </div>
-
+                        {renderChatInput()}
 
 
                     </div>
@@ -1707,7 +2103,7 @@ function Chat(props) {
                                                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: 'var(--third-color)', padding: '4px 10px 4px 10px', borderRadius: 7 }}>
                                                         {false ?
                                                             <>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-success">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="text-success">
                                                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                                                 </svg>
@@ -1756,7 +2152,7 @@ function Chat(props) {
                                                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: 'var(--third-color)', padding: '4px 10px 4px 10px', borderRadius: 7 }}>
                                                         {false ?
                                                             <>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-success">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="text-success">
                                                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                                                 </svg>

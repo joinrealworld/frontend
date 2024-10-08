@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { ChevronRightIcon, Trash2Icon, XIcon } from 'lucide-react';
 import { Accordion, AccordionItem, Avatar, Progress, User } from '@nextui-org/react';
+import parse from 'html-react-parser';
 
 import './styles.css';
 import connect from '@/components/ConnectStore/connect';
@@ -212,7 +213,7 @@ function Courses(props) {
                   <div class="card-img-wrap-9a9q792">
                     {/* <img src={"https://assets.therealworld.ag/uploads/bmPVttVt2jZqYpg4mngSGbPrxf3Fod3hwVGmFh-IH2?max_side=500"} className="card-img-9a9q792" alt="..." /> */}
                     <img src={item.category_pic} className="card-img-9a9q792 card-img-top" alt="..." />
-                    <div style={{ position: 'absolute', backgroundColor: '#92929267', borderRadius: 4, height: 44, width: '100%', bottom: 0, padding: '0px 10px' }}>
+                    <div style={{ position: 'absolute', backgroundColor: '#92929267', alignItems: 'end', borderRadius: 4, height: 44, width: '100%', bottom: 0, padding: '0px 10px' }}>
                       <p className="card-completed-9a9q792">{item.completed}% completed</p>
                       <Progress
                         size="sm"
@@ -229,11 +230,11 @@ function Courses(props) {
                   <div className="card-body-9a9q792">
                     <div style={{ height: '78%', display: 'flex', flexDirection: 'column' }}>
                       <h5 className="card-name-9a9q792 card-title">{item.name}</h5>
-                      <p className="card-description-9a9q792 card-text">{item.description}</p>
+                      <p className="card-description-9a9q792 card-text">{parse(item.description)}</p>
                     </div>
                     <div style={{ backgroundColor: '#ecc870', cursor: 'pointer', padding: '6px 0px', borderRadius: 4, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }} onClick={(e) => onSelectCategory(item)}>
-                      <p className="card-btn-text-9a9q792">{item.no_of_courses} Course(s)</p>
-                      <ChevronRightIcon size={20} color='var(--third-color)' strokeWidth={2.5} />
+                      <p className="card-btn-text-9a9q792">{item.no_of_courses} Courses</p>
+                      <ChevronRightIcon size={17} color='var(--third-color)' strokeWidth={3} />
                     </div>
                   </div>
                 </div>
@@ -419,7 +420,9 @@ function Courses(props) {
           })}
         </div>
 
-        {renderChannelContent()}
+        <div className='scroll-98a2s'>
+          {renderChannelContent()}
+        </div>
 
       </div>
     </div>

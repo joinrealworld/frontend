@@ -4,13 +4,16 @@ const nextConfig = {
     reactStrictMode: false,
     swcMinify: true,
     images: {
-        domains: [
-            'cdn.discordapp.com', 'discordapp.com', 'onrender.com', 'joinrealworld-backend.onrender.com'
-        ],
         remotePatterns: [
             {
                 protocol: 'https',
                 hostname: '*.discordapp.com', // 'discordapp.com',
+                port: '',
+                pathname: '**',
+            },
+            {
+                protocol: 'https',
+                hostname: '*.onrender.com', // 'discordapp.com',
                 port: '',
                 pathname: '**',
             },

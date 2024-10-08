@@ -478,13 +478,6 @@ main {
     margin-bottom: 0px !important;
 }
 
-.message-wrap-83nja {
-    flex-direction: row;
-    display: flex;
-    justify-content: space-evenly;
-    padding: 3px 20px;
-}
-
 .chat-user-icon-ac2s2 {
     display: flex;
     width: 60px;
@@ -534,6 +527,119 @@ main {
 
 .message-datetime-zkn22d:hover {
     display: flex;
+}
+
+.feedback-box-ac2s2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 13px 20px;
+    background-color: var(--seventh-color);
+    border-radius: 5px;
+    width: 100%;
+}
+
+.stream-box-ac2s2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 13px 20px;
+    background-color: var(--seventh-color);
+    border-radius: 5px;
+    width: 100%;
+}
+
+.stream-live-wrap {
+    background-color: #80848e34;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    border-radius: 12px;
+}
+
+.feedback-live-wrap {
+    background-color: #80848e34;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    justify-content: center;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    border-radius: 12px;
+    display: flex;
+    margin-top: 10px;
+    padding: 12px 10px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.f1--xs {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.feedback-icon-text {
+    font-weight: 400;
+    font-size: 12px;
+    margin-top: 5px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.stream-live {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.stream-date {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.f1-bold--xs {
+    font-weight: bolder;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.team-color-icon {
+    width: 4px;
+    height: 14px;
+    margin: 0 10px;
+}
+
+.feedback-wrap-83nja {
+    flex-direction: row;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 3px 20px;
+}
+
+.stream-wrap-83nja {
+    flex-direction: row;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 3px 20px;
+}
+
+.message-wrap-83nja {
+    flex-direction: row;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 3px 20px;
 }
 
 .message-ac2s2 {
