@@ -116,7 +116,7 @@ const currentUser = {
     isVerified: true
 };
 
-const dummyadminMessage =[{
+const dummyadminMessage = [{
     user: {
         id: "2", // Fake admin ID
         name: "Admin",
@@ -284,12 +284,15 @@ function Chat(props) {
     const overflowBlackHole = selectedChannel?.type === ChannelType.blackHole ? 'hidden' : selectedChannel?.type === ChannelType.raffles ? 'hidden' : 'auto';
     const widthBlackHole = selectedChannel?.type === ChannelType.blackHole ? '100%' : selectedChannel?.type === ChannelType.raffles ? "100%" : '67%';
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(24 * 60 * 60);
-    const [messageSent, setMessageSent] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(() => {
+        // Retrieve saved time or set default to 24 hours (86400 seconds)
+        const savedTime = localStorage.getItem('timeLeft');
+        return savedTime ? JSON.parse(savedTime) : 24 * 60 * 60;
+    });
 
     const [supportList, setSupportList] = useState([]);
     const [adminMessages, setAdminMessages] = useState(dummyadminMessage);
-    const [sendMessage,setSendMessage] = useState("");
+    const [sendMessage, setSendMessage] = useState("");
     const [selectedMessage, setSelectedMessage] = useState(null);
 
     const [raffleSent, setRaffleSent] = useState(false);
@@ -588,7 +591,7 @@ function Chat(props) {
             }
         });
         const rsp = await response.json();
-        
+
         if (response.status >= 200 && response.status < 300) {
             const filteredData = rsp.data.filter(item => item !== null);
             setBlackHoleList(filteredData);
@@ -609,10 +612,10 @@ function Chat(props) {
             }
         });
         const rsp = await response.json();
-       
+
         if (response.status >= 200 && response.status < 300) {
             setSupportList(rsp.payload);
-        
+
         } else {
             if (response.status == 401) {
                 dispatch(props.actions.userLogout());
@@ -650,9 +653,9 @@ function Chat(props) {
             setIsPollListFetch(false);
             setPollList([]);
             await getPollsData();
-        }else if (channel?.type == ChannelType.blackHole){
+        } else if (channel?.type == ChannelType.blackHole) {
             await getBlackHoleData();
-        }else if (channel?.type == ChannelType.support){
+        } else if (channel?.type == ChannelType.support) {
             await getSupportData();
         }
         // do not need - so code commented for now
@@ -1078,12 +1081,12 @@ function Chat(props) {
 
     const saveSignature = () => {
         const canvas = canvasRef.current;
-       // router.replace('/media');
+        // router.replace('/media');
         if (canvas) {
             const signatureData = canvas.toDataURL();
             localStorage.setItem('signature', signatureData);
             router.replace('/media');
-          }
+        }
     };
 
     const renderSideMenuOption = () => {
@@ -1430,7 +1433,7 @@ function Chat(props) {
         }));
     };
 
-    const handleCloseModal = () => {
+    const submitChecklist = async () => {
         const itemsToAdd = Object.entries(checkedItems).map(([item, type]) => ({
             item,
             type
@@ -1453,10 +1456,31 @@ function Chat(props) {
                     return !prevListMap.has(newEntry.item) || prevListMap.get(newEntry.item) !== newEntry.type;
                 })
             ];
-
             return updatedList;
         });
-
+        const response = await fetch(apiURL + 'api/v1/checklist/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + props.user.authToken
+            },
+            body: JSON.stringify({
+                payload: checkCompletedList, // selected course uuid
+            })
+        });
+        const rsp = await response.json();
+        if (response.status >= 200 && response.status < 300) {
+            if (rsp) {
+            } else {
+                handleAPIError(rsp);
+            }
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                handleAPIError(rsp);
+            }
+        }
         // Hide modal
         setIsModalVisible(false);
     };
@@ -1636,43 +1660,35 @@ function Chat(props) {
 
     const sendBlackHoleMessage = async () => {
         if (sendText != "") {
-            setMessageSent(true);
             const response = await fetch(apiURL + 'api/v1/blackhall/send/message', {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': 'Bearer ' + props.user.authToken
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + props.user.authToken
                 },
                 body: JSON.stringify({
-                    "data": {
-                      "content_uuid": sendText,   // Ensure `sendText` has a value
-                      "description": "This is a feedback"
-                    }
-                  })
-              });
-              if (response.status >= 200 && response.status < 300) {
+                    content: sendText
+                })
+            });
+            const rsp = await response.json();
+            if (response.status >= 200 && response.status < 300) {
+                if (rsp.status == 0) {
+                    toast(rsp.message);
+                }
                 getBlackHoleData();
-                const currentTime = Date.now();
-                localStorage.setItem('blackHolePostTime', currentTime);
                 setSendText("");
             } else {
                 if (response.status == 401) {
-                  dispatch(props.actions.userLogout());
+                    dispatch(props.actions.userLogout());
                 } else {
-                  handleAPIError(rsp);
+                    handleAPIError(rsp);
                 }
-              }
-            
+            }
+
         }
 
     }
 
-    const showToast = () => {
-        if (messageSent) {
-            setSendText("");
-            toast("You can send only one message per day");
-        }
-    };
 
     const toggleFullscreen = () => {
         if (!isFullscreen) {
@@ -1683,47 +1699,24 @@ function Chat(props) {
         setIsFullscreen(!isFullscreen);
     };
 
-    useEffect(() => {
-        // On component mount, check if a post was already sent
-        const storedTime = localStorage.getItem('blackHolePostTime');
-        if (storedTime) {
-            const currentTime = Date.now();
-            const timeElapsed = Math.floor((currentTime - storedTime) / 1000);
-            const remainingTime = 24 * 60 * 60 - timeElapsed;
 
-            if (remainingTime > 0) {
-                setMessageSent(true); // Disable message sending
-                setTimeLeft(remainingTime); // Set remaining time
-            } else {
-                localStorage.removeItem('blackHolePostTime'); // Clear old time if expired
-            }
-        }
-
-        // Timer that counts down every second
-        const timer = setInterval(() => {
-            setTimeLeft(prevTime => {
-                if (prevTime <= 1) {
-                    setMessageSent(false); // Reset messageSent state
-                    localStorage.removeItem('blackHolePostTime'); // Clear time when 24 hours expire
-                    return 0;
-                }
-                return prevTime - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(timer); // Cleanup on unmount
-    }, []);
 
     // Timer functionality
     useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft(prevTime => {
                 if (prevTime === 1) {
-                    setBlackHoleList([]); // Reset the blackHoleList when timer hits 0
+                    // Reset lists and timer
+                    setBlackHoleList([]);
                     setRaffleList([]);
-                    return 24 * 60 * 60;  // Reset timer to 24 hours
+                    const resetTime = 24 * 60 * 60;
+                    localStorage.setItem('timeLeft', JSON.stringify(resetTime));
+                    return resetTime;
                 }
-                return prevTime - 1;
+
+                const updatedTime = prevTime - 1;
+                localStorage.setItem('timeLeft', JSON.stringify(updatedTime));  // Save updated time
+                return updatedTime;
             });
         }, 1000);
 
@@ -1804,7 +1797,7 @@ function Chat(props) {
                             </p> */}
                             <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, marginRight: 5 }}>
                                 <p className='message-text-3kzc3'>
-                                    <b>{item.content_uuid}</b>
+                                    <b>{item.message}</b>
                                 </p>
 
                             </div>
@@ -1829,7 +1822,7 @@ function Chat(props) {
     }
 
     const showToastRaffle = () => {
-        if(raffleSent){
+        if (raffleSent) {
             toast("You can submit only one raffle per day");
         }
     };
@@ -1916,7 +1909,7 @@ function Chat(props) {
     }
 
     const handleClick = async (chat_id) => {
-        const response1 = await fetch(apiURL + 'api/v1/support/fetch_message?support_chat_id='+ chat_id, {
+        const response1 = await fetch(apiURL + 'api/v1/support/fetch_message?support_chat_id=' + chat_id, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + props.user.authToken
@@ -1954,100 +1947,100 @@ function Chat(props) {
                     <div key={index} className="chat-day">
                         {/* Grouped by Day */}
                         <h4 className="chat-date">{moment(chat.created_at).format('MMMM Do, YYYY')}</h4>
-                        
-                            <div 
-                                className="chat-item" 
-                                key={index} 
-                                onClick={() => handleClick(chat.uuid)}
-                            >
-                                <img 
-                                    src={chat.user.avatar ? chat.user.avatar : "/assets/person.png"} 
-                                    alt={chat.user.first_name} 
-                                    className="avatar" 
-                                />
-                                <div className="chat-content">
-                                    <div className="chat-header">
-                                        <strong>{chat.user.first_name} {chat.user.last_name}</strong> 
-                                        {/* {message.user.isVerified && <span className="verified-icon">✔️</span>} */}
-                                        {/* <small className="timestamp">
+
+                        <div
+                            className="chat-item"
+                            key={index}
+                            onClick={() => handleClick(chat.uuid)}
+                        >
+                            <img
+                                src={chat.user.avatar ? chat.user.avatar : "/assets/person.png"}
+                                alt={chat.user.first_name}
+                                className="avatar"
+                            />
+                            <div className="chat-content">
+                                <div className="chat-header">
+                                    <strong>{chat.user.first_name} {chat.user.last_name}</strong>
+                                    {/* {message.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                                    {/* <small className="timestamp">
                                             {moment(parseInt(message.timestamp)).fromNow()}
                                         </small> */}
-                                    </div>
-                                    {/* <p className="message-preview">
+                                </div>
+                                {/* <p className="message-preview">
                                         {message.content.length > 20 
                                             ? message.content.slice(0, 20) + "..." 
                                             : message.content
                                         }
                                     </p> */}
-                                </div>
                             </div>
-                        
+                        </div>
+
                     </div>
                 ))}
             </div>
         )
     }
-    
+
 
     const renderSelectedMessage = () => {
         const isSender = selectedMessage.user.id == currentUser.id; // Check if the message is sent by the current user
-    
+
         return (
             <div className='chat-window'>
-            {/* Current User Message (Sent) */}
-            <div className="whatsapp-chat received">
-                {/* Display user info only once */}
-                <div className="message-user-info">
-                    <img 
-                        src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"} 
-                        alt={selectedMessage.user.first_name} 
-                        className="avatar" 
-                    />
-                    <strong>{selectedMessage.user.first_name} {selectedMessage.user.last_name}</strong>
-                    {/* Uncomment below to show the verified icon if needed */}
-                    {/* {selectedMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                {/* Current User Message (Sent) */}
+                <div className="whatsapp-chat received">
+                    {/* Display user info only once */}
+                    <div className="message-user-info">
+                        <img
+                            src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"}
+                            alt={selectedMessage.user.first_name}
+                            className="avatar"
+                        />
+                        <strong>{selectedMessage.user.first_name} {selectedMessage.user.last_name}</strong>
+                        {/* Uncomment below to show the verified icon if needed */}
+                        {/* {selectedMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                    </div>
+
+                    {/* Loop through and display the list of messages */}
+                    <div className="message-list">
+                        {selectedMessage.messages.map((message, index) => (
+                            <div className="message-bubble received" key={index}>
+                                <div className="message-content">
+                                    <div className="message-header">
+                                        <small className="timestamp">{moment(message.timestamp).fromNow()}</small>
+                                    </div>
+                                    <p>{message.content}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Loop through and display the list of messages */}
-                <div className="message-list">
-                    {selectedMessage.messages.map((message, index) => (
-                        <div className="message-bubble received" key={index}>
+
+                {/* Admin Reply (Received) */}
+                {adminMessages.map((message, index) => (
+                    <div key={index} className="whatsapp-chat sent">
+                        <div className="message-bubble sent">
+                            <img
+                                src={message.user.image}
+                                alt={message.user.name}
+                                className="avatar"
+                            />
                             <div className="message-content">
                                 <div className="message-header">
-                                    <small className="timestamp">{moment(message.timestamp).fromNow()}</small>
+                                    <strong>{message.user.name}</strong>
+                                    {/* {adminMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                                    <small className="timestamp">{moment(parseInt(message.timestamp)).fromNow()}</small>
                                 </div>
                                 <p>{message.content}</p>
                             </div>
                         </div>
-                    ))}
-                </div>
-            </div>
-
-
-            {/* Admin Reply (Received) */}
-            {adminMessages.map((message, index) => (
-            <div key={index} className="whatsapp-chat sent">
-                <div className="message-bubble sent">
-                    <img 
-                        src={message.user.image} 
-                        alt={message.user.name} 
-                        className="avatar" 
-                    />
-                    <div className="message-content">
-                        <div className="message-header">
-                            <strong>{message.user.name}</strong>
-                            {/* {adminMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
-                            <small className="timestamp">{moment(parseInt(message.timestamp)).fromNow()}</small>
-                        </div>
-                        <p>{message.content}</p>
                     </div>
-                </div>
+                ))}
             </div>
-              ))}
-        </div>
         );
     };
-    
+
 
     return (
         <div className='container-2mda3'>
@@ -2284,7 +2277,7 @@ function Chat(props) {
                                     ) : (
                                         <p style={{ opacity: 0.7, fontSize: 15, marginTop: 20 }}>No checklists available!</p>
                                     )}
-                                    <Button onClick={handleCloseModal} color="default" variant="ghost" className="submit-button-mdkad">
+                                    <Button onClick={submitChecklist} color="default" variant="ghost" className="submit-button-mdkad">
                                         <span className="next-button-text-mdkad">Submit</span>
                                     </Button>
                                 </div>
@@ -2319,16 +2312,16 @@ function Chat(props) {
                                                     value={sendText}
                                                     onChange={(event) => { setSendText(event.target.value) }}
                                                 />
-                                                <div onMouseEnter={showToast}> 
+
                                                 <Button className='main-button-7ajb412' size='sm' color=''
                                                     onClick={(e) => {
                                                         sendBlackHoleMessage()
                                                     }}
-                                                    disabled={messageSent}
-                                                    >
+
+                                                >
                                                     Post
                                                 </Button>
-                                                </div>
+
                                             </div>
                                         </div>
 
@@ -2343,7 +2336,7 @@ function Chat(props) {
                                                         width={250}
                                                         height={70}
                                                         onMouseEnter={raffleSent ? showToastRaffle : sendRaffle}
-                                                        
+
                                                     />
                                                     <span style={{
                                                         position: "absolute",
@@ -2366,46 +2359,46 @@ function Chat(props) {
 
                                         </footer>
                                         : (selectedChannel?.type == ChannelType.support) && selectedMessage ?
-                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)'}}>
-                                            <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
-    
-                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
-                                                    <input type="text" name="support-message"
-                                                        className="message-input-support"
-                                                        value={sendMessage}
-                                                        onChange={(event) => { setSendMessage(event.target.value) }}
-                                                    />
-                                                  
-                                                    <Button className='main-button-7ajb412' size='sm' color=''
-                                                        onClick={(e) => {
-                                                            sendNewMessage()
-                                                        }}
+                                            <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                                <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
+                                                        <input type="text" name="support-message"
+                                                            className="message-input-support"
+                                                            value={sendMessage}
+                                                            onChange={(event) => { setSendMessage(event.target.value) }}
+                                                        />
+
+                                                        <Button className='main-button-7ajb412' size='sm' color=''
+                                                            onClick={(e) => {
+                                                                sendNewMessage()
+                                                            }}
                                                         >
-                                                        Send
-                                                    </Button>
-                                                  
+                                                            Send
+                                                        </Button>
+
+                                                    </div>
                                                 </div>
-                                            </div>
-    
-                                        </footer>
-                                        : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                                            <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
-                                                <input accept="image/*" id="add-media-9"
-                                                    type="file" style={{ display: 'none' }} />
-                                                {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
-                                                    <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
-                                                        +
-                                                    </label>
-                                                    :
-                                                    null}
-                                                <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                                    <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                                                </div>
-                                                {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+
+                                            </footer>
+                                            : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                                <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
+                                                    <input accept="image/*" id="add-media-9"
+                                                        type="file" style={{ display: 'none' }} />
+                                                    {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
+                                                        <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
+                                                            +
+                                                        </label>
+                                                        :
+                                                        null}
+                                                    <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                                        <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                                    </div>
+                                                    {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
                                         <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
                                     </form> */}
-                                            </div>
-                                        </footer>}
+                                                </div>
+                                            </footer>}
                         </div>
                     </div>
                     {/* END - chat input  END - chat left content */}
