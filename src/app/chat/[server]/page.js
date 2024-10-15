@@ -505,6 +505,7 @@ function Chat(props) {
     }
 
     const getCheckListData = async (masterCategoryId = selectedServer?.uuid) => {
+        
         const response = await fetch(apiURL + 'api/v1/checklist/fetch/' + masterCategoryId, {
             method: 'GET',
             headers: {
@@ -1465,12 +1466,14 @@ function Chat(props) {
                 'Authorization': 'Bearer ' + props.user.authToken
             },
             body: JSON.stringify({
-                payload: checkCompletedList, // selected course uuid
+                    "master_category":selectedServer?.uuid,
+                    "data":  checkCompletedList           
             })
         });
         const rsp = await response.json();
         if (response.status >= 200 && response.status < 300) {
             if (rsp) {
+               await getCheckListData();
             } else {
                 handleAPIError(rsp);
             }
@@ -1564,48 +1567,119 @@ function Chat(props) {
         //     );
         // })
 
-        return <div className='message-wrap-83nja'>
-            {checkCompletedList.length == 0 ? null :
-                <div className="chat-user-icon-ac2s2">
-                    <div className='user-info-3kzc3'>
-                        <div style={{ position: 'relative' }}>
-                            <img
+        if (!isCheckListFetch) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Spinner size='md' color='default' />
+                </div>
+            );
+        }
+
+        return (
+            <>
+              {checkList.length === 0
+                ? null
+                : checkList?.map((cData, index) => {
+                    // Formatting the timestamp (you can customize it as per your need)
+                    const formattedDate = new Date(cData.created_at).toLocaleString();
+          
+                    return (
+                      <div key={index} className='message-wrap-83nja' >
+                        <div className="chat-user-icon-ac2s2">
+                          <div className='user-info-3kzc3'>
+                            <div style={{ position: 'relative' }}>
+                              <img
                                 src="/assets/person.png"
                                 style={{ height: 40, width: 40, borderRadius: '50%' }}
-                            />
-                            <img
-                                src={"/assets/queen.svg"}
+                                alt="user-avatar"
+                              />
+                              <img
+                                src="/assets/queen.svg"
                                 style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
-                            />
+                                alt="badge-icon"
+                              />
+                            </div>
+                          </div>
                         </div>
-                    </div>
-                </div>}
-            {checkCompletedList.length == 0 ? null :
-                <div className="message-ac2s2">
-
-                    <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10, marginBottom: 10 }}>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          
+                        <div className="message-ac2s2" style={{ width: "100%" }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginLeft: 10, marginBottom: 10 }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                             <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
-                                Harsh Patel
+                                {cData.user.first_name} {cData.user.last_name}
                             </p>
                             <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#999', marginRight: 10, alignSelf: 'center' }}>
+                            {formattedDate}
+                            </div>
                         </div>
-                    </div>
-                    {checkCompletedList?.map((cData, index) => (
-                        <div key={index} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
-                            <div
-                                className={`custom-checkboxlist ${cData.type === 'true' ? 'yes' : cData.type === 'cross' ? 'cross' : ''}`}
+
+                          {/* Mapping over the data array */}
+                          {cData.data.map((itemData, itemIndex) => (
+                            <div key={itemIndex} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
+                              <div
+                                className={`custom-checkboxlist ${itemData.type === 'true' ? 'yes' : itemData.type === 'cross' ? 'cross' : ''}`}
                                 type="radio"
                                 style={{ marginRight: 10 }}
                                 disabled
-                            ></div>
-                            <p className='message-text-3kzc3' style={{ margin: 0 }}>
-                                {cData.item}
-                            </p>
+                              ></div>
+                              <p className='message-text-3kzc3' style={{ margin: 0 }}>
+                                {itemData.item}
+                              </p>
+                            </div>
+                          ))}
                         </div>
-                    ))}
-                </div>}
-        </div>
+                      </div>
+                    );
+                  })}
+            </>
+          );
+          
+          
+
+        // return <div className='message-wrap-83nja'>
+        //     {checkCompletedList.length == 0 ? null :
+        //         <div className="chat-user-icon-ac2s2">
+        //             <div className='user-info-3kzc3'>
+        //                 <div style={{ position: 'relative' }}>
+        //                     <img
+        //                         src="/assets/person.png"
+        //                         style={{ height: 40, width: 40, borderRadius: '50%' }}
+        //                     />
+        //                     <img
+        //                         src={"/assets/queen.svg"}
+        //                         style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
+        //                     />
+        //                 </div>
+        //             </div>
+        //         </div>}
+        //     {checkCompletedList.length == 0 ? null :
+        //         <div className="message-ac2s2">
+
+        //             <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10, marginBottom: 10 }}>
+        //                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        //                     <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
+        //                         Harsh Patel
+        //                     </p>
+        //                     <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+        //                 </div>
+        //             </div>
+        //             {checkCompletedList?.map((cData, index) => (
+        //                 <div key={index} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
+        //                     <div
+        //                         className={`custom-checkboxlist ${cData.type === 'true' ? 'yes' : cData.type === 'cross' ? 'cross' : ''}`}
+        //                         type="radio"
+        //                         style={{ marginRight: 10 }}
+        //                         disabled
+        //                     ></div>
+        //                     <p className='message-text-3kzc3' style={{ margin: 0 }}>
+        //                         {cData.item}
+        //                     </p>
+        //                 </div>
+        //             ))}
+        //         </div>}
+        // </div>
 
 
 
@@ -2241,7 +2315,7 @@ function Chat(props) {
                                         <div className='custom-checkbox-x-icon'></div>
                                         <div className='custom-checkbox-icon'></div>
                                     </div>
-                                    {checkList.length === 0 ? (
+                                   
                                         <ul className="modal_body" style={{ marginTop: 20 }}>
                                             {[
                                                 '15 secs focus on your ideal future self then review your plans to win that day',
@@ -2274,9 +2348,7 @@ function Chat(props) {
                                                 </li>
                                             ))}
                                         </ul>
-                                    ) : (
-                                        <p style={{ opacity: 0.7, fontSize: 15, marginTop: 20 }}>No checklists available!</p>
-                                    )}
+                                    
                                     <Button onClick={submitChecklist} color="default" variant="ghost" className="submit-button-mdkad">
                                         <span className="next-button-text-mdkad">Submit</span>
                                     </Button>
