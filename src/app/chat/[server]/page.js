@@ -311,8 +311,11 @@ function Chat(props) {
     const overflowBlackHole = selectedChannel?.type === ChannelType.blackHole ? 'hidden' : selectedChannel?.type === ChannelType.raffles ? 'hidden' : 'auto';
     const widthBlackHole = selectedChannel?.type === ChannelType.blackHole ? '100%' : selectedChannel?.type === ChannelType.raffles ? "100%" : '67%';
     const [isFullscreen, setIsFullscreen] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(24 * 60 * 60);
-    const [messageSent, setMessageSent] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(() => {
+        // Retrieve saved time or set default to 24 hours (86400 seconds)
+        const savedTime = localStorage.getItem('timeLeft');
+        return savedTime ? JSON.parse(savedTime) : 24 * 60 * 60;
+    });
 
     const [supportList, setSupportList] = useState([]);
     const [adminMessages, setAdminMessages] = useState(dummyadminMessage);
@@ -531,6 +534,7 @@ function Chat(props) {
     }
 
     const getCheckListData = async (masterCategoryId = selectedServer?.uuid) => {
+
         const response = await fetch(apiURL + 'api/v1/checklist/fetch/' + masterCategoryId, {
             method: 'GET',
             headers: {
@@ -1857,7 +1861,7 @@ function Chat(props) {
         }));
     };
 
-    const handleCloseModal = () => {
+    const submitChecklist = async () => {
         const itemsToAdd = Object.entries(checkedItems).map(([item, type]) => ({
             item,
             type
@@ -1880,10 +1884,33 @@ function Chat(props) {
                     return !prevListMap.has(newEntry.item) || prevListMap.get(newEntry.item) !== newEntry.type;
                 })
             ];
-
             return updatedList;
         });
-
+        const response = await fetch(apiURL + 'api/v1/checklist/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + props.user.authToken
+            },
+            body: JSON.stringify({
+                "master_category": selectedServer?.uuid,
+                "data": checkCompletedList
+            })
+        });
+        const rsp = await response.json();
+        if (response.status >= 200 && response.status < 300) {
+            if (rsp) {
+                await getCheckListData();
+            } else {
+                handleAPIError(rsp);
+            }
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                handleAPIError(rsp);
+            }
+        }
         // Hide modal
         setIsModalVisible(false);
     };
@@ -1967,36 +1994,122 @@ function Chat(props) {
         //     );
         // })
 
-        return <div className='message-wrap-83nja'>
-            {checkCompletedList.length == 0 ? null :
-                <div className="chat-user-icon-ac2s2">
-                    <div className='user-info-3kzc3'>
-                        <div style={{ position: 'relative' }}>
-                            <img
-                                src="/assets/person.png"
-                                style={{ height: 40, width: 40, borderRadius: '50%' }}
-                            />
-                            <img
-                                src={"/assets/queen.svg"}
-                                style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
-                            />
-                        </div>
-                    </div>
-                </div>}
-            {checkCompletedList.length == 0 ? null :
-                <div className="message-ac2s2">
-
-                    <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10, marginBottom: 10 }}>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
-                                Harsh Patel
-                            </p>
-                            <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
-                        </div>
-                    </div>
+        if (!isCheckListFetch) {
+            return (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Spinner size='md' color='default' />
                 </div>
-            }
-        </div>
+            );
+        }
+
+        return (
+            <>
+                {checkList.length === 0
+                    ? null
+                    : checkList?.map((cData, index) => {
+                        // Formatting the timestamp (you can customize it as per your need)
+                        const formattedDate = new Date(cData.created_at).toLocaleString();
+
+                        return (
+                            <div key={index} className='message-wrap-83nja' >
+                                <div className="chat-user-icon-ac2s2">
+                                    <div className='user-info-3kzc3'>
+                                        <div style={{ position: 'relative' }}>
+                                            <img
+                                                src="/assets/person.png"
+                                                style={{ height: 40, width: 40, borderRadius: '50%' }}
+                                                alt="user-avatar"
+                                            />
+                                            <img
+                                                src="/assets/queen.svg"
+                                                style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
+                                                alt="badge-icon"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="message-ac2s2" style={{ width: "100%" }}>
+                                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginLeft: 10, marginBottom: 10 }}>
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
+                                                {cData.user.first_name} {cData.user.last_name}
+                                            </p>
+                                            <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+                                        </div>
+                                        <div style={{ fontSize: '12px', color: '#999', marginRight: 10, alignSelf: 'center' }}>
+                                            {formattedDate}
+                                        </div>
+                                    </div>
+
+                                    {/* Mapping over the data array */}
+                                    {cData.data.map((itemData, itemIndex) => (
+                                        <div key={itemIndex} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
+                                            <div
+                                                className={`custom-checkboxlist ${itemData.type === 'true' ? 'yes' : itemData.type === 'cross' ? 'cross' : ''}`}
+                                                type="radio"
+                                                style={{ marginRight: 10 }}
+                                                disabled
+                                            ></div>
+                                            <p className='message-text-3kzc3' style={{ margin: 0 }}>
+                                                {itemData.item}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+            </>
+        );
+
+
+
+        // return <div className='message-wrap-83nja'>
+        //     {checkCompletedList.length == 0 ? null :
+        //         <div className="chat-user-icon-ac2s2">
+        //             <div className='user-info-3kzc3'>
+        //                 <div style={{ position: 'relative' }}>
+        //                     <img
+        //                         src="/assets/person.png"
+        //                         style={{ height: 40, width: 40, borderRadius: '50%' }}
+        //                     />
+        //                     <img
+        //                         src={"/assets/queen.svg"}
+        //                         style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
+        //                     />
+        //                 </div>
+        //             </div>
+        //         </div>}
+        //     {checkCompletedList.length == 0 ? null :
+        //         <div className="message-ac2s2">
+
+        //             <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10, marginBottom: 10 }}>
+        //                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        //                     <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
+        //                         Harsh Patel
+        //                     </p>
+        //                     <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+        //                 </div>
+        //             </div>
+        //             {checkCompletedList?.map((cData, index) => (
+        //                 <div key={index} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
+        //                     <div
+        //                         className={`custom-checkboxlist ${cData.type === 'true' ? 'yes' : cData.type === 'cross' ? 'cross' : ''}`}
+        //                         type="radio"
+        //                         style={{ marginRight: 10 }}
+        //                         disabled
+        //                     ></div>
+        //                     <p className='message-text-3kzc3' style={{ margin: 0 }}>
+        //                         {cData.item}
+        //                     </p>
+        //                 </div>
+        //             ))}
+        //         </div>}
+        // </div>
+
+
+
     }
 
     const onSelectEmoji = async (emoji) => {
@@ -2075,7 +2188,6 @@ function Chat(props) {
 
     const sendBlackHoleMessage = async () => {
         if (sendText != "") {
-            setMessageSent(true);
             const response = await fetch(apiURL + 'api/v1/blackhall/send/message', {
                 method: 'POST',
                 headers: {
@@ -2083,16 +2195,15 @@ function Chat(props) {
                     'Authorization': 'Bearer ' + props.user.authToken
                 },
                 body: JSON.stringify({
-                    "data": {
-                        "content_uuid": sendText,   // Ensure `sendText` has a value
-                        "description": "This is a feedback"
-                    }
+                    content: sendText
                 })
             });
+            const rsp = await response.json();
             if (response.status >= 200 && response.status < 300) {
+                if (rsp.status == 0) {
+                    toast(rsp.message);
+                }
                 getBlackHoleData();
-                const currentTime = Date.now();
-                localStorage.setItem('blackHolePostTime', currentTime);
                 setSendText("");
             } else {
                 if (response.status == 401) {
@@ -2106,12 +2217,6 @@ function Chat(props) {
 
     }
 
-    const showToast = () => {
-        if (messageSent) {
-            setSendText("");
-            toast("You can send only one message per day");
-        }
-    };
 
     const toggleFullscreen = () => {
         if (!isFullscreen) {
@@ -2122,47 +2227,24 @@ function Chat(props) {
         setIsFullscreen(!isFullscreen);
     };
 
-    useEffect(() => {
-        // On component mount, check if a post was already sent
-        const storedTime = localStorage.getItem('blackHolePostTime');
-        if (storedTime) {
-            const currentTime = Date.now();
-            const timeElapsed = Math.floor((currentTime - storedTime) / 1000);
-            const remainingTime = 24 * 60 * 60 - timeElapsed;
 
-            if (remainingTime > 0) {
-                setMessageSent(true); // Disable message sending
-                setTimeLeft(remainingTime); // Set remaining time
-            } else {
-                localStorage.removeItem('blackHolePostTime'); // Clear old time if expired
-            }
-        }
-
-        // Timer that counts down every second
-        const timer = setInterval(() => {
-            setTimeLeft(prevTime => {
-                if (prevTime <= 1) {
-                    setMessageSent(false); // Reset messageSent state
-                    localStorage.removeItem('blackHolePostTime'); // Clear time when 24 hours expire
-                    return 0;
-                }
-                return prevTime - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(timer); // Cleanup on unmount
-    }, []);
 
     // Timer functionality
     useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft(prevTime => {
                 if (prevTime === 1) {
-                    setBlackHoleList([]); // Reset the blackHoleList when timer hits 0
+                    // Reset lists and timer
+                    setBlackHoleList([]);
                     setRaffleList([]);
-                    return 24 * 60 * 60;  // Reset timer to 24 hours
+                    const resetTime = 24 * 60 * 60;
+                    localStorage.setItem('timeLeft', JSON.stringify(resetTime));
+                    return resetTime;
                 }
-                return prevTime - 1;
+
+                const updatedTime = prevTime - 1;
+                localStorage.setItem('timeLeft', JSON.stringify(updatedTime));  // Save updated time
+                return updatedTime;
             });
         }, 1000);
 
@@ -2243,7 +2325,7 @@ function Chat(props) {
                             </p> */}
                             <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, marginRight: 5 }}>
                                 <p className='message-text-3kzc3'>
-                                    <b>{item.content_uuid}</b>
+                                    <b>{item.message}</b>
                                 </p>
 
                             </div>
@@ -2695,6 +2777,7 @@ function Chat(props) {
                                         <div className='custom-checkbox-x-icon'></div>
                                         <div className='custom-checkbox-icon'></div>
                                     </div>
+
                                     <ul className="modal_body" style={{ marginTop: 20 }}>
                                         {[
                                             '15 secs focus on your ideal future self then review your plans to win that day',
@@ -2727,7 +2810,8 @@ function Chat(props) {
                                             </li>
                                         ))}
                                     </ul>
-                                    <Button onClick={handleCloseModal} color="default" variant="ghost" className="submit-button-mdkad">
+
+                                    <Button onClick={submitChecklist} color="default" variant="ghost" className="submit-button-mdkad">
                                         <span className="next-button-text-mdkad">Submit</span>
                                     </Button>
                                 </div>
