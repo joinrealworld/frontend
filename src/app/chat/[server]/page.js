@@ -312,10 +312,21 @@ function Chat(props) {
     const overflowBlackHole = selectedChannel?.type === ChannelType.blackHole ? 'hidden' : selectedChannel?.type === ChannelType.raffles ? 'hidden' : 'auto';
     const widthBlackHole = selectedChannel?.type === ChannelType.blackHole ? '100%' : selectedChannel?.type === ChannelType.raffles ? "100%" : '67%';
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const calculateTimeLeft = () => {
+        const now = new Date(); // Get the current local time
+        const midnight = new Date(); // Create a new date object for midnight
+        midnight.setHours(24, 0, 0, 0); // Set the time to exactly 24:00 (midnight)
+        
+        const timeLeftInMs = midnight - now; // Calculate the milliseconds difference between now and midnight
+        const timeLeftInSeconds = Math.floor(timeLeftInMs / 1000); // Convert the difference to seconds
+
+        return timeLeftInSeconds;
+    };
+
     const [timeLeft, setTimeLeft] = useState(() => {
-        // Retrieve saved time or set default to 24 hours (86400 seconds)
+        // Retrieve saved time or calculate the remaining time from 24 hours
         const savedTime = localStorage.getItem('timeLeft');
-        return savedTime ? JSON.parse(savedTime) : 24 * 60 * 60;
+        return calculateTimeLeft();
     });
 
     const [supportList, setSupportList] = useState([]);
@@ -2234,11 +2245,11 @@ function Chat(props) {
     useEffect(() => {
         const timer = setInterval(() => {
             setTimeLeft(prevTime => {
-                if (prevTime === 1) {
+                if (prevTime <= 1) {
                     // Reset lists and timer
                     setBlackHoleList([]);
                     setRaffleList([]);
-                    const resetTime = 24 * 60 * 60;
+                    const resetTime = calculateTimeLeft(); // Recalculate time for the next cycle
                     localStorage.setItem('timeLeft', JSON.stringify(resetTime));
                     return resetTime;
                 }
@@ -2270,7 +2281,7 @@ function Chat(props) {
                 </div> */}
                 <div style={{
                     position: 'absolute',
-                    top: 0,
+                    top: 20,
                     right: 10,
                     display: 'flex',
                     alignItems: 'center',
@@ -2360,7 +2371,7 @@ function Chat(props) {
         return (<div id='raffle-background' >
             <div style={{
                 position: 'absolute',
-                top: 0,
+                top: 20,
                 right: 10,
                 display: 'flex',
                 alignItems: 'center',
@@ -2810,8 +2821,10 @@ function Chat(props) {
                             </li>
                         ))}
                     </ul>
-                
-                <Button onClick={submitChecklist} color="default" variant="ghost" className="submit-button-mdkad">
+                    <Button onClick={()=>setIsModalVisible(false)} color="default" variant="ghost" className="submit-button-mdkad mr-2">
+                                        <span className="next-button-text-mdkad">Cancel</span>
+                                    </Button>
+                <Button onClick={submitChecklist} color="default" variant="ghost" className="submit-button-mdkad ml-2">
                     <span className="next-button-text-mdkad">Submit</span>
                 </Button>
             </div>

@@ -1832,9 +1832,7 @@ main {
     cursor: pointer !important;
 }
 
-.submit-button-mdkad:hover,
-.submit-button-mdkad:active,
-.submit-button-mdkad:focus {
+.submit-button-mdkad:hover {
     background: #b78727 !important;
     color: #dedede !important;
     box-shadow: 0 0 10px 0 #b78727 !important;
