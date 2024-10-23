@@ -21,6 +21,13 @@ export function lightTheme() {
     document.documentElement.style.setProperty("--sixth-color", "#e9e9e9");
     document.documentElement.style.setProperty("--seventh-color", "#ebebeb");
     document.documentElement.style.setProperty("--eighth-color", "#2E3136");
+    document.documentElement.style.setProperty("--ninth-color", "#ebebeb");
+    document.documentElement.style.setProperty("--tenth-color", "#2E3136");
+    document.documentElement.style.setProperty("--border-color", "#2E3136");
+    document.documentElement.style.setProperty("--text-color", "#2E3136");
+    document.documentElement.style.setProperty("--hover-color", "#b8d0ea");
+    document.documentElement.style.setProperty("--success-color", "#787878");
+    document.documentElement.style.setProperty("--hoverbox-color", "#b8d0ea");
     localStorage.setItem("--primary-color", "#f1f1f1");
     localStorage.setItem("--third-color", "#fff");
     localStorage.setItem("--fourth-color", "#000");
@@ -28,4 +35,11 @@ export function lightTheme() {
     localStorage.setItem("--sixth-color", "#e9e9e9");
     localStorage.setItem("--seventh-color", "#ebebeb");
     localStorage.setItem("--eighth-color", "#2E3136");
+    localStorage.setItem("--ninth-color", "#ebebeb");
+    localStorage.setItem("--tenth-color", "#2E3136");
+    localStorage.setItem("--border-color", "#2E3136");
+    localStorage.setItem("--text-color", "#2E3136");
+    localStorage.setItem("--hover-color", "#b8d0ea");
+    localStorage.setItem("--success-color", "#787878");
+    localStorage.setItem("--hoverbox-color", "#b8d0ea");
 }

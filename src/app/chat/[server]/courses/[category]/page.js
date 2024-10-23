@@ -328,44 +328,6 @@ function CoursesByCategory(props) {
         router.push('?cid=' + originalCourses?.[0]?.uuid);
       }
     }
-    // setIsPreviousLoading(true);
-    // const response = await fetch(apiURL + 'api/v1/channel/mark/complete/course', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': 'Bearer ' + props.user.authToken
-    //   },
-    //   body: JSON.stringify({
-    //     course_id: selectedCourse?.uuid, // selected course uuid
-    //     content_id: selectedLesson?.uuid,  // selected course's content uuid
-    //   })
-    // });
-    // const rsp = await response.json();
-    // if (response.status >= 200 && response.status < 300) {
-    //   if (rsp.payload) {
-    //     let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
-    //     let newIndex = Math.max(selectedLessonIndex - 1, 0);
-    //     let newLesson = selectedCourse?.data?.[newIndex];
-    //     if (selectedCourse && selectedCourse?.uuid) {
-    //       router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
-    //     } else {
-    //       if (courses?.length > 0) {
-    //         router.push('?cid=' + courses?.[0]?.uuid);
-    //       }
-    //     }
-    //     setIsPreviousLoading(false);
-    //   } else {
-    //     handleAPIError(rsp);
-    //     setIsPreviousLoading(false);
-    //   }
-    // } else {
-    // if (response.status == 401) {
-    //   dispatch(props.actions.userLogout());
-    // } else {
-    //   handleAPIError(rsp);
-    //   setIsPreviousLoading(false);
-    // }
-    // }
   }
 
   const getQuizFromId = async (courseId, quizId, onSuccess = () => { }) => {

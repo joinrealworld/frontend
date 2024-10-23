@@ -478,6 +478,124 @@ main {
     margin-bottom: 0px !important;
 }
 
+@keyframes float-infinite {
+    0% {
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        transform: translate(-50%, -50%);
+    }
+}
+
+#black-hole-background {
+    position: relative;
+    width: 100%;
+    height: 82vh;
+    overflow: hidden;
+    background: black;
+    /* Add a background for black-hole effect */
+}
+
+.message-wrap-83nja {
+    flex-direction: row;
+    display: flex;
+    justify-content: flex-end;
+    padding: 3px 20px;
+}
+
+.message-wrap-83nja-float {
+    padding: 3px 20px;
+    width: fit-content;
+    /* Adjusts width based on content */
+    white-space: nowrap;
+    position: absolute;
+    animation: float-infinite 10s infinite ease-in-out;
+}
+
+#raffle-background {
+    position: relative;
+    width: 100%;
+    height: 82vh;
+    overflow: hidden;
+}
+
+.message-wrap-83nja-float-raffle {
+    padding: 3px 20px;
+    width: fit-content;
+    /* Adjusts width based on content */
+    white-space: nowrap;
+    position: absolute;
+    animation: float-infinite 10s infinite ease-in-out;
+
+}
+
+.raffle-ac2s2 {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 13px 15px;
+    background-color: var(--seventh-color);
+    border-radius: 10px;
+    width: 35%;
+    min-height: 70px;
+    align-self: flex-end;
+    position: relative
+}
+
+
+.raffle-ac2s2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 70%;
+    height: 100%;
+    width: 4px;
+    background: repeating-linear-gradient(to bottom,
+            var(--eighth-color),
+            /* Dot color */
+            var(--eighth-color) 8px,
+            /* Dot height */
+            transparent 1px,
+            /* Gap between dots */
+            transparent 12px
+            /* Gap height */
+        );
+    transform: translateX(-50%);
+}
+
+.left-circle {
+    position: absolute;
+    top: 50%;
+    left: -14px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background-color: var(--channels);
+    border-radius: 50%
+}
+
+.right-circle {
+    position: absolute;
+    top: 50%;
+    right: -14px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background-color: var(--channels);
+    border-radius: 50%
+}
+
+.raffle-text-3kzc3 {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--fourth-color);
+
+    b {
+        font-weight: 600;
+    }
+}
+
 .chat-user-icon-ac2s2 {
     display: flex;
     width: 60px;
@@ -529,17 +647,6 @@ main {
     display: flex;
 }
 
-.feedback-box-ac2s2 {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 5px;
-    padding: 13px 20px;
-    background-color: var(--seventh-color);
-    border-radius: 5px;
-    width: 100%;
-}
 
 .stream-box-ac2s2 {
     display: flex;
@@ -560,23 +667,6 @@ main {
     padding-left: 0.7rem;
     padding-right: 0.7rem;
     border-radius: 12px;
-}
-
-.feedback-live-wrap {
-    background-color: #80848e34;
-    align-items: center;
-    width: 80px;
-    height: 80px;
-    justify-content: center;
-    padding-left: 0.7rem;
-    padding-right: 0.7rem;
-    border-radius: 12px;
-    display: flex;
-    margin-top: 10px;
-    padding: 12px 10px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
 }
 
 .f1--xs {
@@ -642,21 +732,93 @@ main {
     padding: 3px 20px;
 }
 
-.message-ac2s2 {
+.feedback-box-ac2s2 {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 5px;
-    padding: 13px 10px;
+    padding: 13px 20px;
     background-color: var(--seventh-color);
-    border-radius: 5px;
+    border-radius: 10px;
     width: 100%;
+    align-self: flex-end;
+    position: relative
 }
 
-.message-divider-date-wrap-7naj82b {
-    flex-direction: row;
+.message-tail {
+    content: '""';
+    position: absolute;
+    bottom: 3px;
+    right: -10px;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    border-left: 8px solid var(--seventh-color);
+    border-right: 12px solid transparent;
+    border-top: 12px solid var(--seventh-color);
+    border-bottom: 12px solid transparent;
+    transform: rotate(270deg);
+}
+
+.stream-live-wrap {
+    background-color: #80848e34;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    border-radius: 12px;
+}
+
+.feedback-live-wrap {
+    background-color: #80848e34;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    justify-content: center;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    border-radius: 12px;
     display: flex;
-    justify-content: space-evenly;
-    padding: 18px 20px;
+    margin-top: 10px;
+    padding: 12px 10px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.f1--xs {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.stream-live {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.stream-date {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.f1-bold--xs {
+    font-weight: bolder;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--fifth-color);
+}
+
+.team-color-icon {
+    width: 4px;
+    height: 14px;
+    margin: 0 10px;
 }
 
 .message-divider-date-7naj82b {
@@ -703,6 +865,8 @@ main {
     margin-left: 12px;
     margin-bottom: 0px !important;
 }
+
+
 
 /* coin model */
 .coin-modal-mcan34 {
@@ -1282,12 +1446,24 @@ main {
     margin-right: 5px;
 }
 
+.user-name-3kzc3-raffle {
+    color: var(--fourth-color);
+    font-weight: 300;
+    font-size: 14px !important;
+    margin-bottom: 0px !important;
+    margin-right: 5px;
+}
+
 .user-description-3kzc3 {
     color: var(--fifth-color) !important;
     font-size: 10px !important;
     letter-spacing: 0.3px;
     margin-bottom: 0px !important;
     font-weight: 200;
+    width: 18dvw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .user-info-3kzc3 {
@@ -1298,6 +1474,713 @@ main {
     margin-left: 7px;
     color: var(--fourth-color);
 }
+
+.clipboard-icon {
+    color: var(--ninth-color);
+    background-color: #fff;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.clipboard-icon:hover {
+    color: #fff;
+    background-color: var(--ninth-color);
+
+}
+
+/* Add these styles in your CSS file or within a <style> tag */
+.popup-modal {
+    position: absolute;
+    /* Positioned relative to the parent container */
+    bottom: 0;
+    /* Start at the bottom of the parent container */
+    left: 50%;
+    /* Center horizontally */
+    min-width: 55%;
+    min-height: 70%;
+    transform: translate(-50%, 100%);
+    /* Start off-screen below */
+    opacity: 1;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    background-color: var(--seventh-color);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popup-modal.visible {
+    transform: translate(-50%, -15%);
+    /* End position (centered vertically) */
+    opacity: 1;
+}
+
+.rectangle {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    width: 50%;
+    /* Adjust to match the clipboard's clip width */
+    height: 50px;
+    /* Height of the clip */
+    background-color: var(--border-color);
+    border: 3px solid var(--eighth-color);
+    border-radius: 30px 30px 15px 15px;
+    /* Round only the top corners */
+    transform: translateX(-50%);
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+    /* Ensure it appears on top of the modal */
+}
+
+.rectangle-line {
+    width: 100%;
+    position: absolute;
+    top: 60%;
+    border-top: 3px solid var(--eighth-color);
+    ;
+}
+
+.dot {
+    position: absolute;
+    top: 0px;
+    /* Center the dot vertically within the circle */
+    left: 50%;
+    /* Center the dot horizontally within the circle */
+    width: 10px;
+    /* Width of the dot */
+    height: 10px;
+    /* Height of the dot */
+    background-color: var(--border-color);
+    /* Color of the dot */
+    border-radius: 50%;
+    /* Make it a full circle */
+    transform: translate(-50%, -50%);
+    /* Center the dot within the circle */
+    z-index: 4;
+}
+
+.rectangle::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    /* Adjust to position the half-circle on top of the rectangle */
+    left: 50%;
+    width: 60px;
+    /* Width of the half-circle */
+    height: 30px;
+    /* Half the height of the previous full circle */
+    background-color: var(--border-color);
+    border-top-left-radius: 60px;
+    /* Make the top half rounded */
+    border-top-right-radius: 60px;
+    /* Make the top half rounded */
+    border-bottom: none;
+    /* Remove the bottom border */
+    border-left: 3px solid var(--eighth-color);
+    border-right: 3px solid var(--eighth-color);
+    border-top: 3px solid var(--eighth-color);
+    border-bottom: 3px solid var(--eighth-color);
+    transform: translateX(-50%);
+    z-index: 3;
+    /* Ensure the half-circle appears above the clip */
+}
+
+.rectangle::after {
+    content: "";
+    position: absolute;
+    top: 0px;
+    /* Center the circle vertically within the half-circle */
+    left: 50%;
+    /* Center the circle horizontally within the half-circle */
+    width: 25px;
+    /* Width of the full circle */
+    height: 25px;
+    /* Height of the full circle */
+    background-color: var(--eighth-color);
+    /* Color of the full circle */
+    border-radius: 50%;
+    /* Make it a full circle */
+    transform: translate(-50%, -50%);
+    /* Center the full circle within the half-circle */
+    z-index: 3;
+    /* Ensure the full circle appears above the half-circle */
+}
+
+
+.close-btn {
+    position: absolute;
+    top: 37px;
+    /* Adjust as needed */
+    right: 10px;
+    /* Adjust as needed */
+    color: var(--fourth-color);
+    cursor: pointer;
+    height: 28px;
+    width: 28px;
+    border-radius: 50%;
+    padding: 3px;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.modal_text_title {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--fourth-color);
+}
+
+.modal_text_body {
+    margin-left: 10px;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--fourth-color);
+}
+
+.modal_body li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    height: 50px;
+    /* Adjust as needed */
+}
+
+.custom-checkbox {
+    display: none;
+}
+
+/* Create a custom checkbox */
+.custom-checkbox+label {
+    position: relative;
+    display: inline-block;
+    padding-left: 35px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 20px;
+    vertical-align: middle;
+}
+
+/* Create the custom checkbox box */
+.custom-checkbox+label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: var(--fourth-color);
+    border-radius: 4px;
+}
+
+/* Style the custom checkbox when checked */
+.custom-checkbox:checked+label::before {
+    background-color: #ecc879;
+}
+
+/* Add a checkmark symbol when checked */
+.custom-checkbox:checked+label::after {
+    content: "✓";
+    position: absolute;
+    left: 5px;
+    /* Adjusted for better centering */
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 16px;
+    /* Adjusted font size */
+    line-height: 1;
+}
+
+.custom-checkbox-icon,
+.custom-checkbox-x-icon {
+    margin-top: 20px !important;
+
+}
+
+.custom-checkbox-icon::after {
+    content: "✓";
+    position: absolute;
+    left: 65px;
+    /* Adjusted for better centering */
+    top: 15%;
+    color: white;
+    font-size: 22px;
+    /* Adjusted font size */
+    line-height: 1;
+}
+
+.custom-checkbox-x-icon::after {
+    content: "✗";
+    position: absolute;
+    left: 25px;
+    /* Adjusted for better centering */
+    top: 15%;
+    color: white;
+    font-size: 22px;
+    /* Adjusted font size */
+    line-height: 1;
+}
+
+
+
+.custom-checkbox-x {
+    display: none;
+    margin-right: 5px;
+}
+
+/* Create a custom checkbox for the cross */
+.custom-checkbox-x {
+    position: relative;
+    display: inline-block;
+    padding-left: 25px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 20px;
+    vertical-align: middle;
+    margin-right: 10px;
+    margin-left: 10px;
+    /* Adjust the spacing between the two checkboxes */
+}
+
+/* Create the custom cross checkbox box */
+.custom-checkbox-x::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: var(--fourth-color);
+    ;
+    border-radius: 4px;
+}
+
+/* Style the cross checkbox when checked */
+.custom-checkbox-x:checked::before {
+    background-color: #ff6f6f;
+    /* Red background for the cross */
+}
+
+/* Add a cross symbol when checked */
+.custom-checkbox-x:checked::after {
+    content: "✗";
+    /* Cross symbol */
+    position: absolute;
+    left: 2px;
+    /* Adjusted for better centering */
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 15px;
+    /* Adjusted font size */
+    line-height: 1;
+}
+
+.message-input-7ajb312 {
+    background-color: #000;
+    border-color: #ffffff33;
+    border-radius: 20px;
+    height: 32px;
+    border-width: 1px;
+    width: 100%;
+    color: #ffffff;
+    padding: 6px 15px;
+    font-size: 14px;
+}
+
+.message-input-7ajb312:focus {
+    border-color: #ffffff33 !important;
+}
+
+.submit-button-mdkad {
+    outline: 0 !important;
+    background: #b78727 !important;
+    width: fit-content !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    padding: 5px !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    -webkit-transition: all 0.3 ease !important;
+    transition: all 0.4s ease-in-out !important;
+    cursor: pointer !important;
+}
+
+.submit-button-mdkad:hover,
+.submit-button-mdkad:active,
+.submit-button-mdkad:focus {
+    background: #b78727 !important;
+    color: #dedede !important;
+    box-shadow: 0 0 10px 0 #b78727 !important;
+    font-size: 16px !important;
+}
+
+.ticket-raffle {
+    color: var(--eighth-color);
+    width: 200px;
+    height: 70px;
+}
+
+.raffle-ac2s2-icon {
+    display: flex;
+    flex-direction: column;
+    padding: 13px 15px;
+    background-color: var(--eighth-color);
+    width: 25%;
+    min-height: 50px;
+    position: relative
+}
+
+
+.raffle-ac2s2-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 70%;
+    height: 100%;
+    width: 4px;
+    background: repeating-linear-gradient(to bottom,
+            var(--seventh-color),
+            /* Dot color */
+            var(--seventh-color) 8px,
+            /* Dot height */
+            transparent 1px,
+            /* Gap between dots */
+            transparent 12px
+            /* Gap height */
+        );
+    transform: translateX(-50%);
+}
+
+.left-circles-container,
+.right-circles-container {
+    position: absolute;
+    top: 50%;
+    height: 100%;
+    transform: translateY(-50%);
+}
+
+.left-circles-container {
+    left: -6px;
+    /* Adjust according to your needs */
+}
+
+.right-circles-container {
+    right: 6px;
+    /* Adjust according to your needs */
+}
+
+.circle {
+    width: 12px;
+    height: 12px;
+    background-color: var(--seventh-color);
+    border-radius: 50%;
+    position: absolute;
+}
+
+.circle.top {
+    top: 10%;
+    /* Adjust to position at the top */
+}
+
+.circle.middle {
+    top: 50%;
+    /* Center position */
+    transform: translateY(-50%);
+}
+
+.circle.bottom {
+    bottom: 10%;
+    /* Adjust to position at the bottom */
+}
+
+.custom-checkboxlist {
+    width: 17px;
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 15px;
+    color: #000;
+    background-color: #fff;
+}
+
+.custom-checkboxlist.yes::before {
+    content: '✓';
+    /* Checkmark for true */
+    color: green;
+    /* Optional: color for the checkmark */
+
+}
+
+.custom-checkboxlist.cross::before {
+    content: '✗';
+    /* X mark for cross */
+    color: red;
+    /* Optional: color for the X mark */
+}
+
+.modal_body-media li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    height: auto;
+    /* Adjust as needed */
+}
+
+.online-count-body-title-72bak-media {
+    color: var(--fourth-color);
+    margin-bottom: 20px;
+    font-size: 18.5px;
+    font-weight: 600;
+    margin-left: 15px;
+}
+
+.custom-checkbox-modal {
+    display: none;
+}
+
+/* Create a custom checkbox */
+.custom-checkbox-modal+label {
+    position: relative;
+    display: inline-block;
+    padding-left: 35px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 20px;
+    vertical-align: middle;
+}
+
+/* Create the custom checkbox box */
+.custom-checkbox-modal+label::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: var(--fourth-color);
+    border-radius: 4px;
+}
+
+/* Style the custom checkbox when checked */
+.custom-checkbox-modal:checked+label::before {
+    background-color: #ecc879;
+}
+
+/* Add a checkmark symbol when checked */
+.custom-checkbox-modal:checked+label::after {
+    content: "✓";
+    position: absolute;
+    left: 5px;
+    /* Adjusted for better centering */
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 16px;
+    /* Adjusted font size */
+    line-height: 1;
+}
+
+.signature-title {
+    color: var(--fourth-color);
+    margin-bottom: 5px;
+}
+
+.clear-button-mdkad {
+    outline: 0 !important;
+    background: #b78727 !important;
+    width: fit-content !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    padding: 0px !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    -webkit-transition: all 0.3 ease !important;
+    transition: all 0.4s ease-in-out !important;
+    cursor: pointer !important;
+}
+
+.clear-button-mdkad:hover,
+.clear-button-mdkad:active,
+.clear-button-mdkad:focus {
+    background: #b78727 !important;
+    color: #dedede !important;
+    box-shadow: 0 0 10px 0 #b78727 !important;
+    font-size: 16px !important;
+}
+
+.whatsapp-chat-list {
+    padding: 10px;
+    width: auto;
+    margin: auto;
+}
+
+.chat-day {
+    margin-bottom: 20px;
+}
+
+.chat-date {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--seventh-color);
+    border-bottom: 1px solid var(--fourth-color);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-item:hover {
+    background-color: var(--hoverbox-color);
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.chat-content {
+    flex-grow: 1;
+    padding-bottom: 10px;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    color: var(--fourth-color);
+}
+
+.verified-icon {
+    color: #25D366;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+.timestamp {
+    color: #888;
+    font-size: 12px;
+}
+
+.message-preview {
+    color: #888;
+    font-size: 14px;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 250px;
+}
+
+.chat-window {
+    margin: 10px;
+    padding: 10px;
+    background-color: transparent;
+    height: 600px;
+    width: auto;
+    overflow-y: auto;
+}
+
+.whatsapp-chat.sent {
+    display: flex;
+    justify-content: flex-end;
+    /* Align sent messages to the right */
+    margin-bottom: 10px;
+}
+
+.message-user-info {
+    color: var(--fourth-color);
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.whatsapp-chat.received {
+
+    margin-bottom: 10px;
+}
+
+.message-bubble.sent {
+    background-color: var(--seventh-color);
+    /* WhatsApp sent message color */
+    color: var(--fourth-color);
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 60%;
+    display: flex;
+    align-items: center;
+}
+
+.message-bubble.received {
+    background-color: var(--seventh-color);
+    /* WhatsApp received message color */
+    color: var(--fourth-color);
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 60%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.message-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.verified-icon {
+    color: blue;
+}
+
+.timestamp {
+    font-size: 0.75em;
+    color: gray;
+}
+
+.message-input-support {
+    background-color: var(--third-color);
+    border-color: #ffffff33;
+    border-radius: 20px;
+    height: 32px;
+    border-width: 1px;
+    width: 100%;
+    color: #ffffff;
+    padding: 6px 15px;
+    font-size: 14px;
+}
+
+
 
 @media screen and (max-width: 1000px) {
     #chat {
