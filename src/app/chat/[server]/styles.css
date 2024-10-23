@@ -746,6 +746,18 @@ main {
     position: relative
 }
 
+.message-ac2s2 {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: var(--seventh-color);
+    border-radius: 20px;
+    width: fit-content;
+    align-self: flex-end;
+    position: relative
+}
+
 .message-tail {
     content: '""';
     position: absolute;
@@ -759,6 +771,13 @@ main {
     border-top: 12px solid var(--seventh-color);
     border-bottom: 12px solid transparent;
     transform: rotate(270deg);
+}
+
+.message-divider-date-wrap-7naj82b {
+    flex-direction: row;
+    display: flex;
+    justify-content: flex-end;
+    padding: 18px 20px;
 }
 
 .stream-live-wrap {
