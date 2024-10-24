@@ -1516,7 +1516,7 @@ main {
     /* Start at the bottom of the parent container */
     left: 50%;
     /* Center horizontally */
-    min-width: 55%;
+    min-width: 95%;
     min-height: 70%;
     transform: translate(-50%, 100%);
     /* Start off-screen below */
@@ -1664,7 +1664,7 @@ main {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
-    height: 50px;
+    height: 45px;
     /* Adjust as needed */
 }
 
@@ -2137,7 +2137,7 @@ main {
 }
 
 .message-bubble.sent {
-    background-color: var(--seventh-color);
+    background-color: var(--success-color);
     /* WhatsApp sent message color */
     color: var(--fourth-color);
     border-radius: 8px;
@@ -2195,6 +2195,21 @@ main {
     color: #ffffff;
     padding: 6px 15px;
     font-size: 14px;
+}
+
+.arrow-left {
+    color: var(--fourth-color);
+    background-color: var(--primary-color);
+    cursor: pointer;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    padding: 7px; 
+    margin-right: 10px;
+}
+
+.arrow-left:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 

@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList, Ticket, Fullscreen } from 'lucide-react';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList, Ticket, Fullscreen ,ArrowLeft} from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
@@ -2531,6 +2531,7 @@ function Chat(props) {
                 <div className="whatsapp-chat received">
                     {/* Display user info only once */}
                     <div className="message-user-info">
+                    <ArrowLeft  className="arrow-left" onClick={()=>setSelectedMessage(false)} /> 
                         <img
                             src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"}
                             alt={selectedMessage.user.first_name}
@@ -2760,6 +2761,7 @@ function Chat(props) {
     <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: overflowBlackHole, padding: '20px 0px', backgroundColor: blackChatbackgroundColor }}>
         {selectedChannel?.type == ChannelType.raffles ? null :
             selectedChannel?.type == ChannelType.blackHole ? null :
+            selectedChannel?.type == ChannelType.support ? null :
                 <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
                     <div style={{ margin: '20px 20px', backgroundColor: 'var(--seventh-color)', padding: '20px 20px', borderRadius: 5 }}>
                         <div style={{ color: 'var(--fourth-color)', fontSize: 18, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
