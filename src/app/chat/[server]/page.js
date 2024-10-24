@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, ClipboardList, Ticket, Fullscreen ,ArrowLeft} from 'lucide-react';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, Fullscreen, ArrowLeft } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
@@ -316,7 +316,7 @@ function Chat(props) {
         const now = new Date(); // Get the current local time
         const midnight = new Date(); // Create a new date object for midnight
         midnight.setHours(24, 0, 0, 0); // Set the time to exactly 24:00 (midnight)
-        
+
         const timeLeftInMs = midnight - now; // Calculate the milliseconds difference between now and midnight
         const timeLeftInSeconds = Math.floor(timeLeftInMs / 1000); // Convert the difference to seconds
 
@@ -557,6 +557,22 @@ function Chat(props) {
         if (response.status >= 200 && response.status < 300) {
             setIsCheckListFetch(true);
             setCheckList(rsp.payload);
+
+            let currentUserCheckList = rsp.payload.find(c =>
+                moment(c.created_at).startOf('days').format('DD-MM-YYYY') == moment().startOf('days').format('DD-MM-YYYY') &&
+                c.user?.id == props.user.user.id
+            );
+
+            if (currentUserCheckList) {
+                for (let index = 0; index < currentUserCheckList.data.length; index++) {
+                    const data = currentUserCheckList.data[index];
+                    setCheckedItems(prev => ({
+                        ...prev,
+                        [data.item]: data.type // Either 'cross' or 'true'
+                    }));
+                }
+            }
+
         } else {
             if (response.status == 401) {
                 dispatch(props.actions.userLogout());
@@ -942,12 +958,10 @@ function Chat(props) {
     }
 
     const onFeedbackVideoClick = (item) => {
-        setIsLoadingRandomVideoClick(true);
-        setTimeout(() => {
-            // zzz
-            router.push(props?.params?.server + '/courses/5ff78efe-3ed2-4bc6-b64d-35cab5b3f792?cid=' + item.course + '&lid=' + item?.content?.uuid);
-            setIsLoadingRandomVideoClick(false);
-        }, 1500);
+        console.log(item);
+
+        // zzz
+        // router.push(props?.params?.server + '/courses/5ff78efe-3ed2-4bc6-b64d-35cab5b3f792?cid=' + item.course + '&lid=' + item?.content?.uuid);
     }
 
     const purchaseIdentityBooster = async (authToken) => {
@@ -1720,7 +1734,7 @@ function Chat(props) {
         return data.map((item, index) => {
             return (
                 <div key={index} className='feedback-wrap-83nja'>
-                    <div className="feedback-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer' }} onClick={onStreamingClick(item)}>
+                    <div className="feedback-box-ac2s2" style={{ marginTop: 0 }}>
                         <div style={{ display: 'flex', flexDirection: 'column', }}>
                             <div style={{ display: 'flex', flexDirection: 'row', marginTop: 12 }}>
                                 <img
@@ -1874,30 +1888,27 @@ function Chat(props) {
     };
 
     const submitChecklist = async () => {
-        const itemsToAdd = Object.entries(checkedItems).map(([item, type]) => ({
-            item,
-            type
-        }));
+        if (checkedItems.length == 0) return;
+        const itemsToAdd = Object.entries(checkedItems).map(([item, type]) => ({ item, type }));
+
+        // Create a map from the previous list for quick lookup
+        const prevListMap = new Map(checkCompletedList.map(entry => [entry.item, entry.type]));
+
+        // Combine previous list and new items, updating types if necessary
+        const updatedList = [
+            ...checkCompletedList.filter(entry => {
+                const currentType = prevListMap.get(entry.item);
+                // Keep item if type is the same or it's not in the new items
+                return itemsToAdd.some(newEntry => newEntry.item === entry.item && newEntry.type === currentType);
+            }),
+            ...itemsToAdd.filter(newEntry => {
+                // Add new item if it's not in the previous list or type is different
+                return !prevListMap.has(newEntry.item) || prevListMap.get(newEntry.item) !== newEntry.type;
+            })
+        ];
 
         // // Add all checked items to checkCompletedList
-        setCheckCompletedList(prevList => {
-            // Create a map from the previous list for quick lookup
-            const prevListMap = new Map(prevList.map(entry => [entry.item, entry.type]));
-
-            // Combine previous list and new items, updating types if necessary
-            const updatedList = [
-                ...prevList.filter(entry => {
-                    const currentType = prevListMap.get(entry.item);
-                    // Keep item if type is the same or it's not in the new items
-                    return itemsToAdd.some(newEntry => newEntry.item === entry.item && newEntry.type === currentType);
-                }),
-                ...itemsToAdd.filter(newEntry => {
-                    // Add new item if it's not in the previous list or type is different
-                    return !prevListMap.has(newEntry.item) || prevListMap.get(newEntry.item) !== newEntry.type;
-                })
-            ];
-            return updatedList;
-        });
+        setCheckCompletedList(updatedList);
         const response = await fetch(apiURL + 'api/v1/checklist/submit', {
             method: 'POST',
             headers: {
@@ -1906,7 +1917,7 @@ function Chat(props) {
             },
             body: JSON.stringify({
                 "master_category": selectedServer?.uuid,
-                "data": checkCompletedList
+                "data": updatedList
             })
         });
         const rsp = await response.json();
@@ -2057,12 +2068,9 @@ function Chat(props) {
                                     {/* Mapping over the data array */}
                                     {cData.data.map((itemData, itemIndex) => (
                                         <div key={itemIndex} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
-                                            <div
-                                                className={`custom-checkboxlist ${itemData.type === 'true' ? 'yes' : itemData.type === 'cross' ? 'cross' : ''}`}
-                                                type="radio"
-                                                style={{ marginRight: 10 }}
-                                                disabled
-                                            ></div>
+                                            <div style={{ marginRight: 10 }}>
+                                                {itemData.type === 'true' ? "✅" : "❌"}
+                                            </div>
                                             <p className='message-text-3kzc3' style={{ margin: 0 }}>
                                                 {itemData.item}
                                             </p>
@@ -2317,13 +2325,14 @@ function Chat(props) {
                 </button> */}
                 </div>
                 {blackHoleList.map((item, index) => {
+                    let isSelected = item.user == props.user?.user?.id;
                     const { top, left } = positions[index] || { top: 50, left: 50 };
                     return (<div key={index} className='message-wrap-83nja-float' style={{
                         top: `${top}%`,
                         left: `${left}%`,
                         transform: 'translate(-50%, -50%)',
                     }}>
-                        <div className="message-ac2s2">
+                        <div className="message-ac2s2" style={{ backgroundColor: isSelected ? 'var(--gold-color)' : 'var(--seventh-color)' }}>
                             {/* <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                     <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{item.username}</p>
@@ -2336,12 +2345,12 @@ function Chat(props) {
                                 {dateFormat('09/01/2024')}
                             </p> */}
                             <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, marginRight: 5 }}>
-                                <p className='message-text-3kzc3'>
+                                <p className='message-text-3kzc3' style={isSelected ? { color: '#000', fontWeight: '500' } : {}}>
                                     <b>{item.message}</b>
                                 </p>
 
                             </div>
-                            <div className='message-tail' />
+                            <div className='message-tail' style={isSelected ? { borderLeftColor: 'var(--gold-color)', borderTopColor: 'var(--gold-color)', } : {}} />
                         </div>
                     </div>
                     );
@@ -2531,7 +2540,7 @@ function Chat(props) {
                 <div className="whatsapp-chat received">
                     {/* Display user info only once */}
                     <div className="message-user-info">
-                    <ArrowLeft  className="arrow-left" onClick={()=>setSelectedMessage(false)} /> 
+                        <ArrowLeft className="arrow-left" onClick={() => setSelectedMessage(false)} />
                         <img
                             src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"}
                             alt={selectedMessage.user.first_name}
@@ -2753,252 +2762,250 @@ function Chat(props) {
                 {/* START - main right content */}
                 <div id='chat-background' className="chat-gsdu3b">
 
-{/* START - chat left content */}
-<div style={{ width: widthBlackHole, overflowX: 'hidden', overflowY: 'hidden', position: 'relative' }}>
+                    {/* START - chat left content */}
+                    <div style={{ width: widthBlackHole, overflowX: 'hidden', overflowY: 'hidden', position: 'relative' }}>
 
 
-    {/* START - chat content */}
-    <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: overflowBlackHole, padding: '20px 0px', backgroundColor: blackChatbackgroundColor }}>
-        {selectedChannel?.type == ChannelType.raffles ? null :
-            selectedChannel?.type == ChannelType.blackHole ? null :
-            selectedChannel?.type == ChannelType.support ? null :
-                <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
-                    <div style={{ margin: '20px 20px', backgroundColor: 'var(--seventh-color)', padding: '20px 20px', borderRadius: 5 }}>
-                        <div style={{ color: 'var(--fourth-color)', fontSize: 18, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <svg style={{ marginRight: 5 }} width="24" height="24" viewBox="0 0 24 24" className="icon-2W8DHg" aria-hidden="true" role="img">
-                                <path fill="currentColor" fillRule="evenodd" clipRule="evenodd"
-                                    d="M5.88657 21C5.57547 21 5.3399 20.7189 5.39427 20.4126L6.00001 17H2.59511C2.28449 17 2.04905 16.7198 2.10259 16.4138L2.27759 15.4138C2.31946 15.1746 2.52722 15 2.77011 15H6.35001L7.41001 9H4.00511C3.69449 9 3.45905 8.71977 3.51259 8.41381L3.68759 7.41381C3.72946 7.17456 3.93722 7 4.18011 7H7.76001L8.39677 3.41262C8.43914 3.17391 8.64664 3 8.88907 3H9.87344C10.1845 3 10.4201 3.28107 10.3657 3.58738L9.76001 7H15.76L16.3968 3.41262C16.4391 3.17391 16.6466 3 16.8891 3H17.8734C18.1845 3 18.4201 3.28107 18.3657 3.58738L17.76 7H21.1649C21.4755 7 21.711 7.28023 21.6574 7.58619L21.4824 8.58619C21.4406 8.82544 21.2328 9 20.9899 9H17.41L16.35 15H19.7549C20.0655 15 20.301 15.2802 20.2474 15.5862L20.0724 16.5862C20.0306 16.8254 19.8228 17 19.5799 17H16L15.3632 20.5874C15.3209 20.8261 15.1134 21 14.8709 21H13.8866C13.5755 21 13.3399 20.7189 13.3943 20.4126L14 17H8.00001L7.36325 20.5874C7.32088 20.8261 7.11337 21 6.87094 21H5.88657ZM9.41045 9L8.35045 15H14.3504L15.4104 9H9.41045Z">
-                                </path>
-                            </svg> {selectedChannel?.name}
-                        </div>
-                        <div style={{ color: 'var(--fourth-color)', fontSize: 15 }} className="mt-2">This is the start of your conversation.</div>
-                    </div>
-                </div>
-        }
-        <div>
-            {renderMainContent()}
-        </div>
-        {(selectedChannel?.type == ChannelType.checkList) ? (
-            <div className={`popup-modal ${isModalVisible ? 'visible' : ''}`} onMouseEnter={handleMouseEnter}>
-                <div className="rectangle">
-                    <div className="dot"></div>
-                    <div className="rectangle-line"></div>
-                </div>
-                {/* <XIcon className="close-btn" onClick={handleCloseModal} /> */}
-                <h3 className="modal_text_title">✅┃daily-checklist</h3>
-                <div style={{ marginBottom: '42px' }}>
-                    <div className='custom-checkbox-x-icon'></div>
-                    <div className='custom-checkbox-icon'></div>
-                </div>
-               
-                    <ul className="modal_body" style={{ marginTop: 20 }}>
-                        {[
-                            '15 secs focus on your ideal future self then review your plans to win that day',
-                            'watch the morning POWER UP call of the day',
-                            'Spend 10 mins reviewing your notes and/or analyzing good copy from the swipe file or Top Players',
-                            'send 3-10 outreach messages OR perform 1 G work-session on client work',
-                            'Train',
-                            'Review your wins and losses for the day. Plan out your next day accordingly.'
-                        ].map((item, index) => (
-                            <li key={index}>
-                                {/* Cross checkbox */}
-                                <input
-                                    className="custom-checkbox-x"
-                                    type="radio"
-                                    id={`cross${index + 1}`}
-                                    name={`checkbox-group-${index}`} // Group the checkboxes
-                                    checked={checkedItems[item] === 'cross'}
-                                    onChange={() => handleItemCheck(item, 'cross')}
-                                />
-                                {/* True checkbox */}
-                                <input
-                                    className="custom-checkbox"
-                                    type="radio"
-                                    id={`list${index + 1}`}
-                                    name={`checkbox-group-${index}`} // Group the checkboxes
-                                    checked={checkedItems[item] === 'true'}
-                                    onChange={() => handleItemCheck(item, 'true')}
-                                />
-                                <label className="modal_text_body" htmlFor={`list${index + 1}`}>{item}</label>
-                            </li>
-                        ))}
-                    </ul>
-                    <Button onClick={()=>setIsModalVisible(false)} color="default" variant="ghost" className="submit-button-mdkad mr-2">
+                        {/* START - chat content */}
+                        <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: overflowBlackHole, padding: '20px 0px', backgroundColor: blackChatbackgroundColor }}>
+                            {selectedChannel?.type !== ChannelType.raffles && selectedChannel?.type !== ChannelType.blackHole && selectedChannel?.type !== ChannelType.support && selectedChannel?.type !== ChannelType.feedback ?
+                                <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
+                                    <div style={{ margin: '20px 20px', backgroundColor: 'var(--seventh-color)', padding: '20px 20px', borderRadius: 5 }}>
+                                        <div style={{ color: 'var(--fourth-color)', fontSize: 18, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                            <svg style={{ marginRight: 5 }} width="24" height="24" viewBox="0 0 24 24" className="icon-2W8DHg" aria-hidden="true" role="img">
+                                                <path fill="currentColor" fillRule="evenodd" clipRule="evenodd"
+                                                    d="M5.88657 21C5.57547 21 5.3399 20.7189 5.39427 20.4126L6.00001 17H2.59511C2.28449 17 2.04905 16.7198 2.10259 16.4138L2.27759 15.4138C2.31946 15.1746 2.52722 15 2.77011 15H6.35001L7.41001 9H4.00511C3.69449 9 3.45905 8.71977 3.51259 8.41381L3.68759 7.41381C3.72946 7.17456 3.93722 7 4.18011 7H7.76001L8.39677 3.41262C8.43914 3.17391 8.64664 3 8.88907 3H9.87344C10.1845 3 10.4201 3.28107 10.3657 3.58738L9.76001 7H15.76L16.3968 3.41262C16.4391 3.17391 16.6466 3 16.8891 3H17.8734C18.1845 3 18.4201 3.28107 18.3657 3.58738L17.76 7H21.1649C21.4755 7 21.711 7.28023 21.6574 7.58619L21.4824 8.58619C21.4406 8.82544 21.2328 9 20.9899 9H17.41L16.35 15H19.7549C20.0655 15 20.301 15.2802 20.2474 15.5862L20.0724 16.5862C20.0306 16.8254 19.8228 17 19.5799 17H16L15.3632 20.5874C15.3209 20.8261 15.1134 21 14.8709 21H13.8866C13.5755 21 13.3399 20.7189 13.3943 20.4126L14 17H8.00001L7.36325 20.5874C7.32088 20.8261 7.11337 21 6.87094 21H5.88657ZM9.41045 9L8.35045 15H14.3504L15.4104 9H9.41045Z">
+                                                </path>
+                                            </svg> {selectedChannel?.name}
+                                        </div>
+                                        <div style={{ color: 'var(--fourth-color)', fontSize: 15 }} className="mt-2">This is the start of your conversation.</div>
+                                    </div>
+                                </div>
+                                :
+                                null
+                            }
+                            <div>
+                                {renderMainContent()}
+                            </div>
+                            {(selectedChannel?.type == ChannelType.checkList) ? (
+                                <div className={`popup-modal ${isModalVisible ? 'visible' : ''}`} onMouseEnter={handleMouseEnter}>
+                                    <div className="rectangle">
+                                        <div className="dot"></div>
+                                        <div className="rectangle-line"></div>
+                                    </div>
+                                    {/* <XIcon className="close-btn" onClick={handleCloseModal} /> */}
+                                    <h3 className="modal_text_title">✅┃daily-checklist</h3>
+                                    <div style={{ marginBottom: '42px' }}>
+                                        <div className='custom-checkbox-x-icon'></div>
+                                        <div className='custom-checkbox-icon'></div>
+                                    </div>
+
+                                    <ul className="modal_body" style={{ marginTop: 20 }}>
+                                        {[
+                                            '15 secs focus on your ideal future self then review your plans to win that day',
+                                            'watch the morning POWER UP call of the day',
+                                            'Spend 10 mins reviewing your notes and/or analyzing good copy from the swipe file or Top Players',
+                                            'send 3-10 outreach messages OR perform 1 G work-session on client work',
+                                            'Train',
+                                            'Review your wins and losses for the day. Plan out your next day accordingly.'
+                                        ].map((item, index) => (
+                                            <li key={index}>
+                                                {/* Cross checkbox */}
+                                                <div style={{ cursor: 'pointer' }} onClick={(e) => handleItemCheck(item, 'cross')}>
+                                                    {checkedItems[item] === 'cross' ?
+                                                        <div style={{ fontSize: 20, marginLeft: 10 }}>❌</div>
+                                                        :
+                                                        <div style={{ width: 20, height: 20, backgroundColor: 'var(--fourth-color)', borderRadius: 4, marginLeft: 10 }}></div>
+                                                    }
+                                                </div>
+                                                {/* True checkbox */}
+                                                <div style={{ cursor: 'pointer' }} onClick={(e) => handleItemCheck(item, 'true')}>
+                                                    {checkedItems[item] === 'true' ?
+                                                        <div style={{ fontSize: 20, marginLeft: 10 }}>✅</div>
+                                                        :
+                                                        <div style={{ width: 20, height: 20, backgroundColor: 'var(--fourth-color)', borderRadius: 4, marginLeft: 10 }}></div>
+                                                    }
+                                                </div>
+                                                <label className="message-text-3kzc3" style={{ marginLeft: 15 }} htmlFor={`list${index + 1}`}>{item}</label>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <Button onClick={submitChecklist} color="default" variant="ghost" className="submit-button-mdkad ml-2">
+                                        <span className="next-button-text-mdkad">Submit</span>
+                                    </Button>
+                                    <Button onClick={() => setIsModalVisible(false)} className='side-button-mdkad ml-2' style={{ height: 40 }} size='lg' variant='light'>
                                         <span className="next-button-text-mdkad">Cancel</span>
                                     </Button>
-                <Button onClick={submitChecklist} color="default" variant="ghost" className="submit-button-mdkad ml-2">
-                    <span className="next-button-text-mdkad">Submit</span>
-                </Button>
-            </div>
-        ) : null}
+                                </div>
+                            ) : null}
 
-    </div>
-    {/* END - chat content */}
+                        </div>
+                        {/* END - chat content */}
 
 
-    {/* START - chat input */}
-    <div style={{ height: '10%', backgroundColor: blackbackgroundColor }} className="flex flex-col">
-        {(selectedChannel?.type == ChannelType.checkList) ?
-            <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
-                    {/* <div
+                        {/* START - chat input */}
+                        <div style={{ height: '10%', backgroundColor: blackbackgroundColor }} className="flex flex-col">
+                            {(selectedChannel?.type == ChannelType.checkList) ?
+                                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                    <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                        {/* <div
                         className="relative"
                         onMouseEnter={handleMouseEnter}
                     >
                         <ClipboardList className='clipboard-icon' size={36} />
 
                     </div> */}
-                </div>
+                                    </div>
 
-            </footer>
-            : selectedChannel?.type == ChannelType.blackHole ?
-                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: '#000' }}>
-                    <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                </footer>
+                                : selectedChannel?.type == ChannelType.blackHole ?
+                                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: '#000' }}>
+                                        <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
 
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
-                            <input type="text" name="black-hole-message"
-                                className="message-input-7ajb312"
-                                value={sendText}
-                                onChange={(event) => { setSendText(event.target.value) }}
-                            />
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
+                                                <input type="text" name="black-hole-message"
+                                                    className="message-input-7ajb312"
+                                                    value={sendText}
+                                                    onChange={(event) => { setSendText(event.target.value) }}
+                                                />
 
-                            <Button className='main-button-7ajb412' size='sm' color=''
-                                onClick={(e) => {
-                                    sendBlackHoleMessage()
-                                }}
+                                                <Button className='main-button-7ajb412' size='sm' color=''
+                                                    onClick={(e) => {
+                                                        sendBlackHoleMessage()
+                                                    }}
 
-                            >
-                                Post
-                            </Button>
+                                                >
+                                                    Post
+                                                </Button>
 
-                        </div>
-                    </div>
+                                            </div>
+                                        </div>
 
-                </footer>
-                : selectedChannel?.type == ChannelType.raffles ?
-                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "var(--channels)" }}>
-                        <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
-                            <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}  >
-                                <Image
-                                    src="/assets/rafflenew.png"
-                                    style={{ height: "100%" }}
-                                    width={250}
-                                    height={70}
-                                    onMouseEnter={raffleSent ? showToastRaffle : sendRaffle}
+                                    </footer>
+                                    : selectedChannel?.type == ChannelType.raffles ?
+                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "var(--channels)" }}>
+                                            <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
+                                                <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}  >
+                                                    <Image
+                                                        src="/assets/rafflenew.png"
+                                                        style={{ height: "100%" }}
+                                                        width={250}
+                                                        height={70}
+                                                        onMouseEnter={raffleSent ? showToastRaffle : sendRaffle}
 
-                                />
-                                <span style={{
-                                    position: "absolute",
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                    fontSize: "18px",
-                                    fontWeight: "bold",
-                                    color: "#000", // Or any color that contrasts with the image
-                                }}>
-                                    Admit One
-                                </span>
-                            </div>
-                            {/* <Image src="/assets/rafflenew.png"
+                                                    />
+                                                    <span style={{
+                                                        position: "absolute",
+                                                        top: "50%",
+                                                        left: "50%",
+                                                        transform: "translate(-50%, -50%)",
+                                                        fontSize: "18px",
+                                                        fontWeight: "bold",
+                                                        color: "#000", // Or any color that contrasts with the image
+                                                    }}>
+                                                        Admit One
+                                                    </span>
+                                                </div>
+                                                {/* <Image src="/assets/rafflenew.png"
                                 style={{ height: "70px" }}
                                 width={150}
                                 height={20}
                                 onMouseEnter={() => { sendRaffle() }} /> */}
-                        </div>
+                                            </div>
 
-                    </footer>
-                    : (selectedChannel?.type == ChannelType.support) && selectedMessage ?
-                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                            <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                        </footer>
+                                        : (selectedChannel?.type == ChannelType.support) && selectedMessage ?
+                                            <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                                <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
 
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
-                                    <input type="text" name="support-message"
-                                        className="message-input-support"
-                                        value={sendMessage}
-                                        onChange={(event) => { setSendMessage(event.target.value) }}
-                                    />
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
+                                                        <input type="text" name="support-message"
+                                                            className="message-input-support"
+                                                            value={sendMessage}
+                                                            onChange={(event) => { setSendMessage(event.target.value) }}
+                                                        />
 
-                                    <Button className='main-button-7ajb412' size='sm' color=''
-                                        onClick={(e) => {
-                                            sendNewMessage()
-                                        }}
-                                    >
-                                        Send
-                                    </Button>
+                                                        <Button className='main-button-7ajb412' size='sm' color=''
+                                                            onClick={(e) => {
+                                                                sendNewMessage()
+                                                            }}
+                                                        >
+                                                            Send
+                                                        </Button>
 
-                                </div>
-                            </div>
+                                                    </div>
+                                                </div>
 
-                        </footer>
-                        : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                            <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
-                                <input accept="image/*" id="add-media-9"
-                                    type="file" style={{ display: 'none' }} />
-                                {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
-                                    <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
-                                        +
-                                    </label>
-                                    :
-                                    null}
-                                <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                    <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                                </div>
-                                {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                            </footer>
+                                            : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                                <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
+                                                    <input accept="image/*" id="add-media-9"
+                                                        type="file" style={{ display: 'none' }} />
+                                                    {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
+                                                        <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
+                                                            +
+                                                        </label>
+                                                        :
+                                                        null}
+                                                    <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                                        <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                                    </div>
+                                                    {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
                     <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
                 </form> */}
-                            </div>
-                        </footer>}
-    </div>
-</div>
-{/* END - chat input  END - chat left content */}
-
-{/* START - chat right content */}
-{selectedChannel?.type === ChannelType.blackHole ?
-    null :
-    selectedChannel?.type === ChannelType.raffles ?
-        null :
-        <div style={{ width: '33%', overflowX: 'hidden', backgroundColor: 'var(--seventh-color)', }}>
-
-            <div style={{ display: 'flex', alignItems: 'center', marginTop: 15, marginLeft: 20 }}>
-                {/* <img alt="Avatar" src={selectedServer?.category_pic} width={46} height={46} /> */}
-                {/* zzz */}
-                <img alt="Avatar" src={`/assets/server${selectedServer?.id}selected.svg`} width={46} height={46} />
-                <div className="channels-footer-details-23mas">
-                    <span className="username-312c02qena">{selectedServer?.name}</span>
-
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <div style={{ backgroundColor: '#36d399', width: 11, height: 11, borderRadius: '50%', marginRight: 6 }} />
-                        <span style={{ cursor: 'pointer' }} className="tag-kla3mca2" onClick={() => onlineCountModel.onOpen()}>{selectedServer?.online_users} online</span>
+                                                </div>
+                                            </footer>}
+                        </div>
                     </div>
+                    {/* END - chat input  END - chat left content */}
+
+                    {/* START - chat right content */}
+                    {selectedChannel?.type === ChannelType.blackHole ?
+                        null :
+                        selectedChannel?.type === ChannelType.raffles ?
+                            null :
+                            <div style={{ width: '33%', overflowX: 'hidden', backgroundColor: 'var(--seventh-color)', }}>
+
+                                <div style={{ display: 'flex', alignItems: 'center', marginTop: 15, marginLeft: 20 }}>
+                                    {/* <img alt="Avatar" src={selectedServer?.category_pic} width={46} height={46} /> */}
+                                    {/* zzz */}
+                                    <img alt="Avatar" src={`/assets/server${selectedServer?.id}selected.svg`} width={46} height={46} />
+                                    <div className="channels-footer-details-23mas">
+                                        <span className="username-312c02qena">{selectedServer?.name}</span>
+
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                            <div style={{ backgroundColor: '#36d399', width: 11, height: 11, borderRadius: '50%', marginRight: 6 }} />
+                                            <span style={{ cursor: 'pointer' }} className="tag-kla3mca2" onClick={() => onlineCountModel.onOpen()}>{selectedServer?.online_users} online</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex h-8 font-medium border-grey-400 mt-2 border-b px-2">
+                                    {SideMenus.map((option, index) => {
+                                        let isSelected = selectedSideMenu.Value == option.Value;
+                                        return (
+                                            <button
+                                                key={index}
+                                                type="button"
+                                                className="relative flex flex-1 cursor-pointer items-center justify-center"
+                                                style={isSelected ? { borderBottomColor: 'var(--fifth-color)', borderBottomWidth: 3 } : {}}
+                                                onClick={(e) => setSelectedSideMenu(option)}
+                                            >
+                                                {option.Icon()}
+                                            </button >
+                                        );
+                                    })}
+                                </div>
+
+                                <div style={{ overflowX: 'hidden', overflowY: 'scroll' }}>
+                                    {renderSideMenuOption()}
+                                </div>
+                            </div>
+                    }
+
+                    {/* END - chat right content */}
+
                 </div>
-            </div>
-
-            <div className="flex h-8 font-medium border-grey-400 mt-2 border-b px-2">
-                {SideMenus.map((option, index) => {
-                    let isSelected = selectedSideMenu.Value == option.Value;
-                    return (
-                        <button
-                            key={index}
-                            type="button"
-                            className="relative flex flex-1 cursor-pointer items-center justify-center"
-                            style={isSelected ? { borderBottomColor: 'var(--fifth-color)', borderBottomWidth: 3 } : {}}
-                            onClick={(e) => setSelectedSideMenu(option)}
-                        >
-                            {option.Icon()}
-                        </button >
-                    );
-                })}
-            </div>
-
-            <div style={{ overflowX: 'hidden', overflowY: 'scroll' }}>
-                {renderSideMenuOption()}
-            </div>
-        </div>
-}
-
-{/* END - chat right content */}
-
-</div>
                 {/* START - main right content */}
 
             </div>

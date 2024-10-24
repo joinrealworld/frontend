@@ -1243,7 +1243,7 @@
 
 /* Add a checkmark symbol when checked */
 .custom-checkbox-modal:checked+label::after {
-    content: "✓";
+    content: "✅";
     position: absolute;
     left: 5px;
     /* Adjusted for better centering */

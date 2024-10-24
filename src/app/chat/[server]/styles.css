@@ -800,6 +800,7 @@ main {
     border-radius: 12px;
     display: flex;
     margin-top: 10px;
+    cursor: pointer;
     padding: 12px 10px;
     flex-direction: column;
     align-items: center;
@@ -1698,19 +1699,19 @@ main {
 
 /* Style the custom checkbox when checked */
 .custom-checkbox:checked+label::before {
-    background-color: #ecc879;
+    /* background-color: #ecc879; */
 }
 
 /* Add a checkmark symbol when checked */
 .custom-checkbox:checked+label::after {
-    content: "✓";
+    content: "✅";
     position: absolute;
-    left: 5px;
+    left: -0.1px;
     /* Adjusted for better centering */
-    top: 50%;
+    top: 52%;
     transform: translateY(-50%);
     color: white;
-    font-size: 16px;
+    font-size: 20px;
     /* Adjusted font size */
     line-height: 1;
 }
@@ -1722,25 +1723,25 @@ main {
 }
 
 .custom-checkbox-icon::after {
-    content: "✓";
+    content: "✅";
     position: absolute;
-    left: 65px;
+    left: 60px;
     /* Adjusted for better centering */
     top: 15%;
     color: white;
-    font-size: 22px;
+    font-size: 19px;
     /* Adjusted font size */
     line-height: 1;
 }
 
 .custom-checkbox-x-icon::after {
-    content: "✗";
+    content: "❌";
     position: absolute;
-    left: 25px;
+    left: 28px;
     /* Adjusted for better centering */
-    top: 15%;
+    top: 15.2%;
     color: white;
-    font-size: 22px;
+    font-size: 18px;
     /* Adjusted font size */
     line-height: 1;
 }
@@ -1776,19 +1777,18 @@ main {
     width: 20px;
     height: 20px;
     background-color: var(--fourth-color);
-    ;
     border-radius: 4px;
 }
 
 /* Style the cross checkbox when checked */
 .custom-checkbox-x:checked::before {
-    background-color: #ff6f6f;
+    /* background-color: #ff6f6f; */
     /* Red background for the cross */
 }
 
 /* Add a cross symbol when checked */
 .custom-checkbox-x:checked::after {
-    content: "✗";
+    content: "❌";
     /* Cross symbol */
     position: absolute;
     left: 2px;
@@ -1837,6 +1837,30 @@ main {
     color: #dedede !important;
     box-shadow: 0 0 10px 0 #b78727 !important;
     font-size: 16px !important;
+}
+
+.side-button-mdkad {
+    outline: 0;
+    min-width: 120px;
+    border: 0;
+    margin-top: 12px;
+    border-radius: 4px !important;
+    margin-bottom: 10px;
+    padding: 5px;
+    color: var(--fifth-color) !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.4s ease-in-out;
+    cursor: pointer;
+}
+
+.side-button-mdkad:hover,
+.side-button-mdkad:active,
+.side-button-mdkad:focus {
+    background: #7d7e81;
+    color: var(--fourth-color);
+    font-size: 16px;
 }
 
 .ticket-raffle {
@@ -1931,7 +1955,7 @@ main {
 }
 
 .custom-checkboxlist.yes::before {
-    content: '✓';
+    content: '✅';
     /* Checkmark for true */
     color: green;
     /* Optional: color for the checkmark */
@@ -1939,7 +1963,7 @@ main {
 }
 
 .custom-checkboxlist.cross::before {
-    content: '✗';
+    content: '❌';
     /* X mark for cross */
     color: red;
     /* Optional: color for the X mark */
@@ -1996,7 +2020,7 @@ main {
 
 /* Add a checkmark symbol when checked */
 .custom-checkbox-modal:checked+label::after {
-    content: "✓";
+    content: "✅";
     position: absolute;
     left: 5px;
     /* Adjusted for better centering */
@@ -2204,7 +2228,7 @@ main {
     height: 2rem;
     width: 2rem;
     border-radius: 50%;
-    padding: 7px; 
+    padding: 7px;
     margin-right: 10px;
 }
 
