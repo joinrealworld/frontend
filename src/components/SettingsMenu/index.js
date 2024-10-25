@@ -70,6 +70,8 @@ function SettingsMenu(props) {
 
     } finally {
       dispatch(props.actions.userLogout());
+      localStorage.removeItem('mediaRules');
+      localStorage.removeItem('signature');
       router.replace('/');
     }
   }
@@ -94,6 +96,8 @@ function SettingsMenu(props) {
 
     } finally {
       dispatch(props.actions.userLogout());
+      localStorage.removeItem('mediaRules');
+      localStorage.removeItem('signature');
       router.replace('/');
     }
   }

@@ -336,6 +336,9 @@ function Chat(props) {
 
     const [raffleSent, setRaffleSent] = useState(false);
 
+    const[clanData,setClanData] = useState([]);
+    const [isClanDataFetch, setIsClanDataFetch] = useState(false);
+
     const handleMouseEnter = () => setIsModalVisible(true);
 
     // Update positions when a new message is added
@@ -676,8 +679,8 @@ function Chat(props) {
         const rsp = await response.json();
         if (response.status >= 200 && response.status < 300) {
             if (rsp.payload && typeof rsp.payload == 'object') {
-                setChatData(Object.values(rsp.payload));
-                setIsChatDataFetch(true);
+                setClanData(Object.values(rsp.payload));
+                setIsClanDataFetch(true);
                 scrollToBottomChatContent();
             } else {
                 toast("Error while fetching data!");
@@ -1303,6 +1306,7 @@ function Chat(props) {
         // router.replace('/media');
         if (canvas) {
             const signatureData = canvas.toDataURL();
+            localStorage.setItem('mediaRules', JSON.stringify(checkedMediaRules));
             localStorage.setItem('signature', signatureData);
             router.replace('/media');
         }
@@ -1433,8 +1437,13 @@ function Chat(props) {
 
     useEffect(() => {
         if (selectedChannel?.type == ChannelType.media) {
-            mediaContractModel.onOpen();
-            setIsDrawing(true);
+            if(localStorage.getItem('signature') !== null){
+                router.replace('/media');
+            }else{
+                mediaContractModel.onOpen();
+                setIsDrawing(true);
+            }
+           
             // Alternatively, you might want to redirect here
             // router.replace('/media');
         } else {
@@ -1674,41 +1683,47 @@ function Chat(props) {
     }
 
     const renderClans = (clansData) => {
-        if (!isChatDataFetch) {
+        if (!isClanDataFetch) {
             return (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Spinner size='md' color='default' />
                 </div>
             );
         }
-        if (clansData.length == 0) {
+        if (clanData.length == 0) {
             return (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <p style={{ color: 'var(--fourth-color)', opacity: 0.7, fontSize: 15, marginTop: 30 }}>No clans available!</p>
                 </div>
             );
         }
-        return clansData.map((clan, index) => {
+        return clanData.map((clan, index) => {
             return (
                 <div key={index} className='stream-wrap-83nja'>
                     {clan?.length > 0 &&
-                        <li className="stream-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer' }}>
-                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <span className="f1-bold--xs" style={{ minWidth: 35, width: 'unset' }}>NBA</span>
-                                <span className="team-color-icon" style={{ background: '#00D2BE' }}></span>
-                                <span className="f1--xs MacBaslik">
-                                    {/* zzz */}
-                                    <span className="d-md-inline f1-capitalize">
-                                        {"clan.title"}
-                                    </span>
-                                </span>
+                        <div className="stream-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer',display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        
+                            <span className="f1-bold--xs" style={{ minWidth: 35 }}>Clan {index + 1}</span>
+                            <span className="team-color-icon" style={{ background: '#00D2BE' }}></span>
+                           
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span className="f1-bold--xs" style={{marginBottom:'5px'}}>Online</span>
+                                <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>{clan.filter(member => member.is_online).length}/10</span>
                             </div>
-                            <span className="f1-podium-right">
-                                {/* zzz */}
-
-                                <i className="icon icon-chevron-right f1-color--warmRed"></i>
-                            </span>
-                        </li>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span className="f1-bold--xs" style={{marginBottom:'5px'}}>Server Speed</span>
+                                <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>Fast</span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span className="f1-bold--xs"style={{marginBottom:'5px'}} >Lesson Completed</span>
+                                <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>7/10</span>
+                            </div>
+                       
+                        <span className="f1-podium-right">
+                            <i className="icon icon-chevron-right f1-color--warmRed"></i>
+                        </span>
+                    </div>
+                    
                     }
                 </div>
             );

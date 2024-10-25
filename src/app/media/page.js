@@ -64,6 +64,7 @@ function MediaPage(props) {
   const [isSubmitVisible, setIsSubmitVisible] = useState(false);
 
   const [signatureData, setSignatureData] = useState('');
+  const [mediaRules, setMediaRules] = useState('');
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -121,8 +122,10 @@ function MediaPage(props) {
 
   useEffect(() => {
     const savedSignature = localStorage.getItem('signature');
+    const mediaRules = localStorage.getItem('mediaRules');
     if (savedSignature) {
       setSignatureData(savedSignature);
+      setMediaRules(JSON.parse(mediaRules));
     }
   }, []);
 
@@ -1315,7 +1318,7 @@ function MediaPage(props) {
                               type="checkbox"
                               id={`list${index + 1}`}
                               name={`checkbox-group-${index}`} // Group the checkboxes
-                            // checked={checkedMediaRules[item] === 'true'}
+                            checked={mediaRules[item] === 'true'}
                             // onChange={() => handleMediaRulesCheck(item, 'true')}
                             />
                             <label className="modal_text_body" htmlFor={`list${index + 1}`}>{item}</label>
