@@ -338,6 +338,7 @@ function Chat(props) {
 
     const[clanData,setClanData] = useState([]);
     const [isClanDataFetch, setIsClanDataFetch] = useState(false);
+    const [onLeaderboardClick,setOnLeaderboardClick] = useState(false);
 
     const handleMouseEnter = () => setIsModalVisible(true);
 
@@ -770,6 +771,32 @@ function Chat(props) {
     }
 
     const getSupportData = async () => {
+        // console.log(props);
+        // const response1 = await fetch(apiURL + 'api/v1/support/fetch_message?support_chat_id=' + '42692c20-645b-4462-9fee-3c1c479ee848', {
+        //     method: 'GET',
+        //     headers: {
+        //         'Authorization': 'Bearer ' + props.user.authToken
+        //     }
+        // });
+        // const rsp1 = await response1.json();
+        // console.log(rsp1);
+        // const response2 = await fetch(apiURL + 'api/v1/support/send_message/' +props.user.user.uuid, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Authorization': 'Bearer ' + props.user.authToken
+        //     },
+        //     body: JSON.stringify({
+        //         "message": 
+        //           {
+        //             "content": "Hello",
+        //             "timestamp": "2024-09-19T14:32:15"
+        //           }
+                
+        //       })
+        // });
+        // const rsp2 = await response2.json();
+        // console.log(rsp2);
         const response = await fetch(apiURL + 'api/v1/support/support_list', {
             method: 'GET',
             headers: {
@@ -1697,7 +1724,48 @@ function Chat(props) {
                 </div>
             );
         }
-        return clanData.map((clan, index) => {
+        return (<>
+          <div style={{
+                display: 'flex',
+                justifyContent: 'center', // Center horizontally within the parent
+                alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
+            }}>
+                <div style={{
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    width: "50%",
+                    alignItems: 'center',
+                    justifyContent: 'center',   
+                    color: "var(--fourth-color)"
+                }}
+                className='stream-box-ac2s2'
+                onClick={()=>{setOnLeaderboardClick(true)}}>
+                    Leaderboard
+                </div>
+            </div>
+            {onLeaderboardClick ? <div style={{
+                marginTop:"10px",
+                marginBottom:"10px",
+                display: 'flex',
+                justifyContent: 'center', // Center horizontally within the parent
+                alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
+            }}>
+                <div style={{
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    width: "65%",
+                    alignItems: 'center',
+                    justifyContent: 'center',   
+                    color: "var(--fourth-color)"
+                }}
+                > <ArrowLeft className="arrow-left" onClick={() => setOnLeaderboardClick(false)} />
+                   70 Lesson Completed
+                </div>
+            </div> : null}
+            
+           {clanData.map((clan, index) => {
             return (
                 <div key={index} className='stream-wrap-83nja'>
                     {clan?.length > 0 &&
@@ -1714,10 +1782,10 @@ function Chat(props) {
                                 <span className="f1-bold--xs" style={{marginBottom:'5px'}}>Server Speed</span>
                                 <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>Fast</span>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <span className="f1-bold--xs"style={{marginBottom:'5px'}} >Lesson Completed</span>
                                 <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>7/10</span>
-                            </div>
+                            </div> */}
                        
                         <span className="f1-podium-right">
                             <i className="icon icon-chevron-right f1-color--warmRed"></i>
@@ -1727,7 +1795,10 @@ function Chat(props) {
                     }
                 </div>
             );
-        });
+        })}
+        </>)
+        
+        
     }
 
 
