@@ -66,6 +66,16 @@ function MediaPage(props) {
   const [signatureData, setSignatureData] = useState('');
   const [mediaRules, setMediaRules] = useState('');
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [nextPage, setNextPage] = useState(null);
+  const [prevPage, setPrevPage] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const [userEmail,setUserEmail] = useState("");
+  const [userFirstName,setUserFirstName] = useState("");
+  const [userLastName,setUserLastName] = useState("");
+  const [userName,setUserName] = useState("");
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -111,8 +121,46 @@ function MediaPage(props) {
   useEffect(() => {
     if (!props.user.isLoggedIn) {
       router.push('/login');
-    }
+    } else {
+      // get data
+      getProfile(props.user.authToken);
+  }
   }, [props.user.isLoggedIn]);
+
+  const getProfile = async (authToken) => {
+    const response = await fetch(apiURL + 'api/v1/user/profile', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authToken
+        }
+    });
+    console.log("response --------------------------------");
+    console.log(response);
+    if (response.status >= 200 && response.status < 300) {
+        const rsp = await response.json();
+        console.log("rsp.payload --------------------------------");
+        console.log(rsp.payload);
+        if (rsp.payload && rsp.payload?.id) {
+            setUserEmail(rsp.payload.email)
+            setUserFirstName(rsp.payload.first_name)
+            setUserLastName(rsp.payload.last_name)
+            setUserName(rsp.payload.username)
+        } else {
+            if (rsp.message && typeof rsp.message === 'string') {
+                toast(rsp.message);
+            } else {
+                toast("Something went wrong!");
+            }
+        }
+    } else {
+        if (response.status == 401) {
+            dispatch(props.actions.userLogout());
+        } else {
+            toast("Something went wrong!");
+        }
+    }
+}
 
   useEffect(() => {
     if (searchParams?.cid && searchParams?.cid != selectedCourse?.uuid) {
@@ -129,26 +177,68 @@ function MediaPage(props) {
     }
   }, []);
 
-  const getMediaData = async () => {
-    const response = await fetch(apiURL + 'api/v1/media/fetch/message', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + props.user.authToken
-      }
-    });
-    if (response.status >= 200 && response.status < 300) {
-      const rsp = await response.json();
-      if (rsp.results) {
-        const reverseArray = rsp.results.reverse();
-        setMedias(reverseArray);
-        setOriginalMedias(reverseArray);
-        setIsMediaFetch(true);
-      }
-    } else {
-      toast("Error while fetching data!");
+  const getMediaData = async (page=1) => {
+    setIsMediaFetch(true);
+    try {
+      const response = await fetch(`https://joinrealworld-backend.onrender.com/api/v1/media/fetch/message?page=${page}`);
+      const data = await response.json();
+      setMedias(data.results);
+      setOriginalMedias(data.results);
+      setNextPage(data.next);
+      setPrevPage(data.previous);
+      setTotalCount(data.count);
+      setCurrentPage(page);
+    } catch (error) {
+      console.error('Error fetching media:', error);
+      // Optionally set an error state here
+    } finally {
+      setIsMediaFetch(false);
     }
+    // const response = await fetch(apiURL + 'api/v1/media/fetch/message?page=3', {
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer ' + props.user.authToken
+    //   }
+    // });
+    // if (response.status >= 200 && response.status < 300) {
+    //   const rsp = await response.json();
+    //   if (rsp.results) {
+    //     const reverseArray = rsp.results.reverse();
+    //     setMedias(rsp.results);
+    //     setOriginalMedias(reverseArray);
+    //     setIsMediaFetch(true);
+    //   }
+    // } else {
+    //   toast("Error while fetching data!");
+    // }
   }
+
+  const handleNextPage = () => {
+    if (nextPage) {
+      const urlParams = new URLSearchParams(nextPage.split('?')[1]);
+      const nextPageNumber = urlParams.get('page');
+      if (nextPageNumber && nextPageNumber !== 'null') {
+        getMediaData(nextPageNumber);
+      }
+    }
+  };
+  
+  const handlePrevPage = () => {
+    if (prevPage) {
+      const urlParams = new URLSearchParams(prevPage.split('?')[1]);
+      let prevPageNumber = urlParams.get('page');
+  
+      // Set default page number if prevPageNumber is null
+      if (!prevPageNumber || prevPageNumber === 'null') {
+        prevPageNumber = '1'; // Set this as per your pagination logic or requirement
+      }
+      getMediaData(prevPageNumber);
+    }
+  };
+  
+  
+  
 
   const getInitData = async () => {
     getMediaData();
@@ -511,6 +601,184 @@ function MediaPage(props) {
   }, [medias]);
 
   const renderMediaContent = () => {
+    if (isMediaFetch) {
+      return <Loading />;
+    } else {
+      return (
+        <>
+          <div className="media-posts">
+            {/* Search Bar */}
+            <div className={`search-post-o38ca3 ${isSearchVisible ? 'visible' : ''}`} >
+              <SearchIcon
+                color="var(--fifth-color)"
+                size={17}
+                className="search-icon"
+                style={{ position: 'absolute', top: 21, left: 8 }}
+              />
+              <input
+                type="text"
+                name="search"
+                className="search-input-7ajb312"
+                placeholder="Search ..."
+                value={searchText}
+                autoComplete="off"
+                style={{ paddingLeft: '40px' }}
+                onChange={(event) => {
+                  let searchTextValue = event.target.value.trim().toLowerCase();
+                  setSearchText(searchTextValue);
+                  const filteredMedias = searchTextValue
+                    ? originalMedias.filter(asset => {
+                      return (
+                        asset?.message?.toLowerCase().includes(searchTextValue) ||
+                        asset?.user?.toLowerCase().includes(searchTextValue)
+                      );
+                    })
+                    : medias;
+                  console.log(searchTextValue);
+                  setMedias(filteredMedias);
+                }}
+              />
+              <XIcon
+                color="var(--fifth-color)"
+                size={24}
+                className="close-icon-search"
+                style={{ cursor: 'pointer', position: 'absolute', top: 17.5, right: 8 }}
+                onClick={() => {
+                  setSearchText('');
+                  setMedias(originalMedias);
+                }}
+              />
+            </div>
+
+            {/* Media Posts */}
+            {medias?.length > 0 ? (
+              medias.map((media, index) => (
+                <div key={media.uuid || index} className="post">
+                  <div className="info2">
+                    <div className="user">
+                      <div className="profile-pic">
+                        <img
+                          src='/assets/person.png'
+                          alt={`${media.user}'s profile`}
+                          style={{ height: 36, width: 36, borderRadius: '50%' }}
+                        />
+                      </div>
+                      <p className="username">{media.user}</p>
+                    </div>
+                    {media.content && (
+                      <div style={{ marginLeft: 'auto' }}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          style={{ cursor: "pointer", color: "var(--fourth-color)" }}
+                          width="26"
+                          height="26"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-ellipsis"
+                        >
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="19" cy="12" r="1" />
+                          <circle cx="5" cy="12" r="1" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Media Content */}
+                  {media.content && media.content.type_of_content === 'image' ? (
+                    <img
+                      src={"/assets/media/post1.webp"}
+                      className="post-image"
+                      alt={media.message}
+                    />
+                  ) : null}
+
+                  {/* Message Content */}
+                  {media.content === null && (
+                    <p className="description-text">{media.message}</p>
+                  )}
+
+                  {/* Post Actions */}
+                  <div className="post-content">
+                    <div className="reaction-wrapper">
+                      <HeartIcon
+                        className="heart-icon"
+                        style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10px' }}
+                        fill={media.likes_count > 0 ? "var(--fourth-color)" : "transparent"}
+                        onClick={() => onToggleFavorite(media)}
+                      />
+                      <Send
+                        className="send-icon"
+                        onClick={messagePage}
+                        style={{ cursor: "pointer", color: "var(--fourth-color)", marginRight: '10px' }}
+                      />
+                      {media.content && (
+                        <Bookmark
+                          className="send-icon"
+                          onClick={messagePage}
+                          style={{ cursor: "pointer", color: "var(--fourth-color)", marginLeft: 'auto' }}
+                        />
+                      )}
+                    </div>
+                    <p className="likes">{media.likes_count} Likes</p>
+                    {media.content && (
+                      <p className="description">{media.message}</p>
+                    )}
+                    {/* <p className="post-time">{timeAgo(media.timestamp)}</p> */}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No media posts found.</p>
+            )}
+
+            {/* Pagination Controls */}
+            <div className="pagination-controls" style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
+              <button
+                onClick={handlePrevPage}
+                disabled={!prevPage}
+                style={{
+                  padding: '10px 20px',
+                  marginRight: '10px',
+                  cursor: prevPage ? 'pointer' : 'not-allowed',
+                  backgroundColor: prevPage ? 'var(--primary-color)' : 'grey',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px'
+                }}
+              >
+                Previous
+              </button>
+              <span style={{ alignSelf: 'center', color:"var(--fourth-color)" }}>
+                Page {currentPage} of {Math.ceil(totalCount / 10)} {/* Adjust 10 based on your page size */}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={!nextPage}
+                style={{
+                  padding: '10px 20px',
+                  marginLeft: '10px',
+                  cursor: nextPage ? 'pointer' : 'not-allowed',
+                  backgroundColor: nextPage ? 'var(--primary-color)' : 'grey',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px'
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </>
+      );
+    }
+  };
+
+  const renderMedia1Content = () => {
     if (isMediaFetch) {
       return (
         <>
@@ -1242,11 +1510,11 @@ function MediaPage(props) {
                           src='/assets/person.png'
                           style={{ height: 84, width: 84, borderRadius: '50%' }}
                         /></div>
-                        <div style={{ marginLeft: '20px' }}> <p className="username1" >samwilson624663
+                        <div style={{ marginLeft: '20px' }}> <p className="username1" >{userName}
                           <Button className="edit-profile-button username2" >Edit Profile</Button></p>
                           <p className="username1" style={{ fontSize: '14px' }}>4 posts
-                            <span className="username2" > samwilson624663@gmail.com</span></p>
-                          <p className="username1" > Sam Wilson</p></div>
+                            <span className="username2" > {userEmail}</span></p>
+                          <p className="username1" > {userFirstName} {userLastName}</p></div>
 
 
 

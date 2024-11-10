@@ -2251,6 +2251,17 @@ main {
         transition: left 0.3s linear;
     }
 
+    .message-text-3kzc3 {
+        font-size: 12px;
+        font-weight: 300;
+        color: var(--fourth-color);
+        line-height: 16px;
+    
+        b {
+            font-weight: 600;
+        }
+    }
+
 
     @media screen and (max-width: 600px) {
 
@@ -2270,7 +2281,7 @@ main {
     @media screen and (max-width: 490px) {
         #chat {
             display: flex;
-            width: 50%;
+            width: 100%;
             transition: left 0.3s linear;
         }
 
