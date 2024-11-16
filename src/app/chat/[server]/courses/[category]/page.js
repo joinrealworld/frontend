@@ -3,12 +3,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { User, Progress, Button, RadioGroup, useRadio, cn, VisuallyHidden, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure, } from "@nextui-org/react";
+import { User, Progress, Button, RadioGroup, useRadio, cn, VisuallyHidden, Spinner } from "@nextui-org/react";
 import Link from "next/link";
 import $ from "jquery";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon, MoveLeft, AlignLeft, ArrowLeftCircle, PanelLeft, CheckCircleIcon, CheckCircle2Icon } from 'lucide-react';
+import { ArrowLeft, CheckIcon, ChevronRight, ChevronRightIcon, HeartIcon, XIcon, SearchIcon } from 'lucide-react';
 
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/audio.css';
@@ -16,7 +16,6 @@ import '@vidstack/react/player/styles/default/layouts/video.css';
 
 import { MediaPlayer, MediaProvider, Poster, Track } from "@vidstack/react"
 import { DefaultVideoLayout, defaultLayoutIcons } from '@vidstack/react/player/layouts/default';
-import ValidatedForm from '@/components/ValidatedForm';
 
 import './styles.css';
 import connect from '@/components/ConnectStore/connect';
@@ -56,14 +55,6 @@ function CoursesByCategory(props) {
 
   const [isNextLoading, setIsNextLoading] = useState(false);
   const [isPreviousLoading, setIsPreviousLoading] = useState(false);
-
-  const [isNextClick, setIsNextClick] = useState(false);
-  const [feedbackValue, setFeedbackValue] = useState('');
-  const [isLoadingSubmitFeedback, setIsLoadingSubmitFeedback] = useState(false);
-
-  const feedbackModel = useDisclosure({
-    id: 'ask-feedback',
-  });
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -153,6 +144,7 @@ function CoursesByCategory(props) {
       const rsp = await response.json();
 
       if (rsp.payload && rsp.payload?.uuid) {
+        console.log(rsp.payload);
         setSelectedCourse(rsp.payload);
         setIsCourseDataFetch(true);
         let coursesList = [...courses];
@@ -197,7 +189,6 @@ function CoursesByCategory(props) {
 
   const onSelectCourse = (item) => {
     if (item.uuid !== selectedCourse?.uuid) {
-      setIsNextClick(false);
       setIsCourseDataFetch(false);
       router.push('?cid=' + item.uuid);
     }
@@ -217,12 +208,6 @@ function CoursesByCategory(props) {
     $('#course-sidebar').toggleClass("visible");
     $('#course-content').toggleClass("visible");
     $('.header-3m32aaw').toggleClass("visible");
-  }
-
-  const markLessonFavorite = () => {
-    if (!selectedCourse?.is_favorite) {
-      onToggleFavorite();
-    }
   }
 
   const onToggleFavorite = async () => {
@@ -293,12 +278,18 @@ function CoursesByCategory(props) {
     const rsp = await response.json();
     if (response.status >= 200 && response.status < 300) {
       if (rsp.payload) {
-        if (selectedLesson?.section == Sections.video && !isNextClick) {
-          setIsNextClick(true);
+        let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
+        let newIndex = Math.min(selectedLessonIndex + 1, selectedCourse?.data?.length - 1);
+        let newLesson = selectedCourse?.data?.[newIndex];
+        if (selectedCourse && selectedCourse?.uuid) {
+          router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
         } else {
-          onNextLessonClick();
+          if (originalCourses?.length > 0) {
+            router.push('?cid=' + originalCourses?.[0]?.uuid);
+          }
         }
         setIsNextLoading(false);
+        getCourseDataById(selectedCourse?.uuid, false);
       } else {
         handleAPIError(rsp);
         setIsNextLoading(false);
@@ -314,10 +305,6 @@ function CoursesByCategory(props) {
   }
 
   const onPreStep = async (e) => {
-    if (isNextClick) {
-      setIsNextClick(false);
-      return;
-    }
     let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
     let newIndex = Math.max(selectedLessonIndex - 1, 0);
     let newLesson = selectedCourse?.data?.[newIndex];
@@ -328,6 +315,44 @@ function CoursesByCategory(props) {
         router.push('?cid=' + originalCourses?.[0]?.uuid);
       }
     }
+    // setIsPreviousLoading(true);
+    // const response = await fetch(apiURL + 'api/v1/channel/mark/complete/course', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer ' + props.user.authToken
+    //   },
+    //   body: JSON.stringify({
+    //     course_id: selectedCourse?.uuid, // selected course uuid
+    //     content_id: selectedLesson?.uuid,  // selected course's content uuid
+    //   })
+    // });
+    // const rsp = await response.json();
+    // if (response.status >= 200 && response.status < 300) {
+    //   if (rsp.payload) {
+    //     let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
+    //     let newIndex = Math.max(selectedLessonIndex - 1, 0);
+    //     let newLesson = selectedCourse?.data?.[newIndex];
+    //     if (selectedCourse && selectedCourse?.uuid) {
+    //       router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
+    //     } else {
+    //       if (courses?.length > 0) {
+    //         router.push('?cid=' + courses?.[0]?.uuid);
+    //       }
+    //     }
+    //     setIsPreviousLoading(false);
+    //   } else {
+    //     handleAPIError(rsp);
+    //     setIsPreviousLoading(false);
+    //   }
+    // } else {
+    // if (response.status == 401) {
+    //   dispatch(props.actions.userLogout());
+    // } else {
+    //   handleAPIError(rsp);
+    //   setIsPreviousLoading(false);
+    // }
+    // }
   }
 
   const getQuizFromId = async (courseId, quizId, onSuccess = () => { }) => {
@@ -419,80 +444,14 @@ function CoursesByCategory(props) {
     return null;
   }
 
-  const onNextLessonClick = (onSuccess = () => { }) => {
-    let selectedLessonIndex = selectedCourse?.data?.findIndex(c => c.uuid === selectedLesson?.uuid);
-    let newIndex = Math.min(selectedLessonIndex + 1, selectedCourse?.data?.length - 1);
-    let newLesson = selectedCourse?.data?.[newIndex];
-    if (selectedCourse && selectedCourse?.uuid) {
-      router.push('?cid=' + selectedCourse?.uuid + '&lid=' + newLesson?.uuid);
-    } else {
-      if (originalCourses?.length > 0) {
-        router.push('?cid=' + originalCourses?.[0]?.uuid);
-      }
-    }
-    getCourseDataById(selectedCourse?.uuid, false);
-    onSuccess();
-  }
-
   const renderCourseContentBySection = (currentMessage) => {
     if (currentMessage.section == Sections.video && currentMessage?.section_url) {
-      if (isNextClick) {
-        return (
-          <>
-            <div style={{ flex: 1, width: '90%' }}>
-
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 22 }}>
-                <CheckCircle2Icon size={24} style={{ color: "var(--gold-color)", marginRight: 10 }} />
-                <div className="lesson-complete-mcajn2">
-                  Lesson Complete
-                </div>
-              </div>
-
-              <div className="after-course-box-mcajn2" onClick={(e) => markLessonFavorite()}>
-                <div style={{ display: 'flex', flexDirection: 'column', }}>
-                  <h1 className="after-course-title-mcajn2">Favorite</h1>
-                  <p className="after-course-desc-mcajn2">Liked the lesson? Add it to your favorites to watch it again later.</p>
-                </div>
-                <button className="btn btn-sm btn-circle btn-ghost">
-                  <HeartIcon
-                    className="heart-icon"
-                    fill={selectedCourse.is_favorite ? "var(--fourth-color)" : "transparent"}
-                    style={{ color: "var(--fourth-color)" }}
-                    size={22}
-                  />
-                </button>
-              </div>
-              <div className="after-course-box-mcajn2" onClick={(e) => feedbackModel.onOpen()}>
-                <div style={{ display: 'flex', flexDirection: 'column', }}>
-                  <h1 className="after-course-title-mcajn2">Feedback</h1>
-                  <p className="after-course-desc-mcajn2">Share your feedback with us about this lesson.</p>
-                </div>
-                <button className="btn btn-sm btn-circle btn-ghost">
-                  <ChevronRight size={22} style={{ color: "var(--fourth-color)" }} />
-                </button>
-              </div>
-              <div style={{ display: 'flex', width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <Button isLoading={isNextLoading} variant="flat" className="next-lesson-button-mdkad" onClick={(e) => {
-                  onNextLessonClick(() => {
-                    setTimeout(() => {
-                      setIsNextClick(false);
-                    }, 2000);
-                  });
-                }}>
-                  <span className="next-button-text-mdkad">Next Lesson</span>
-                </Button>
-              </div>
-            </div>
-          </>
-        );
-      }
-
       return (
         <>
           <div className="lesson-video-3naksn">
             {/* <iframe
-              src={getVimeoPlayerURL(currentMessage?.section_url)}
-              // src={"https://player.vimeo.com/video/856230447?h=553ef6e21b&vimeo_logo=0"}
+              // src={getVimeoPlayerURL(currentMessage?.section_url)}
+              src={"https://player.vimeo.com/video/856230447?h=553ef6e21b&vimeo_logo=0"}
               // src={"https://drive.google.com/uc?id=1JOZBkMwOllSNg7ameXnAj1dlagusMeux/preview"}
               width="640"
               height="360"
@@ -501,13 +460,6 @@ function CoursesByCategory(props) {
               allow="autoplay; encrypted-media"
             >
             </iframe> */}
-
-            {/* <video class="relative h-full w-full"
-              poster="https://assets.therealworld.ag/thumbnails/01J6AB5AM7WA0YYKS5H39VNVJ2?max_side=1600"
-              playsinline=""
-              src="blob:https://app.jointherealworld.com/703b6d66-4697-4464-ac7e-d1d96c285238">
-
-            </video> */}
 
             <MediaPlayer
               // src={`https://drive.google.com/file/d/1uYMjUoyQpt0c14DGCEGFp_pTk5I4Q9Ka/preview`}
@@ -597,43 +549,6 @@ function CoursesByCategory(props) {
     }
   }
 
-  const onSubmitFeedback = async () => {
-    if (!feedbackValue) return;
-    setIsLoadingSubmitFeedback(true);
-    const response = await fetch(apiURL + 'api/v1/feedback/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + props.user.authToken
-      },
-      body: JSON.stringify({
-        data: {
-          course: selectedCourse?.uuid,
-          content: selectedLesson,
-          description: feedbackValue
-        }
-      })
-    });
-    const rsp = await response.json();
-    if (response.status >= 200 && response.status < 300) {
-      if (rsp.payload) {
-        toast("Feedback submitted successfully!");
-        setIsLoadingSubmitFeedback(false);
-        feedbackModel.onClose();
-      } else {
-        handleAPIError(rsp);
-        setIsLoadingSubmitFeedback(false);
-      }
-    } else {
-      if (response.status == 401) {
-        dispatch(props.actions.userLogout());
-      } else {
-        handleAPIError(rsp);
-        setIsLoadingSubmitFeedback(false);
-      }
-    }
-  }
-
   const CustomRadio = (props) => {
     const {
       Component,
@@ -653,10 +568,10 @@ function CoursesByCategory(props) {
         {...getBaseProps()}
         className={cn(
           "group inline-flex items-center hover:opacity-70 active:opacity-50 justify-between tap-highlight-transparent",
-          "cursor-pointer rounded-lg gap-1",
+          "cursor-pointer border-1 border-default rounded-lg gap-1",
           "data-[selected=true]:border-primary",
         )}
-        style={{ width: 'auto', maxWidth: '100%', borderRadius: 9, padding: '8.5px 18px', borderWidth: 0.1, borderColor: 'rgba(255, 255, 255, 0.7)' }}
+        style={{ width: 'auto', maxWidth: '100%', minWidth: 200, borderRadius: 20, padding: '8.5px 18px', }}
       >
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <VisuallyHidden>
@@ -685,7 +600,6 @@ function CoursesByCategory(props) {
   };
 
   const goToNextCourse = (e) => {
-    setIsNextClick(false);
     let index = Math.min(originalCourses.findIndex(c => c.uuid == selectedCourse?.uuid) + 1, originalCourses?.length);
     router.push('?cid=' + originalCourses?.[index]?.uuid);
   }
@@ -753,16 +667,15 @@ function CoursesByCategory(props) {
             </div>
             <div className="lesson-content-mdak32">
               {renderCourseContentBySection(currentMessage)}
-              {currentMessage.section != Sections.video || (currentMessage.section == Sections.video && currentMessage?.section_url && !isNextClick) ?
-                <div style={{ display: 'flex', width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: '90%' }} />
-                  <Button spinner={<Spinner color='current' size='sm' />} color="default" isLoading={isNextLoading} variant="ghost" className="next-button-mdkad" onClick={onNextStep}>
-                    <span className="next-button-text-mdkad">NEXT</span>
-                  </Button>
-                </div>
-                :
-                null
-              }
+              <div style={{ display: 'flex', width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                {/* {selectedCourse?.data?.findIndex(c => c?.uuid == selectedLesson?.uuid) > 0 &&
+                 
+                } */}
+                <div style={{ width: '90%' }} />
+                <Button spinner={<Spinner color='current' size='sm' />} color="default" isLoading={isNextLoading} variant="ghost" className="next-button-mdkad" onClick={onNextStep}>
+                  <span className="next-button-text-mdkad">NEXT</span>
+                </Button>
+              </div>
             </div>
           </>
         );
@@ -801,48 +714,6 @@ function CoursesByCategory(props) {
     }
   }
 
-  const lessonClick = (lesson) => () => {
-    setIsNextClick(false);
-    router.push('?cid=' + selectedCourse?.uuid + '&lid=' + lesson?.uuid);
-  }
-
-  const renderSubTextByLessonSection = (section) => {
-    if (section == Sections.video) {
-      return "Video";
-    }
-    else if (section == Sections.attachment) {
-      return "Attachment";
-    }
-    else if (section == Sections.general || section == Sections.summary) {
-      return "Text";
-    }
-    else if (section == Sections.quiz) {
-      return "Quiz";
-    }
-  }
-
-  const renderLessons = () => {
-    if (selectedCourse && selectedCourse.data && selectedCourse.data.length > 0) {
-      return (
-        <div style={{ marginBottom: 20, backgroundColor: 'var(--primary-color)', paddingTop: 10 }}>
-          {selectedCourse.data.map((lesson, index) => {
-            const isSelected = selectedLesson?.uuid == lesson.uuid;
-            return (
-              <div className={`lesson-box-62nks ${isSelected ? 'active' : undefined}`} onClick={lessonClick(lesson)}>
-                <div className="lesson-text-info">
-                  <div className="lesson-name-9qncq6">{selectedCourse.name} - {"Lesson " + (index + 1)}</div>
-
-                  <div className="lesson-description-9qncq6">{renderSubTextByLessonSection(lesson.section)}</div>
-                </div>
-                <ChevronRightIcon size={18} style={{ color: "var(--fourth-color)" }} />
-              </div>
-            )
-          })}
-        </div>
-      )
-    }
-  }
-
   const renderCourseList = () => {
     if (isCoursesFetch) {
       if (courses.length > 0) {
@@ -852,41 +723,43 @@ function CoursesByCategory(props) {
             // <div key={index} className="course-item-k3bda">
             //   <div className={`course-item-header-acnk3 ${isSelected ? "active" : undefined}`} onClick={(e) => onSelectCourse(course)}>
             //     <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <>
-              <div key={index} className={`course-box ${course.completed === 100 ? 'success-course-box' : 'course-box'} ${isSelected ? 'selected-course' : undefined}`} onClick={(e) => onSelectCourse(course)} >
-                <div className="course-info-mc2nw">
-                  <div className="course-text-info">
-                    <div className="course-name-9qncq6">{course.name}</div>
-                    <div className="course-name1-9qncq6">{(isSelected ? selectedCourse?.completed : course.completed)}%<span className="course-label-nja72b"> complete</span></div>
+            <div key={index} className={`course-box ${course.completed === 100 ? 'success-course-box' : 'course-box'}`} onClick={(e) => onSelectCourse(course)} >
+              <div className="course-info-mc2nw">
+                <div className="course-text-info">
+                  <div className="course-name-9qncq6">{course.name}</div>
+                  <div className="course-name1-9qncq6">{(isSelected ? selectedCourse?.completed : course.completed)}%<span className="course-label-nja72b"> complete</span></div>
 
-                    <Progress
-                      size="sm"
-                      radius="sm"
-                      aria-label="Loading..."
-                      value={isSelected ? selectedCourse?.completed : course.completed}
-                      style={{ marginTop: 4 }}
-                      classNames={{
-                        indicator: "course-progress-983bzs",
-                      }}
-                      color="success"
-                    />
-                    <div style={{ flexDirection: 'row', marginTop: 5, alignItems: 'center', display: 'flex', }}>
-                      {/* <span className="course-value-nja72b">{(course.completed * course.lessons) / 100} / {course.lessons}</span> */}
-                      <span className="course-value-nja72b">{course.lessons}</span>
-                      <span className="course-label-nja72b">Lessons</span>
-                      {/* <span className="course-desc-divider-nja72b">|</span>
+                  <Progress
+                    size="sm"
+                    radius="sm"
+                    aria-label="Loading..."
+                    value={isSelected ? selectedCourse?.completed : course.completed}
+                    style={{ marginTop: 4 }}
+                    classNames={{
+                      indicator: "course-progress-983bzs",
+                    }}
+                    color="success"
+                  />
+                  <div style={{ flexDirection: 'row', marginTop: 5, alignItems: 'center', display: 'flex', }}>
+                    {/* <span className="course-value-nja72b">{(course.completed * course.lessons) / 100} / {course.lessons}</span> */}
+                    <span className="course-value-nja72b">{course.lessons}</span>
+                    <span className="course-label-nja72b">Lessons</span>
+                    {/* <span className="course-desc-divider-nja72b">|</span>
                   <span className="course-value-nja72b">{selectedCourse.data?.filter(x => x.section == 'video')?.length}</span>
                   <span className="course-label-nja72b">Videos</span> */}
-                    </div>
                   </div>
-                  <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
-                  {/* <div className="course-avatar">
+                </div>
+                <ChevronRightIcon style={{ color: "var(--fourth-color)" }} />
+                {/* <div className="course-avatar">
                 <span>{(course.name).split('┃')[0]}</span>
                 </div> */}
-                </div>
               </div>
-              {isSelected ? renderLessons() : null}
-            </>
+            </div>
+
+
+
+
+
             //     </div>
 
 
@@ -917,10 +790,10 @@ function CoursesByCategory(props) {
       <div className='header-3m32aaw'>
         <div style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
           <Link href={'/chat/' + serverId + '/courses/'} className="back-icon-nw3rf">
-            <ArrowLeft className="arrow-left-header" style={{ color: "var(--fourth-color)" }} />
+            <ArrowLeft className="arrow-left-header" style={{ color: "var(--fourth-color)", fontWeight: "600" }} />
           </Link>
           <div className="course-navigation-cnaw34">
-            <Link href={'/chat/' + serverId + '/courses/'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 12 }}>
+            <Link href={'/chat/' + serverId + '/courses/'} style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', marginLeft: 18 }}>
               {/* <img
                 src={"https://img.freepik.com/free-vector/online-certification-illustration_23-2148575636.jpg?size=626&ext=jpg"}
                 className="category-img-9ama2f"
@@ -930,7 +803,7 @@ function CoursesByCategory(props) {
             </Link>
             {selectedCourse &&
               <>
-                <ChevronRight size={18} style={{ marginLeft: 12, marginRight: 12, color: "var(--fourth-color)" }} />
+                <ChevronRight size={10} style={{ marginLeft: 8, marginRight: 8, color: "var(--fourth-color)" }} />
                 <div style={{ flexDirection: 'row', alignItems: 'center', display: 'flex', cursor: 'pointer', marginLeft: 2 }}>
                   {/* <Image
                     src={selectedCourse?.pic ? (apiURL + selectedCourse?.pic) : null}
@@ -962,8 +835,8 @@ function CoursesByCategory(props) {
             <input
               type="text"
               name="search"
-              className="search-input-ncka2nx"
-              placeholder="Search lessons"
+              className="search-input-7ajb312"
+              placeholder="Search course..."
               value={searchText}
               autoComplete="off"
               style={{ paddingLeft: '40px' }} // Adjust padding to make space for the search icon
@@ -1000,72 +873,6 @@ function CoursesByCategory(props) {
 
         </div>
       </div>
-      <Modal
-        id="ask-feedback"
-        isOpen={feedbackModel.isOpen}
-        backdrop="opaque"
-        radius="md"
-        onOpenChange={feedbackModel.onOpenChange}
-        classNames={{
-          body: "py-6 modal-ncka2nx",
-          header: "modal-header-ncka2nx border-b-[1px] border-[#292f46]",
-          footer: "modal-ncka2nx pt-2",
-        }}
-        onClose={() => {
-          setFeedbackValue('');
-        }}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="modal-title-ncka2nx flex flex-col gap-1">Give Feedback</ModalHeader>
-              <ModalBody>
-                <ValidatedForm
-                  rules={{
-                    feedbackvalue: {
-                      required: true
-                    },
-                  }}
-                  messages={{
-                    feedbackvalue: {
-                      required: "Feedback is required!"
-                    }
-                  }}
-                  onSubmit={onSubmitFeedback}
-                >
-                  <form>
-                    <div style={{ marginTop: 10 }}>
-                      <div style={{ marginBottom: 10, display: 'flex', flexDirection: 'column' }}>
-                        <span className='modal-title-ncka2nx fs-6'>Have feedback about this lesson?</span>
-                        <span className='modal-title-ncka2nx fs-6'>Share it here.</span>
-                      </div>
-                      <textarea
-                        type="text"
-                        name="feedbackvalue"
-                        className="form-control-ncka2nx"
-                        placeholder="Share your feedback"
-                        autoComplete="off"
-                        style={{ height: 100 }}
-                        aria-multiline
-                        value={feedbackValue}
-                        maxLength={120}
-                        onChange={(event) =>
-                          setFeedbackValue(event.target.value)
-                        }
-                      />
-                    </div>
-                  </form>
-                </ValidatedForm>
-              </ModalBody>
-              <ModalFooter>
-                <Button className='main-button-ncka2nx' style={{ width: 'fit-content', marginBottom: 0 }} spinner={<Spinner color='current' size='sm' />} isLoading={isLoadingSubmitFeedback} radius='sm' size='lg' type='submit' color='' onClick={onSubmitFeedback}>
-                  SUBMIT FEEDBACK
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
     </div>
   );
 }

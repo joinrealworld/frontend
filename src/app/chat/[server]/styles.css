@@ -2015,7 +2015,7 @@ main {
 
 /* Style the custom checkbox when checked */
 .custom-checkbox-modal:checked+label::before {
-    background-color: #ecc879;
+    background-color: #fff;
 }
 
 /* Add a checkmark symbol when checked */
@@ -2072,15 +2072,16 @@ main {
 }
 
 .chat-date {
-    font-size: 14px;
+    font-size: 12px;
     color: #888;
-    margin-bottom: 10px;
+    margin-right:20px;
 }
 
 .chat-item {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 5px;
+    border-radius: 8px;
     background-color: var(--seventh-color);
     border-bottom: 1px solid var(--fourth-color);
     cursor: pointer;
@@ -2098,17 +2099,25 @@ main {
     margin-right: 15px;
 }
 
-.chat-content {
+.chat-content1 {
     flex-grow: 1;
-    padding-bottom: 10px;
+    /* padding-bottom: 10px; */
 }
 
 .chat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
     color: var(--fourth-color);
+    font-size: medium;
+}
+
+
+.chat-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 15px;
 }
 
 .verified-icon {
@@ -2133,12 +2142,28 @@ main {
 }
 
 .chat-window {
-    margin: 10px;
-    padding: 10px;
-    background-color: transparent;
-    height: 600px;
-    width: auto;
-    overflow-y: auto;
+    position: relative;
+    overflow-y: auto; /* Enables scrolling */
+    max-height: 80vh; /* Adjust based on your container height */
+}
+
+.message-user-info {
+    position: sticky;
+    display: flex;
+    align-items: center;
+    top: 0;
+    z-index: 10; /* Ensures it stays on top of other content */
+    background: var(--hoverbox-color);
+    color: var(--fourth-color);
+    padding: 5px; /* Adjust padding as needed */
+    margin-top: 0; /* Remove margin-top if you want it flush with the top */
+}
+
+.chat-area{
+    margin:10px;
+    padding-top: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .whatsapp-chat.sent {
@@ -2148,25 +2173,19 @@ main {
     margin-bottom: 10px;
 }
 
-.message-user-info {
-    color: var(--fourth-color);
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
 .whatsapp-chat.received {
-
+    display: flex;
+    justify-content: flex-start;
     margin-bottom: 10px;
 }
 
 .message-bubble.sent {
-    background-color: var(--success-color);
+    background:linear-gradient(94.38deg, #ecc879 -14.69%, #d46b32 210%);
     /* WhatsApp sent message color */
     color: var(--fourth-color);
     border-radius: 8px;
     padding: 10px;
-    max-width: 60%;
+    width: auto;
     display: flex;
     align-items: center;
 }
@@ -2177,11 +2196,13 @@ main {
     color: var(--fourth-color);
     border-radius: 8px;
     padding: 10px;
-    max-width: 60%;
+    width: auto;
     display: flex;
     align-items: center;
     margin-bottom: 2px;
 }
+
+
 
 .avatar {
     width: 40px;

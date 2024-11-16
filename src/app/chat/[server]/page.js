@@ -18,6 +18,7 @@ import { darkTheme } from "@/themes/darkTheme";
 import { lightTheme } from "@/themes/lightTheme";
 import ValidatedForm from '@/components/ValidatedForm';
 import Image from 'next/image';
+import Loading from "@/components/Loading";
 
 const ChannelType = {
     checkList: 1,
@@ -270,9 +271,12 @@ function Chat(props) {
 
 
     const [sendText, setSendText] = useState('');
+    const [isblackHoleListFetch, setIsblackHoleListFetch] = useState(false);
     const [blackHoleList, setBlackHoleList] = useState([]);
 
-    const [raffleList, setRaffleList] = useState(dummyNumbers);
+    const [isRaffleListFetch, setIsRaffleListFetch] = useState(false);
+    const [raffleList, setRaffleList] = useState([]);
+    const [raffleIndex,setRaffleIndex] = useState(0);
 
     const [selectedSideMenu, setSelectedSideMenu] = useState(SideMenus[0]);
     const [searchText, setSearchText] = useState('');
@@ -330,15 +334,16 @@ function Chat(props) {
     });
 
     const [supportList, setSupportList] = useState([]);
+    const [isSupportListFetch, setIsSupportListFetch] = useState(false);
     const [adminMessages, setAdminMessages] = useState(dummyadminMessage);
     const [sendMessage, setSendMessage] = useState("");
     const [selectedMessage, setSelectedMessage] = useState(null);
 
     const [raffleSent, setRaffleSent] = useState(false);
 
-    const[clanData,setClanData] = useState([]);
+    const [clanData, setClanData] = useState([]);
     const [isClanDataFetch, setIsClanDataFetch] = useState(false);
-    const [onLeaderboardClick,setOnLeaderboardClick] = useState(false);
+    const [onLeaderboardClick, setOnLeaderboardClick] = useState(false);
 
     const handleMouseEnter = () => setIsModalVisible(true);
 
@@ -760,6 +765,7 @@ function Chat(props) {
 
         if (response.status >= 200 && response.status < 300) {
             const filteredData = rsp.data.filter(item => item !== null);
+            setIsblackHoleListFetch(true);
             setBlackHoleList(filteredData);
         } else {
             if (response.status == 401) {
@@ -770,16 +776,72 @@ function Chat(props) {
         }
     }
 
+    const getRaffleData = async () => {
+        const response = await fetch(apiURL + 'api/v1/raffel/current_position', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + props.user.authToken
+            }
+        });
+        const rsp = await response.json();
+
+        if (response.status >= 200 && response.status < 300) {
+            setIsRaffleListFetch(true);
+            setRaffleIndex(rsp.payload.index)
+            setRaffleList(Array.from({ length: rsp.payload.total_index }, (_, i) => ({ number: i + 1 })));
+        } else {
+            if (response.status == 401) {
+                dispatch(props.actions.userLogout());
+            } else {
+                toast("Error while fetching data!");
+            }
+        }
+    }
+
     const getSupportData = async () => {
-        // console.log(props);
-        // const response1 = await fetch(apiURL + 'api/v1/support/fetch_message?support_chat_id=' + '42692c20-645b-4462-9fee-3c1c479ee848', {
-        //     method: 'GET',
-        //     headers: {
-        //         'Authorization': 'Bearer ' + props.user.authToken
-        //     }
-        // });
-        // const rsp1 = await response1.json();
-        // console.log(rsp1);
+        console.log(props.user.user.is_admin);
+        if (props.user.user.is_admin) {
+            const response = await fetch(apiURL + 'api/v1/support/support_list', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + props.user.authToken
+                }
+            });
+            const rsp = await response.json();
+            if (response.status >= 200 && response.status < 300) {
+                setSupportList(rsp.payload);
+                console.log(rsp);
+
+                setIsSupportListFetch(true);
+            } else {
+                if (response.status == 401) {
+                    dispatch(props.actions.userLogout());
+                } else {
+                    toast("Error while fetching data!");
+                }
+            }
+        } else {
+            const response1 = await fetch(apiURL + 'api/v1/support/fetch_message', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + props.user.authToken
+                }
+            });
+            const rsp1 = await response1.json();
+            console.log(rsp1);
+            if (response1.status >= 200 && response1.status < 300) {
+                setSelectedMessage(rsp1.payload);
+
+            } else {
+                if (response1.status == 401) {
+                    dispatch(props.actions.userLogout());
+                } else {
+                    toast("Error while fetching data!");
+                }
+            }
+        }
+
+
         // const response2 = await fetch(apiURL + 'api/v1/support/send_message/' +props.user.user.uuid, {
         //     method: 'POST',
         //     headers: {
@@ -792,29 +854,14 @@ function Chat(props) {
         //             "content": "Hello",
         //             "timestamp": "2024-09-19T14:32:15"
         //           }
-                
+
         //       })
         // });
         // const rsp2 = await response2.json();
         // console.log(rsp2);
-        const response = await fetch(apiURL + 'api/v1/support/support_list', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + props.user.authToken
-            }
-        });
-        const rsp = await response.json();
 
-        if (response.status >= 200 && response.status < 300) {
-            setSupportList(rsp.payload);
 
-        } else {
-            if (response.status == 401) {
-                dispatch(props.actions.userLogout());
-            } else {
-                toast("Error while fetching data!");
-            }
-        }
+
     }
 
     useEffect(() => {
@@ -840,6 +887,9 @@ function Chat(props) {
         }
         else if (channel?.type == ChannelType.blackHole) {
             await getBlackHoleData();
+        }
+        else if (channel?.type == ChannelType.raffles) {
+            await getRaffleData();
         }
         else if (channel?.type == ChannelType.support) {
             await getSupportData();
@@ -1464,13 +1514,13 @@ function Chat(props) {
 
     useEffect(() => {
         if (selectedChannel?.type == ChannelType.media) {
-            if(localStorage.getItem('signature') !== null){
+            if (localStorage.getItem('signature') !== null) {
                 router.replace('/media');
-            }else{
+            } else {
                 mediaContractModel.onOpen();
                 setIsDrawing(true);
             }
-           
+
             // Alternatively, you might want to redirect here
             // router.replace('/media');
         } else {
@@ -1725,7 +1775,7 @@ function Chat(props) {
             );
         }
         return (<>
-          <div style={{
+            <div style={{
                 display: 'flex',
                 justifyContent: 'center', // Center horizontally within the parent
                 alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
@@ -1736,17 +1786,17 @@ function Chat(props) {
                     flexDirection: 'row',
                     width: "50%",
                     alignItems: 'center',
-                    justifyContent: 'center',   
+                    justifyContent: 'center',
                     color: "var(--fourth-color)"
                 }}
-                className='stream-box-ac2s2'
-                onClick={()=>{setOnLeaderboardClick(true)}}>
+                    className='stream-box-ac2s2'
+                    onClick={() => { setOnLeaderboardClick(true) }}>
                     Leaderboard
                 </div>
             </div>
             {onLeaderboardClick ? <div style={{
-                marginTop:"10px",
-                marginBottom:"10px",
+                marginTop: "10px",
+                marginBottom: "10px",
                 display: 'flex',
                 justifyContent: 'center', // Center horizontally within the parent
                 alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
@@ -1757,48 +1807,48 @@ function Chat(props) {
                     flexDirection: 'row',
                     width: "65%",
                     alignItems: 'center',
-                    justifyContent: 'center',   
+                    justifyContent: 'center',
                     color: "var(--fourth-color)"
                 }}
                 > <ArrowLeft className="arrow-left" onClick={() => setOnLeaderboardClick(false)} />
-                   70 Lesson Completed
+                    70 Lesson Completed
                 </div>
             </div> : null}
-            
-           {clanData.map((clan, index) => {
-            return (
-                <div key={index} className='stream-wrap-83nja'>
-                    {clan?.length > 0 &&
-                        <div className="stream-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer',display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        
-                            <span className="f1-bold--xs" style={{ minWidth: 35 }}>Clan {index + 1}</span>
-                            <span className="team-color-icon" style={{ background: '#00D2BE' }}></span>
-                           
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <span className="f1-bold--xs" style={{marginBottom:'5px'}}>Online</span>
-                                <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>{clan.filter(member => member.is_online).length}/10</span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <span className="f1-bold--xs" style={{marginBottom:'5px'}}>Server Speed</span>
-                                <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>Fast</span>
-                            </div>
-                            {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+            {clanData.map((clan, index) => {
+                return (
+                    <div key={index} className='stream-wrap-83nja'>
+                        {clan?.length > 0 &&
+                            <div className="stream-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+
+                                <span className="f1-bold--xs" style={{ minWidth: 35 }}>Clan {index + 1}</span>
+                                <span className="team-color-icon" style={{ background: '#00D2BE' }}></span>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <span className="f1-bold--xs" style={{ marginBottom: '5px' }}>Online</span>
+                                    <span style={{ color: "var(--fourth-color)", fontSize: "12px" }}>{clan.filter(member => member.is_online).length}/10</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <span className="f1-bold--xs" style={{ marginBottom: '5px' }}>Server Speed</span>
+                                    <span style={{ color: "var(--fourth-color)", fontSize: "12px" }}>Fast</span>
+                                </div>
+                                {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <span className="f1-bold--xs"style={{marginBottom:'5px'}} >Lesson Completed</span>
                                 <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>7/10</span>
                             </div> */}
-                       
-                        <span className="f1-podium-right">
-                            <i className="icon icon-chevron-right f1-color--warmRed"></i>
-                        </span>
+
+                                <span className="f1-podium-right">
+                                    <i className="icon icon-chevron-right f1-color--warmRed"></i>
+                                </span>
+                            </div>
+
+                        }
                     </div>
-                    
-                    }
-                </div>
-            );
-        })}
+                );
+            })}
         </>)
-        
-        
+
+
     }
 
 
@@ -2276,15 +2326,17 @@ function Chat(props) {
         }
     }
 
-    const chatContainerRef = useRef(null);
+    const supportContainerRef = useRef(null);
 
     const raffleContainerRef = useRef(null);
 
+
     useEffect(() => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        if (supportContainerRef.current) {
+            // Scroll to the bottom of the container
+            supportContainerRef.current.scrollTop = supportContainerRef.current.scrollHeight;
         }
-    }, [blackHoleList]);
+    }, [sendMessage]);
 
     useEffect(() => {
         if (raffleContainerRef.current) {
@@ -2366,6 +2418,12 @@ function Chat(props) {
 
     const renderBlackHole = () => {
 
+        if (!isblackHoleListFetch) {
+
+            return <Loading />;
+
+        }
+
         return (
             <div id="black-hole-background">
                 {/* <div className='message-divider-date-wrap-7naj82b'>
@@ -2446,14 +2504,33 @@ function Chat(props) {
 
     }
 
-    const sendRaffle = () => {
-        setRaffleSent(true);
-        setRaffleList((prevList) => {
-            if (Array.isArray(prevList)) {
-                return [...prevList, { 'username': "Chirag Lathiya", 'number': 11 }];
-            }
-            return [{ 'username': "Harsh Patel", 'message': "Text Message" }]; // or handle the error as needed
+    const sendRaffle = async () => {
+
+        const response = await fetch(apiURL + 'api/v1/raffel/checkout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + props.user.authToken
+            },
+            body: JSON.stringify({
+                content: sendText
+            })
         });
+        const rsp = await response.json();
+        console.log(rsp);
+        if (rsp.message === "You've already checkedout today for the Raffel.") {
+            setRaffleSent(true);
+            setRaffleList(Array.from({ length: rsp.payload.total_index }, (_, i) => ({ number: i + 1 })));
+        } else {
+            setIsRaffleListFetch(false);
+            getRaffleData();
+        }
+        // setRaffleList((prevList) => {
+        //     if (Array.isArray(prevList)) {
+        //         return [...prevList, { 'username': "Chirag Lathiya", 'number': 11 }];
+        //     }
+        //     return [{ 'username': "Harsh Patel", 'message': "Text Message" }]; // or handle the error as needed
+        // });
     }
 
     const showToastRaffle = () => {
@@ -2463,6 +2540,12 @@ function Chat(props) {
     };
 
     const renderRaffle = () => {
+
+        if (!isRaffleListFetch) {
+
+            return <Loading />;
+
+        }
         return (<div id='raffle-background' >
             <div style={{
                 position: 'absolute',
@@ -2487,59 +2570,52 @@ function Chat(props) {
 
             </div>
             {raffleList.map((item, index) => {
-                const { top, left } = positions[index] || { top: 50, left: 50 };
-                return (
+            const { top, left } = positions[index] || { top: 50, left: 50 };
+            const isLastElement = index === raffleIndex-1; // Check if it's the last element
 
-
-                    <div key={index} className='message-wrap-83nja-float-raffle' style={{
+            return (
+                <div
+                    key={index}
+                    className="message-wrap-83nja-float-raffle"
+                    style={{
                         top: `${top}%`,
                         left: `${left}%`,
-                        transform: 'translate(-50%, -50%)'
-                    }}>
-                        <div style={{ position: "relative", display: "inline-block", width: "60px", height: "50px" }}>
-                            <Image
-                                src="/assets/rafflenew.png"
-                                style={{ height: "100%" }}
-                                width={60}
-                                height={50}
-                            />
-                            <span style={{
+                        transform: 'translate(-50%, -50%)',
+                        color: isLastElement ? 'orange' : 'inherit', // Set color to orange if last element
+                    }}
+                >
+                    <div
+                        style={{
+                            position: "relative",
+                            display: "inline-block",
+                            width: "60px",
+                            height: "50px",
+                        }}
+                    >
+                        <Image
+                            src="/assets/rafflenew.png"
+                            style={{ height: "100%" }}
+                            width={60}
+                            height={50}
+                        />
+                        <span
+                            style={{
                                 position: "absolute",
                                 top: "50%",
                                 left: "50%",
                                 transform: "translate(-50%, -50%)",
                                 fontSize: "24px",
                                 fontWeight: "bold",
-                                color: "#000", // Or any color that contrasts with the image
-                            }}>
-                                {item.number}
-                            </span>
-                        </div>
-                        {/* <div className="raffle-ac2s2">
-                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '60%' }}>
-                                    <p className='user-name-3kzc3-raffle' style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: '#f1c40f', fontWeight: '400' }}>{item.username}
-                                        <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
-                                    </p>
-
-                                </div>
-
-                                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 40, alignItems: 'center' }}>
-                                    <p className='raffle-text-3kzc3' >
-                                        <b>{item.number}</b>
-                                    </p>
-
-                                </div>
-                            </div>
-
-
-                            <div className='left-circle' ></div>
-                            <div className='right-circle' ></div>
-                        </div> */}
+                                color: isLastElement ? 'red' : '#000', // Set text color for the last element
+                            }}
+                        >
+                            {item.number}
+                        </span>
                     </div>
+                </div>
+            );
+        })}
 
-                );
-            })}
         </div>)
     }
 
@@ -2576,12 +2652,15 @@ function Chat(props) {
     };
 
     const renderSupport = () => {
+        if (!isSupportListFetch) {
+            return <Loading />
+        }
         return (
             <div className='whatsapp-chat-list'>
                 {supportList.map((chat, index) => (
                     <div key={index} className="chat-day">
                         {/* Grouped by Day */}
-                        <h4 className="chat-date">{moment(chat.created_at).format('MMMM Do, YYYY')}</h4>
+
 
                         <div
                             className="chat-item"
@@ -2591,9 +2670,9 @@ function Chat(props) {
                             <img
                                 src={chat.user.avatar ? chat.user.avatar : "/assets/person.png"}
                                 alt={chat.user.first_name}
-                                className="avatar"
+                                className="chat-avatar"
                             />
-                            <div className="chat-content">
+                            <div className="chat-content1">
                                 <div className="chat-header">
                                     <strong>{chat.user.first_name} {chat.user.last_name}</strong>
                                     {/* {message.user.isVerified && <span className="verified-icon">✔️</span>} */}
@@ -2608,6 +2687,7 @@ function Chat(props) {
                                         }
                                     </p> */}
                             </div>
+                            <h4 className="chat-date">{moment(chat.created_at).format('MMMM Do, YYYY')}</h4>
                         </div>
 
                     </div>
@@ -2621,59 +2701,59 @@ function Chat(props) {
         const isSender = selectedMessage.user.id == currentUser.id; // Check if the message is sent by the current user
 
         return (
-            <div className='chat-window'>
-                {/* Current User Message (Sent) */}
-                <div className="whatsapp-chat received">
-                    {/* Display user info only once */}
-                    <div className="message-user-info">
+            <div className='chat-window' ref={supportContainerRef}>
+                <div className="message-user-info" style={{ marginTop: "-10px" }}>
+                    {props.user.user.is_admin ? (
                         <ArrowLeft className="arrow-left" onClick={() => setSelectedMessage(false)} />
-                        <img
-                            src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"}
-                            alt={selectedMessage.user.first_name}
-                            className="avatar"
-                        />
+                    ) : null}
+
+                    <img
+                        src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"}
+                        alt={selectedMessage.user.first_name}
+                        className="avatar"
+                    />
+                    {props.user.user.is_admin ? (
                         <strong>{selectedMessage.user.first_name} {selectedMessage.user.last_name}</strong>
-                        {/* Uncomment below to show the verified icon if needed */}
-                        {/* {selectedMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
+                    ) : "Admin"}
+                </div>
+
+                {/* Current User Message (Sent) */}
+                <div className='chat-area'>
+                    <div className="whatsapp-chat received">
+                        <div className="message-list">
+                            {selectedMessage.messages.map((message, index) => (
+                                <div className="message-bubble received" key={index}>
+                                    <div className="message-content">
+                                        <div className="message-header">
+                                            <small className="timestamp">
+                                                {moment(message.timestamp).format("MMM D, YYYY h:mm A")}
+                                            </small>
+                                        </div>
+                                        <p>{message.content}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Loop through and display the list of messages */}
-                    <div className="message-list">
-                        {selectedMessage.messages.map((message, index) => (
-                            <div className="message-bubble received" key={index}>
+                    {/* Admin Reply (Received) */}
+                    {adminMessages.map((message, index) => (
+                        <div key={index} className="whatsapp-chat sent">
+                            <div className="message-bubble sent">
                                 <div className="message-content">
                                     <div className="message-header">
-                                        <small className="timestamp">{moment(message.timestamp).fromNow()}</small>
+                                        <small className="timestamp">
+                                            {moment(parseInt(message.timestamp)).format("MMM D, YYYY h:mm A")}
+                                        </small>
                                     </div>
                                     <p>{message.content}</p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-
-                {/* Admin Reply (Received) */}
-                {adminMessages.map((message, index) => (
-                    <div key={index} className="whatsapp-chat sent">
-                        <div className="message-bubble sent">
-                            <img
-                                src={message.user.image}
-                                alt={message.user.name}
-                                className="avatar"
-                            />
-                            <div className="message-content">
-                                <div className="message-header">
-                                    <strong>{message.user.name}</strong>
-                                    {/* {adminMessage.user.isVerified && <span className="verified-icon">✔️</span>} */}
-                                    <small className="timestamp">{moment(parseInt(message.timestamp)).fromNow()}</small>
-                                </div>
-                                <p>{message.content}</p>
-                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
+
         );
     };
 
@@ -2969,7 +3049,7 @@ function Chat(props) {
 
                                     </footer>
                                     : selectedChannel?.type == ChannelType.raffles ?
-                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "var(--channels)" }}>
+                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "rgb(13 24 36" }}>
                                             <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
                                                 <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}  >
                                                     <Image

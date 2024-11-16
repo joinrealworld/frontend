@@ -236,12 +236,33 @@ function MediaPage(props) {
       getMediaData(prevPageNumber);
     }
   };
+
+  const getNotificationsData = async () => {
+    const response = await fetch(apiURL + 'api/v1/media/notifications', {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + props.user.authToken
+        }
+    });
+    const rsp = await response.json();
+
+    if (response.status >= 200 && response.status < 300) {
+        console.log(rsp.payload);
+    } else {
+        if (response.status == 401) {
+            dispatch(props.actions.userLogout());
+        } else {
+            toast("Error while fetching data!");
+        }
+    }
+}
   
   
   
 
   const getInitData = async () => {
     getMediaData();
+    getNotificationsData();
   }
 
   useEffect(() => {

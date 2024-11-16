@@ -1238,7 +1238,7 @@
 
 /* Style the custom checkbox when checked */
 .custom-checkbox-modal:checked+label::before {
-    background-color: #ecc879;
+    background-color: #fff;
 }
 
 /* Add a checkmark symbol when checked */
