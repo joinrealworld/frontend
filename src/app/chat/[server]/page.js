@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, Fullscreen, ArrowLeft } from 'lucide-react';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, Fullscreen, ArrowLeft, ListStartIcon } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
@@ -276,7 +276,7 @@ function Chat(props) {
 
     const [isRaffleListFetch, setIsRaffleListFetch] = useState(false);
     const [raffleList, setRaffleList] = useState([]);
-    const [raffleIndex,setRaffleIndex] = useState(0);
+    const [raffleIndex, setRaffleIndex] = useState(0);
 
     const [selectedSideMenu, setSelectedSideMenu] = useState(SideMenus[0]);
     const [searchText, setSearchText] = useState('');
@@ -335,7 +335,7 @@ function Chat(props) {
 
     const [supportList, setSupportList] = useState([]);
     const [isSupportListFetch, setIsSupportListFetch] = useState(false);
-    const [adminMessages, setAdminMessages] = useState(dummyadminMessage);
+    const [adminMessages, setAdminMessages] = useState([]);
     const [sendMessage, setSendMessage] = useState("");
     const [selectedMessage, setSelectedMessage] = useState(null);
 
@@ -726,7 +726,6 @@ function Chat(props) {
     }
 
     const getSavedProgressData = async () => {
-        // zzz - in progress
         const response = await fetch(apiURL + 'api/v1/channel/save/progress/channel', {
             method: 'GET',
             headers: {
@@ -736,10 +735,7 @@ function Chat(props) {
         const rsp = await response.json();
         if (response.status >= 200 && response.status < 300) {
             if (rsp.payload && typeof rsp.payload == 'object') {
-                // zzz
-                console.log("rsp.payload --------------------------------");
-                console.log(rsp.payload);
-                setChatData([rsp.payload]);
+                setChatData(rsp.payload);
                 setIsChatDataFetch(true);
                 scrollToBottomChatContent();
             } else {
@@ -854,6 +850,7 @@ function Chat(props) {
         //             "content": "Hello",
         //             "timestamp": "2024-09-19T14:32:15"
         //           }
+
 
         //       })
         // });
@@ -1521,6 +1518,7 @@ function Chat(props) {
                 setIsDrawing(true);
             }
 
+
             // Alternatively, you might want to redirect here
             // router.replace('/media');
         } else {
@@ -1776,10 +1774,11 @@ function Chat(props) {
         }
         return (<>
             <div style={{
-                display: 'flex',
-                justifyContent: 'center', // Center horizontally within the parent
-                alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
-            }}>
+            < div style={{
+                    display: 'flex',
+                    justifyContent: 'center', // Center horizontally within the parent
+                    alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
+                }}>
                 <div style={{
                     cursor: 'pointer',
                     display: 'flex',
@@ -1787,14 +1786,19 @@ function Chat(props) {
                     width: "50%",
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: "var(--fourth-color)"
+                    color: "var(--fourth-color)",
+                    marginBottom: 6
                 }}
+                    className='stream-box-ac2s2'
+                    onClick={() => { setOnLeaderboardClick(true) }}>
                     className='stream-box-ac2s2'
                     onClick={() => { setOnLeaderboardClick(true) }}>
                     Leaderboard
                 </div>
             </div>
             {onLeaderboardClick ? <div style={{
+                marginTop: "10px",
+                marginBottom: "10px",
                 marginTop: "10px",
                 marginBottom: "10px",
                 display: 'flex',
@@ -1808,9 +1812,12 @@ function Chat(props) {
                     width: "65%",
                     alignItems: 'center',
                     justifyContent: 'center',
+                    justifyContent: 'center',
                     color: "var(--fourth-color)"
                 }}
-                > <ArrowLeft className="arrow-left" onClick={() => setOnLeaderboardClick(false)} />
+                >
+                    {/* zzz */}
+                    <ArrowLeft className="arrow-left" onClick={() => setOnLeaderboardClick(false)} />
                     70 Lesson Completed
                 </div>
             </div> : null}
@@ -1819,27 +1826,22 @@ function Chat(props) {
                 return (
                     <div key={index} className='stream-wrap-83nja'>
                         {clan?.length > 0 &&
-                            <div className="stream-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div className="stream-box-ac2s2" style={{ marginTop: 0, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
 
-                                <span className="f1-bold--xs" style={{ minWidth: 35 }}>Clan {index + 1}</span>
-                                <span className="team-color-icon" style={{ background: '#00D2BE' }}></span>
+                                <span className="f1-bold--xs" style={{}}>Clan {index + 1}</span>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <span className="f1-bold--xs" style={{ marginBottom: '5px' }}>Online</span>
-                                    <span style={{ color: "var(--fourth-color)", fontSize: "12px" }}>{clan.filter(member => member.is_online).length}/10</span>
+                                    <span className="f1-light--xs" style={{ marginBottom: '5px' }}>Online</span>
+                                    <span className="f1-bold--xs" style={{ color: "var(--fourth-color)", }}>{clan.filter(member => member.is_online).length}/10</span>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <span className="f1-bold--xs" style={{ marginBottom: '5px' }}>Server Speed</span>
-                                    <span style={{ color: "var(--fourth-color)", fontSize: "12px" }}>Fast</span>
+                                    <span className="f1-light--xs" style={{ marginBottom: '5px' }}>Server Speed</span>
+                                    <span className="f1-bold--xs" style={{ color: "var(--fourth-color)", }}>{(index + 1) % 3 == 0 ? "Moderate" : "Fast"}</span>
                                 </div>
-                                {/* <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <span className="f1-bold--xs"style={{marginBottom:'5px'}} >Lesson Completed</span>
-                                <span style={{ color: "var(--fourth-color)",fontSize:"12px" }}>7/10</span>
-                            </div> */}
 
-                                <span className="f1-podium-right">
+                                {/* <span className="f1-podium-right">
                                     <i className="icon icon-chevron-right f1-color--warmRed"></i>
-                                </span>
+                                </span> */}
                             </div>
 
                         }
@@ -1847,6 +1849,8 @@ function Chat(props) {
                 );
             })}
         </>)
+
+
 
 
     }
@@ -1935,45 +1939,33 @@ function Chat(props) {
         return data.map((item, index) => {
             return (
                 <div key={index} className='feedback-wrap-83nja'>
-                    <div className="feedback-box-ac2s2" style={{ marginTop: 0, cursor: 'pointer' }} onClick={onStreamingClick(item)}>
+                    <div className="feedback-box-ac2s2" style={{ marginTop: 0 }}>
                         <div style={{ display: 'flex', flexDirection: 'column', }}>
-                            <div style={{ display: 'flex', flexDirection: 'row', marginTop: 12 }}>
-                                <img
-                                    key={index}
-                                    size='sm'
-                                    style={{
-                                        height: 32, width: 32, borderRadius: '50%'
-                                    }}
-                                    src={item?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + item?.user?.avatar) : "/assets/person.png"}
-                                />
-                                <div style={{ display: 'flex', flexDirection: 'column', }}>
-                                    <span style={{ flex: 1, color: 'var(--fourth-color)', fontSize: 13.5, letterSpacing: 0.6, fontWeight: '500', marginLeft: 12 }}>
-                                        {item?.user?.first_name + ' ' + item?.user?.last_name}
-                                        <span style={{ fontSize: 13, opacity: 0.5, fontWeight: '100', marginLeft: 4 }}>
-                                            gave feedback for video of
-                                        </span>
-                                        <span style={{ marginLeft: 4 }}>
-                                            🍼┃tutorials
-                                        </span>
-                                        <span style={{ fontSize: 13, opacity: 0.5, fontWeight: '100', marginLeft: 4 }}>
-                                            course.
-                                        </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', }}>
+                                <span style={{ flex: 1, color: 'var(--fourth-color)', fontSize: 13.5, letterSpacing: 0.6, fontWeight: '500', marginLeft: 12 }}>
+                                    Lesson:
+                                    <span style={{ fontSize: 13, opacity: 0.7, fontWeight: '200', marginLeft: 8 }}>
+                                        <b>Lesson {Math.max(item?.course?.data?.findIndex(c => c?.uuid == item?.course?.last_saved), 0) + 1}</b>
                                     </span>
-                                    <span style={{ flex: 1, color: 'var(--fourth-color)', opacity: 0.6, fontSize: 9, fontWeight: '300', marginLeft: 12 }}>
-                                        {moment(item.created_at).format('DD MMM, YYYY')}
+                                    <br />
+                                    Course:
+                                    <span style={{ fontSize: 13, opacity: 0.7, fontWeight: '200', marginLeft: 8 }}>
+                                        <b>  {item?.course?.name}</b>
                                     </span>
-                                </div>
-                            </div>
-                            <span className="f1--xs MacBaslik" style={{ marginTop: 20 }}>
-                                <span style={{ color: 'var(--fourth-color)', fontSize: 13, letterSpacing: 0.6, fontWeight: '300', marginLeft: 4 }}>
-                                    {item.description}
+                                    <br />
+                                    Category:
+                                    <span style={{ fontSize: 13, opacity: 0.7, fontWeight: '200', marginLeft: 8 }}>
+                                        <b>  {item?.category?.name}</b>
+                                    </span>
                                 </span>
-                            </span>
+                            </div>
                         </div>
                         <span className="f1-podium-right">
-                            <div className='feedback-live-wrap' onClick={(e) => onFeedbackVideoClick(item)}>
-                                <PlayCircleIcon size={30} className="refresh" />
-                                <span className="feedback-icon-text">Play</span>
+                            <div className='feedback-live-wrap' onClick={(e) => {
+                                router.push(item?.master_category?.uuid + `/courses/${item?.category?.uuid}?cid=${item?.course?.uuid}&lid=${item?.content_uuid}`);
+                            }}>
+                                <ListStartIcon size={30} className="refresh" />
+                                <span className="feedback-icon-text">Continue</span>
                             </div>
                         </span>
                     </div>
@@ -2570,51 +2562,51 @@ function Chat(props) {
 
             </div>
             {raffleList.map((item, index) => {
-            const { top, left } = positions[index] || { top: 50, left: 50 };
-            const isLastElement = index === raffleIndex-1; // Check if it's the last element
+                const { top, left } = positions[index] || { top: 50, left: 50 };
+                const isLastElement = index === raffleIndex - 1; // Check if it's the last element
 
-            return (
-                <div
-                    key={index}
-                    className="message-wrap-83nja-float-raffle"
-                    style={{
-                        top: `${top}%`,
-                        left: `${left}%`,
-                        transform: 'translate(-50%, -50%)',
-                        color: isLastElement ? 'orange' : 'inherit', // Set color to orange if last element
-                    }}
-                >
+                return (
                     <div
+                        key={index}
+                        className="message-wrap-83nja-float-raffle"
                         style={{
-                            position: "relative",
-                            display: "inline-block",
-                            width: "60px",
-                            height: "50px",
+                            top: `${top}%`,
+                            left: `${left}%`,
+                            transform: 'translate(-50%, -50%)',
+                            color: isLastElement ? 'orange' : 'inherit', // Set color to orange if last element
                         }}
                     >
-                        <Image
-                            src="/assets/rafflenew.png"
-                            style={{ height: "100%" }}
-                            width={60}
-                            height={50}
-                        />
-                        <span
+                        <div
                             style={{
-                                position: "absolute",
-                                top: "50%",
-                                left: "50%",
-                                transform: "translate(-50%, -50%)",
-                                fontSize: "24px",
-                                fontWeight: "bold",
-                                color: isLastElement ? 'red' : '#000', // Set text color for the last element
+                                position: "relative",
+                                display: "inline-block",
+                                width: "60px",
+                                height: "50px",
                             }}
                         >
-                            {item.number}
-                        </span>
+                            <Image
+                                src="/assets/rafflenew.png"
+                                style={{ height: "100%" }}
+                                width={60}
+                                height={50}
+                            />
+                            <span
+                                style={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    left: "50%",
+                                    transform: "translate(-50%, -50%)",
+                                    fontSize: "24px",
+                                    fontWeight: "bold",
+                                    color: isLastElement ? 'red' : '#000', // Set text color for the last element
+                                }}
+                            >
+                                {item.number}
+                            </span>
+                        </div>
                     </div>
-                </div>
-            );
-        })}
+                );
+            })}
 
         </div>)
     }
@@ -2933,8 +2925,14 @@ function Chat(props) {
 
 
                         {/* START - chat content */}
-                        <div id='chat-content' style={{ flex: 1, height: '90%', overflowX: 'hidden', overflowY: overflowBlackHole, padding: '20px 0px', backgroundColor: blackChatbackgroundColor }}>
-                            {selectedChannel?.type !== ChannelType.raffles && selectedChannel?.type !== ChannelType.blackHole && selectedChannel?.type !== ChannelType.support && selectedChannel?.type !== ChannelType.feedback ?
+                        <div id='chat-content' style={{ flex: 1, height: selectedChannel?.type != ChannelType.clans ? '90%' : '100%', overflowX: 'hidden', overflowY: overflowBlackHole, padding: '20px 0px', backgroundColor: blackChatbackgroundColor }}>
+                            {selectedChannel?.type !== ChannelType.raffles &&
+                                selectedChannel?.type !== ChannelType.blackHole &&
+                                selectedChannel?.type !== ChannelType.support &&
+                                selectedChannel?.type !== ChannelType.feedback &&
+                                selectedChannel?.type !== ChannelType.clans &&
+                                selectedChannel?.type !== ChannelType.savedProgressChannels
+                                ?
                                 <div id="wrap_beginning" data-index="0" className="chat-item-wrapper will-change-transform" style={{ transform: 'translateY(0px)' }}>
                                     <div style={{ margin: '20px 20px', backgroundColor: 'var(--seventh-color)', padding: '20px 20px', borderRadius: 5 }}>
                                         <div style={{ color: 'var(--fourth-color)', fontSize: 18, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -3010,118 +3008,127 @@ function Chat(props) {
 
 
                         {/* START - chat input */}
-                        <div style={{ height: '10%', backgroundColor: blackbackgroundColor }} className="flex flex-col">
-                            {(selectedChannel?.type == ChannelType.checkList) ?
-                                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                                    <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
-                                        {/* <div
-                        className="relative"
-                        onMouseEnter={handleMouseEnter}
-                    >
-                        <ClipboardList className='clipboard-icon' size={36} />
-
-                    </div> */}
-                                    </div>
-
-                                </footer>
-                                : selectedChannel?.type == ChannelType.blackHole ?
-                                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: '#000' }}>
+                        {selectedChannel?.type != ChannelType.clans ?
+                            <div style={{ height: '10%', backgroundColor: blackbackgroundColor }} className="flex flex-col">
+                                {(selectedChannel?.type == ChannelType.checkList) ?
+                                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
                                         <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                            {/* <div
+                                            className="relative"
+                                            onMouseEnter={handleMouseEnter}
+                                        >
+                                            <ClipboardList className='clipboard-icon' size={36} />
 
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
-                                                <input type="text" name="black-hole-message"
-                                                    className="message-input-7ajb312"
-                                                    value={sendText}
-                                                    onChange={(event) => { setSendText(event.target.value) }}
-                                                />
-
-                                                <Button className='main-button-7ajb412' size='sm' color=''
-                                                    onClick={(e) => {
-                                                        sendBlackHoleMessage()
-                                                    }}
-
-                                                >
-                                                    Post
-                                                </Button>
-
-                                            </div>
+                                        </div> */}
                                         </div>
 
                                     </footer>
-                                    : selectedChannel?.type == ChannelType.raffles ?
-                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "rgb(13 24 36" }}>
-                                            <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
-                                                <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}  >
-                                                    <Image
-                                                        src="/assets/rafflenew.png"
-                                                        style={{ height: "100%" }}
-                                                        width={250}
-                                                        height={70}
-                                                        onMouseEnter={raffleSent ? showToastRaffle : sendRaffle}
+                                    :
+                                    selectedChannel?.type == ChannelType.blackHole ?
+                                        <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: '#000' }}>
+                                            <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
 
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
+                                                    <input type="text" name="black-hole-message"
+                                                        className="message-input-7ajb312"
+                                                        value={sendText}
+                                                        onChange={(event) => { setSendText(event.target.value) }}
                                                     />
-                                                    <span style={{
-                                                        position: "absolute",
-                                                        top: "50%",
-                                                        left: "50%",
-                                                        transform: "translate(-50%, -50%)",
-                                                        fontSize: "18px",
-                                                        fontWeight: "bold",
-                                                        color: "#000", // Or any color that contrasts with the image
-                                                    }}>
-                                                        Admit One
-                                                    </span>
+
+                                                    <Button className='main-button-7ajb412' size='sm' color=''
+                                                        onClick={(e) => {
+                                                            sendBlackHoleMessage()
+                                                        }}
+
+                                                    >
+                                                        Post
+                                                    </Button>
+
                                                 </div>
-                                                {/* <Image src="/assets/rafflenew.png"
-                                style={{ height: "70px" }}
-                                width={150}
-                                height={20}
-                                onMouseEnter={() => { sendRaffle() }} /> */}
                                             </div>
 
                                         </footer>
-                                        : (selectedChannel?.type == ChannelType.support) && selectedMessage ?
-                                            <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                                                <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+                                        :
+                                        selectedChannel?.type == ChannelType.raffles ?
+                                            <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "rgb(13 24 36" }}>
+                                                <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
+                                                    <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}  >
+                                                        <Image
+                                                            src="/assets/rafflenew.png"
+                                                            style={{ height: "100%" }}
+                                                            width={250}
+                                                            height={70}
+                                                            onMouseEnter={raffleSent ? showToastRaffle : sendRaffle}
 
-                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
-                                                        <input type="text" name="support-message"
-                                                            className="message-input-support"
-                                                            value={sendMessage}
-                                                            onChange={(event) => { setSendMessage(event.target.value) }}
                                                         />
-
-                                                        <Button className='main-button-7ajb412' size='sm' color=''
-                                                            onClick={(e) => {
-                                                                sendNewMessage()
-                                                            }}
-                                                        >
-                                                            Send
-                                                        </Button>
-
+                                                        <span style={{
+                                                            position: "absolute",
+                                                            top: "50%",
+                                                            left: "50%",
+                                                            transform: "translate(-50%, -50%)",
+                                                            fontSize: "18px",
+                                                            fontWeight: "bold",
+                                                            color: "#000", // Or any color that contrasts with the image
+                                                        }}>
+                                                            Admit One
+                                                        </span>
                                                     </div>
+                                                    {/* <Image src="/assets/rafflenew.png"
+                                                    style={{ height: "70px" }}
+                                                    width={150}
+                                                    height={20}
+                                                    onMouseEnter={() => { sendRaffle() }} /> */}
                                                 </div>
 
                                             </footer>
-                                            : <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                                                <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
-                                                    <input accept="image/*" id="add-media-9"
-                                                        type="file" style={{ display: 'none' }} />
-                                                    {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
-                                                        <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
-                                                            +
-                                                        </label>
-                                                        :
-                                                        null}
-                                                    <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                                        <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                            :
+                                            (selectedChannel?.type == ChannelType.support) && selectedMessage ?
+                                                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                                    <div className="border-base-300 flex items-center justify-center border-t px-3 pt-2">
+
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 32, borderRadius: 20, flex: 1, height: 32, }}>
+                                                            <input type="text" name="support-message"
+                                                                className="message-input-support"
+                                                                value={sendMessage}
+                                                                onChange={(event) => { setSendMessage(event.target.value) }}
+                                                            />
+
+                                                            <Button className='main-button-7ajb412' size='sm' color=''
+                                                                onClick={(e) => {
+                                                                    sendNewMessage()
+                                                                }}
+                                                            >
+                                                                Send
+                                                            </Button>
+
+                                                        </div>
                                                     </div>
-                                                    {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                    <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                </form> */}
-                                                </div>
-                                            </footer>}
-                        </div>
+
+                                                </footer>
+                                                :
+                                                <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
+                                                    <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
+                                                        <input accept="image/*" id="add-media-9"
+                                                            type="file" style={{ display: 'none' }} />
+                                                        {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
+                                                            <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
+                                                                +
+                                                            </label>
+                                                            :
+                                                            null}
+                                                        <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                                            <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                                        </div>
+                                                        {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
+                                                        <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                                    </form> */}
+                                                    </div>
+                                                </footer>
+                                }
+                            </div>
+                            :
+                            null
+                        }
                     </div>
                     {/* END - chat input  END - chat left content */}
 

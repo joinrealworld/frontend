@@ -61,8 +61,6 @@ function MediaPage(props) {
   const [originalMedias, setOriginalMedias] = useState([]);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
-  const [isSubmitVisible, setIsSubmitVisible] = useState(false);
-
   const [signatureData, setSignatureData] = useState('');
   const [mediaRules, setMediaRules] = useState('');
 
@@ -546,33 +544,6 @@ function MediaPage(props) {
       </Component>
     );
   };
-
-  const purchaseIdentityBooster = async (authToken) => {
-    let formData = new FormData();
-    formData.append('coin', 200);
-    const response = await fetch(apiURL + 'api/v1/user/purches/identity_booster', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + authToken
-      },
-      body: formData
-    });
-    const rsp = await response.json();
-    if (response.status >= 200 && response.status < 300) {
-      if (rsp.status == 1) {
-        toast("Create New Post Plan purchased successfully!");
-        setIsSubmitVisible(true);
-      } else {
-        handleAPIError(rsp);
-      }
-    } else {
-      if (response.status == 401) {
-        dispatch(props.actions.userLogout());
-      } else {
-        handleAPIError(rsp);
-      }
-    }
-  }
 
   function timeAgo(timestamp) {
     const now = new Date();
@@ -1203,6 +1174,10 @@ function MediaPage(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
+    if (!content) {
+      toast('Please share your thoughts to post!');
+      return;
+    }
     if (image == '') {
       const response = await fetch(apiURL + 'api/v1/media/send/message', {
         method: 'POST',
@@ -1370,7 +1345,7 @@ function MediaPage(props) {
                   </ModalHeader>
                   <ModalBody>
                     <div className='suitcase-model-body-content-82bma2'>
-                      <form onSubmit={handleSubmit}>
+                      <form>
                         <div className="post_image">
                           <label htmlFor="post-image" className="suitcase-body-title-72bak">Upload an image or video (optional):</label>
                           <div className="upload-box" onClick={() => document.getElementById('post-image').click()}>
@@ -1410,24 +1385,19 @@ function MediaPage(props) {
                         </div>
 
                         <div>
-                          {isSubmitVisible ? <Button type="submit" color="default" variant="ghost" className="submit-button-mdkad">
-                            <span className="next-button-text-mdkad">Submit</span>
-                          </Button> :
-                            <Button
-                              className='submit-button-mdkad'
-                              style={{ marginLeft: 0 }}
-                              spinner={<Spinner color='current' size='sm' />}
-                              size='md'
-                              color=''
-                              onClick={(e) => {
-                                purchaseIdentityBooster(props.user.authToken);
-                              }}
-                            >
-                              Post FOR 200 COINS
-                              <img alt="Avatar" src="/assets/coin.svg" width={16} height={16} />
-                            </Button>
-                          }
-
+                          <Button
+                            className='submit-button-mdkad'
+                            style={{ marginLeft: 0 }}
+                            spinner={<Spinner color='current' size='sm' />}
+                            size='md'
+                            variant="ghost"
+                            type="submit"
+                            color=''
+                            onClick={handleSubmit}
+                          >
+                            POST FOR 200 COINS
+                            <img alt="Avatar" src="/assets/coin.svg" width={16} height={16} />
+                          </Button>
 
                         </div>
                       </form>
@@ -1607,7 +1577,7 @@ function MediaPage(props) {
                               type="checkbox"
                               id={`list${index + 1}`}
                               name={`checkbox-group-${index}`} // Group the checkboxes
-                            checked={mediaRules[item] === 'true'}
+                              checked={mediaRules[item] === 'true'}
                             // onChange={() => handleMediaRulesCheck(item, 'true')}
                             />
                             <label className="modal_text_body" htmlFor={`list${index + 1}`}>{item}</label>
@@ -1617,8 +1587,8 @@ function MediaPage(props) {
                       <div className="signature-box" style={{ marginTop: 20 }}>
                         <p className="signature-title">Sign:-</p>
                         {signatureData ? (
-                          <div style={{ border: '1px solid var(--fourth-color)',width:400,height:70, borderRadius: 4, color: "var(--fourth-color)" }}>
-                          <img src={signatureData} alt="Signature" />
+                          <div style={{ border: '1px solid var(--fourth-color)', width: 400, height: 70, borderRadius: 4, color: "var(--fourth-color)" }}>
+                            <img src={signatureData} alt="Signature" />
                           </div>
                         ) : (
                           <p>No signature available</p>

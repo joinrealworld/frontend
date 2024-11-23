@@ -698,13 +698,6 @@ main {
     color: var(--fifth-color);
 }
 
-.f1-bold--xs {
-    font-weight: bolder;
-    font-size: 20px;
-    line-height: 17px;
-    color: var(--fifth-color);
-}
-
 .team-color-icon {
     width: 4px;
     height: 14px;
@@ -828,9 +821,17 @@ main {
     color: var(--fifth-color);
 }
 
+.f1-light--xs {
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 17px;
+    color: var(--fifth-color);
+    opacity: 0.66;
+}
+
 .f1-bold--xs {
     font-weight: bolder;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 17px;
     color: var(--fifth-color);
 }
