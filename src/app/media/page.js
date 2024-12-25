@@ -32,7 +32,7 @@ const Sections = {
 
 function MediaPage(props) {
 
-  const serverId = props.chat?.serverList[0].uuid;
+  const serverId = props.chat?.serverList?.[0]?.uuid;
 
   const { get } = useSearchParams();
   const searchParams = {
@@ -69,10 +69,10 @@ function MediaPage(props) {
   const [prevPage, setPrevPage] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
 
-  const [userEmail,setUserEmail] = useState("");
-  const [userFirstName,setUserFirstName] = useState("");
-  const [userLastName,setUserLastName] = useState("");
-  const [userName,setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userFirstName, setUserFirstName] = useState("");
+  const [userLastName, setUserLastName] = useState("");
+  const [userName, setUserName] = useState("");
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -122,43 +122,43 @@ function MediaPage(props) {
     } else {
       // get data
       getProfile(props.user.authToken);
-  }
+    }
   }, [props.user.isLoggedIn]);
 
   const getProfile = async (authToken) => {
     const response = await fetch(apiURL + 'api/v1/user/profile', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + authToken
-        }
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      }
     });
     console.log("response --------------------------------");
     console.log(response);
     if (response.status >= 200 && response.status < 300) {
-        const rsp = await response.json();
-        console.log("rsp.payload --------------------------------");
-        console.log(rsp.payload);
-        if (rsp.payload && rsp.payload?.id) {
-            setUserEmail(rsp.payload.email)
-            setUserFirstName(rsp.payload.first_name)
-            setUserLastName(rsp.payload.last_name)
-            setUserName(rsp.payload.username)
-        } else {
-            if (rsp.message && typeof rsp.message === 'string') {
-                toast(rsp.message);
-            } else {
-                toast("Something went wrong!");
-            }
-        }
+      // const rsp = await response.json();
+      // console.log("rsp.payload --------------------------------");
+      // console.log(rsp.payload);
+      // if (rsp.payload && rsp.payload?.id) {
+      //   setUserEmail(rsp.payload.email)
+      //   setUserFirstName(rsp.payload.first_name)
+      //   setUserLastName(rsp.payload.last_name)
+      //   setUserName(rsp.payload.username)
+      // } else {
+      //   if (rsp.message && typeof rsp.message === 'string') {
+      //     toast(rsp.message);
+      //   } else {
+      //     toast("Something went wrong!");
+      //   }
+      // }
     } else {
-        if (response.status == 401) {
-            dispatch(props.actions.userLogout());
-        } else {
-            toast("Something went wrong!");
-        }
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        toast("Something went wrong!");
+      }
     }
-}
+  }
 
   useEffect(() => {
     if (searchParams?.cid && searchParams?.cid != selectedCourse?.uuid) {
@@ -175,11 +175,12 @@ function MediaPage(props) {
     }
   }, []);
 
-  const getMediaData = async (page=1) => {
+  const getMediaData = async (page = 1) => {
     setIsMediaFetch(true);
     try {
       const response = await fetch(`https://joinrealworld-backend.onrender.com/api/v1/media/fetch/message?page=${page}`);
       const data = await response.json();
+      console.log(data.results);
       setMedias(data.results);
       setOriginalMedias(data.results);
       setNextPage(data.next);
@@ -221,12 +222,12 @@ function MediaPage(props) {
       }
     }
   };
-  
+
   const handlePrevPage = () => {
     if (prevPage) {
       const urlParams = new URLSearchParams(prevPage.split('?')[1]);
       let prevPageNumber = urlParams.get('page');
-  
+
       // Set default page number if prevPageNumber is null
       if (!prevPageNumber || prevPageNumber === 'null') {
         prevPageNumber = '1'; // Set this as per your pagination logic or requirement
@@ -237,26 +238,23 @@ function MediaPage(props) {
 
   const getNotificationsData = async () => {
     const response = await fetch(apiURL + 'api/v1/media/notifications', {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + props.user.authToken
-        }
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + props.user.authToken
+      }
     });
     const rsp = await response.json();
 
     if (response.status >= 200 && response.status < 300) {
-        console.log(rsp.payload);
+      console.log(rsp.payload);
     } else {
-        if (response.status == 401) {
-            dispatch(props.actions.userLogout());
-        } else {
-            toast("Error while fetching data!");
-        }
+      if (response.status == 401) {
+        dispatch(props.actions.userLogout());
+      } else {
+        toast("Error while fetching data!");
+      }
     }
-}
-  
-  
-  
+  }
 
   const getInitData = async () => {
     getMediaData();
@@ -643,7 +641,7 @@ function MediaPage(props) {
             </div>
 
             {/* Media Posts */}
-            {medias?.length > 0 ? (
+            {medias.length > 0 ? (
               medias.map((media, index) => (
                 <div key={media.uuid || index} className="post">
                   <div className="info2">
@@ -651,11 +649,11 @@ function MediaPage(props) {
                       <div className="profile-pic">
                         <img
                           src='/assets/person.png'
-                          alt={`${media.user}'s profile`}
+                          alt={`${media.user?.username}'s profile`}
                           style={{ height: 36, width: 36, borderRadius: '50%' }}
                         />
                       </div>
-                      <p className="username">{media.user}</p>
+                      <p className="username">{media.user?.first_name} {media.user?.last_name}</p>
                     </div>
                     {media.content && (
                       <div style={{ marginLeft: 'auto' }}>
@@ -745,7 +743,7 @@ function MediaPage(props) {
               >
                 Previous
               </button>
-              <span style={{ alignSelf: 'center', color:"var(--fourth-color)" }}>
+              <span style={{ alignSelf: 'center', color: "var(--fourth-color)" }}>
                 Page {currentPage} of {Math.ceil(totalCount / 10)} {/* Adjust 10 based on your page size */}
               </span>
               <button
@@ -1305,7 +1303,7 @@ function MediaPage(props) {
           {renderSideMenu()}
         </div>
 
-        <div className="right-content-83mzvcj3" ref={rightContentRef} style={{ position: "relative" }}>
+        <div className="right-content-83mzvcj3" ref={rightContentRef} style={{ width: '100%', position: "relative" }}>
 
           {renderMediaContent()}
           <div className="bottom-navigation-bar">

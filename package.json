@@ -12,6 +12,7 @@
     "@fortawesome/fontawesome-free": "^5.12.1",
     "@nextui-org/react": "^2.2.9",
     "@reduxjs/toolkit": "^2.0.1",
+    "@tippyjs/react": "^4.2.6",
     "@vidstack/react": "^1.11.21",
     "clsx": "^2.1.0",
     "dayjs": "^1.11.10",

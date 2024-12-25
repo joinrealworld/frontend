@@ -445,7 +445,7 @@ main {
 
 .tag-kla3mca2 {
     color: rgba(#FFF, 0.45);
-    font-size: 0.8rem;
+    font-size: 12px;
 }
 
 .vert-container-23mazz {
@@ -754,14 +754,18 @@ main {
 .message-tail {
     content: '""';
     position: absolute;
-    bottom: 3px;
-    right: -10px;
+    bottom: 4px;
+    right: 10px;
     width: 0;
     height: 0;
     border-radius: 50%;
-    border-left: 8px solid var(--seventh-color);
+    /* border-left: 8px solid var(--seventh-color);
     border-right: 12px solid transparent;
     border-top: 12px solid var(--seventh-color);
+    border-bottom: 12px solid transparent; */
+    border-left: 8px solid #248bf5;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #248bf5;
     border-bottom: 12px solid transparent;
     transform: rotate(270deg);
 }
@@ -857,13 +861,8 @@ main {
 
 .message-text-3kzc3 {
     font-size: 15px;
-    font-weight: 300;
     color: var(--fourth-color);
-    line-height: 22px;
-
-    b {
-        font-weight: 600;
-    }
+    line-height: 26px;
 }
 
 .options-text-3kzc3 {
@@ -1544,8 +1543,8 @@ main {
     /* Adjust to match the clipboard's clip width */
     height: 50px;
     /* Height of the clip */
-    background-color: var(--border-color);
-    border: 3px solid var(--eighth-color);
+    background-color: var(--sixth-color);
+    border: 2px solid var(--eighth-color);
     border-radius: 30px 30px 15px 15px;
     /* Round only the top corners */
     transform: translateX(-50%);
@@ -1558,8 +1557,7 @@ main {
     width: 100%;
     position: absolute;
     top: 60%;
-    border-top: 3px solid var(--eighth-color);
-    ;
+    border-top: 2px solid var(--eighth-color);
 }
 
 .dot {
@@ -1591,17 +1589,17 @@ main {
     /* Width of the half-circle */
     height: 30px;
     /* Half the height of the previous full circle */
-    background-color: var(--border-color);
+    background-color: var(--sixth-color);
     border-top-left-radius: 60px;
     /* Make the top half rounded */
     border-top-right-radius: 60px;
     /* Make the top half rounded */
     border-bottom: none;
     /* Remove the bottom border */
-    border-left: 3px solid var(--eighth-color);
-    border-right: 3px solid var(--eighth-color);
-    border-top: 3px solid var(--eighth-color);
-    border-bottom: 3px solid var(--eighth-color);
+    border-left: 3.8px solid var(--eighth-color);
+    border-right: 3.8px solid var(--eighth-color);
+    border-top: 2.4px solid var(--eighth-color);
+    border-bottom: 3px solid var(--sixth-color);
     transform: translateX(-50%);
     z-index: 3;
     /* Ensure the half-circle appears above the clip */
@@ -2063,28 +2061,27 @@ main {
 }
 
 .whatsapp-chat-list {
-    padding: 10px;
+    padding: 10px 25px;
     width: auto;
     margin: auto;
 }
 
 .chat-day {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .chat-date {
     font-size: 12px;
     color: #888;
-    margin-right:20px;
+    margin-right: 20px;
 }
 
 .chat-item {
     display: flex;
     align-items: center;
-    padding: 5px;
+    padding: 12px 10px 12px 20px;
     border-radius: 8px;
     background-color: var(--seventh-color);
-    border-bottom: 1px solid var(--fourth-color);
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -2102,6 +2099,9 @@ main {
 
 .chat-content1 {
     flex-grow: 1;
+    flex-direction: row;
+    display: flex;
+    align-items: center;
     /* padding-bottom: 10px; */
 }
 
@@ -2110,7 +2110,7 @@ main {
     justify-content: space-between;
     align-items: center;
     color: var(--fourth-color);
-    font-size: medium;
+    font-size: 15.4px;
 }
 
 
@@ -2144,8 +2144,10 @@ main {
 
 .chat-window {
     position: relative;
-    overflow-y: auto; /* Enables scrolling */
-    max-height: 80vh; /* Adjust based on your container height */
+    overflow-y: auto;
+    /* Enables scrolling */
+    max-height: 80vh;
+    /* Adjust based on your container height */
 }
 
 .message-user-info {
@@ -2153,15 +2155,18 @@ main {
     display: flex;
     align-items: center;
     top: 0;
-    z-index: 10; /* Ensures it stays on top of other content */
+    z-index: 10;
+    /* Ensures it stays on top of other content */
     background: var(--hoverbox-color);
     color: var(--fourth-color);
-    padding: 5px; /* Adjust padding as needed */
-    margin-top: 0; /* Remove margin-top if you want it flush with the top */
+    padding: 5px;
+    /* Adjust padding as needed */
+    margin-top: 0;
+    /* Remove margin-top if you want it flush with the top */
 }
 
-.chat-area{
-    margin:10px;
+.chat-area {
+    margin: 10px;
     padding-top: 20px;
     padding-left: 10px;
     padding-right: 10px;
@@ -2181,7 +2186,7 @@ main {
 }
 
 .message-bubble.sent {
-    background:linear-gradient(94.38deg, #ecc879 -14.69%, #d46b32 210%);
+    background: linear-gradient(94.38deg, #ecc879 -14.69%, #d46b32 210%);
     /* WhatsApp sent message color */
     color: var(--fourth-color);
     border-radius: 8px;
@@ -2273,16 +2278,13 @@ main {
         transition: left 0.3s linear;
     }
 
+    /* 
     .message-text-3kzc3 {
         font-size: 12px;
         font-weight: 300;
         color: var(--fourth-color);
         line-height: 16px;
-    
-        b {
-            font-weight: 600;
-        }
-    }
+    } */
 
 
     @media screen and (max-width: 600px) {
@@ -2331,5 +2333,222 @@ main {
             cursor: pointer;
             display: flex !important;
         }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+} */
+
+.profile-card {
+    width: 100%;
+    max-width: 380px;
+    background-color: #fff5f5;
+    border-radius: 7px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.profile-image-container {
+    position: relative;
+}
+
+.profile-image {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+}
+
+.online-status {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background-color: #22c55e;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.profile-info {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.name-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.verified-badge {
+    background-color: #e2e8f0;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verified-badge i {
+    color: #3b82f6;
+    font-size: 12px;
+}
+
+.username {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin: 4px 0;
+}
+
+.social-badges {
+    display: flex;
+    gap: 8px;
+    font-size: 1.25rem;
+}
+
+.bio {
+    font-size: 0.875rem;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.status-section {
+    display: flex;
+    flex-direction: column;
+    /* gap: 6px; */
+}
+
+.status-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    height: 35px;
+    width: 100%;
+    margin-top: 5px;
+    padding: 8px 10px;
+    background-color: rgba(229, 231, 235, 0.8);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.status-button-inactive {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    height: 35px;
+    margin-top: 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.custom-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: rgba(229, 231, 235, 0.8);
+    border-radius: 8px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 4px;
+}
+
+.divider {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 16px 0;
+}
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.menu-button:hover {
+    background-color: rgba(229, 231, 235, 0.5);
+}
+
+.button-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .profile-card {
+        margin: 16px;
+        border-radius: 8px;
     }
 }

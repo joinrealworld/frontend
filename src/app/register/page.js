@@ -143,32 +143,56 @@ function Register(props) {
           "price_id": selectedPlan?.id
         })
       });
+      console.log(JSON.stringify({
+        "first_name": firstName,
+        "last_name": lastName,
+        "email": emailAddress,
+        "password": password,
+        "card_number": Number(cardNumber),
+        "card_exp_month": Number(expiryDate.split('/')[0]),
+        "card_exp_year": Number(expiryDate.split('/')[1]),
+        "card_cvc": Number(cvv),
+        "card_name": cardHolder,
+        "price_id": selectedPlan?.id
+      }));
+      console.log("response register ----------------------------------------------------------------");
+      console.log(response);
       const rsp = await response.json();
       if (response.status >= 200 && response.status < 300) {
         if (rsp.payload?.data?.user && rsp.payload?.data?.user?.id) {
-          if (rsp.payload?.data?.user?.theme == 'dark') {
-            darkTheme();
-            localStorage.setItem("theme", JSON.stringify('dark'));
-          }
-          else if (rsp.payload?.data?.user?.theme == 'light') {
-            lightTheme();
-            localStorage.setItem("theme", JSON.stringify('light'));
-          }
-          dispatch(props.actions.userLogin({
-            user: rsp.payload?.data?.user,
-            authToken: rsp.payload?.data?.token?.access,
-            refreshToken: rsp.payload?.data?.token?.refresh
-          }));
-          router.replace('/');
+          console.log("rsp register ----------------------------------------------------------------");
+          console.log(rsp);
+          // if (rsp.payload?.data?.user?.theme == 'dark') {
+          //   darkTheme();
+          //   localStorage.setItem("theme", JSON.stringify('dark'));
+          // }
+          // else if (rsp.payload?.data?.user?.theme == 'light') {
+          //   lightTheme();
+          //   localStorage.setItem("theme", JSON.stringify('light'));
+          // }
+          // dispatch(props.actions.userLogin({
+          //   user: rsp.payload?.data?.user,
+          //   authToken: rsp.payload?.data?.token?.access,
+          //   refreshToken: rsp.payload?.data?.token?.refresh
+          // }));
+          toast("Sign up successfully completed! Please verify your email address to login.");
+          router.replace('/login');
         } else {
+          console.log("rsp register 1 ----------------------------------------------------------------");
+          console.log(rsp);
           handleAPIError(rsp);
           setIsLoading(false);
         }
       } else {
+        console.log("rsp register 2 ----------------------------------------------------------------");
+        console.log(rsp);
         handleAPIError(rsp);
         setIsLoading(false);
       }
     } catch (error) {
+      console.log("register error ----------------------------------------------------------------");
+      console.log(error);
+
       toast("Something went wrong!");
       setIsLoading(false);
     }

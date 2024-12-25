@@ -6,8 +6,8 @@ import { toast } from 'react-toastify';
 import parse from 'html-react-parser';
 import { Tooltip, Switch, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, Button, Spinner, Progress, AvatarGroup, Avatar } from "@nextui-org/react";
 import { useDispatch } from 'react-redux';
-import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, Fullscreen, ArrowLeft, ListStartIcon } from 'lucide-react';
-import { useRouter, usePathname } from 'next/navigation';
+import { MenuIcon, HomeIcon, MoonIcon, SunIcon, UsersIcon, LuggageIcon, BadgeCheckIcon, XIcon, ArrowLeftIcon, CheckCircleIcon, PauseCircleIcon, PlayCircleIcon, Fullscreen, ArrowLeft, ListStartIcon, CheckCheck, Check, Mountain, CarFront, Umbrella } from 'lucide-react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import moment from 'moment';
 import $ from 'jquery';
 
@@ -19,6 +19,7 @@ import { lightTheme } from "@/themes/lightTheme";
 import ValidatedForm from '@/components/ValidatedForm';
 import Image from 'next/image';
 import Loading from "@/components/Loading";
+import Tippy from '@tippyjs/react';
 
 const ChannelType = {
     checkList: 1,
@@ -44,11 +45,11 @@ const Channels = [
         name: '📊┃polls',
         type: ChannelType.polls,
     },
-    {
-        uuid: '65720aef-5446-43f3-91fc-86fc3f19b6e6',
-        name: '🎞️┃streaming',
-        type: ChannelType.streaming,
-    },
+    // {
+    //     uuid: '65720aef-5446-43f3-91fc-86fc3f19b6e6',
+    //     name: '🎞️┃streaming',
+    //     type: ChannelType.streaming,
+    // },
     {
         uuid: '2ca63800-92ac-45ba-b856-bd9de193212a',
         name: '🗄️┃clans',
@@ -241,17 +242,28 @@ const ChatData = [
 
 const IDENTITY_BOOSTER_COIN_PRICE = 20;
 
+const AI_PICTURES = [
+    { text: 'Online', Icon: () => <Mountain size={16} color={'black'} style={{ marginRight: 10 }} /> },
+    { text: 'Inactive', Icon: () => <CarFront size={16} color={'black'} style={{ marginRight: 10 }} /> },
+    { text: 'Do Not Disturb', Icon: () => <Umbrella size={16} color={'black'} style={{ marginRight: 10 }} /> }
+];
+
 function Chat(props) {
 
     const dispatch = useDispatch();
     const router = useRouter();
     const path = usePathname();
 
+    const { get } = useSearchParams();
+    const searchParams = {
+        channel: get('c'),
+    }
+
     const [servers, setServers] = useState(props.chat.serverList ?? []);
     const [selectedServer, setSelectedServer] = useState(null);
 
     const [channels, setChannels] = useState(Channels);
-    const [selectedChannel, setSelectedChannel] = useState(Channels[0]);
+    const [selectedChannel, setSelectedChannel] = useState(Channels.find(c => c.uuid.toLowerCase() == searchParams.channel?.toLowerCase?.()) ?? Channels[0]);
 
     const [isPollAnswerLoading, setIsPollAnswerLoading] = useState({ uuid: null });
     const [isChatDataFetch, setIsChatDataFetch] = useState(false);
@@ -338,14 +350,20 @@ function Chat(props) {
     const [adminMessages, setAdminMessages] = useState([]);
     const [sendMessage, setSendMessage] = useState("");
     const [selectedMessage, setSelectedMessage] = useState(null);
+    const [isMessagesLoading, setIsMessagesLoading] = useState({ chat_id: null });
 
     const [raffleSent, setRaffleSent] = useState(false);
 
     const [clanData, setClanData] = useState([]);
+    const [randomCompletedVideos, setRandomCompletedVideos] = useState(Math.round(Math.random() * 100));
     const [isClanDataFetch, setIsClanDataFetch] = useState(false);
     const [onLeaderboardClick, setOnLeaderboardClick] = useState(false);
 
+    const [AIPicture, setAIPicture] = useState(AI_PICTURES.find(a => a.text === props.user?.user?.ai_picture));
+
     const handleMouseEnter = () => setIsModalVisible(true);
+
+    const [popupVisible, setPopupVisible] = useState(false);
 
     // Update positions when a new message is added
     useEffect(() => {
@@ -466,8 +484,29 @@ function Chat(props) {
             }
             getInitData();
             setChatBackground();
+
+            if (searchParams.channel) {
+                const channelIndex = Channels.find(c => c.uuid.toLowerCase() == searchParams.channel?.toLowerCase?.());
+                if (channelIndex > -1) {
+                    setSelectedChannel(Channels[channelIndex]);
+                    onChannelSelected(Channels[channelIndex]);
+                } else {
+                    router.replace('?c=' + Channels[channelIndex].uuid);
+                    setSelectedChannel(Channels[channelIndex]);
+                }
+            }
         }
     }, []);
+
+    useEffect(() => {
+        if (searchParams.channel && searchParams?.channel != selectedChannel?.uuid) {
+            const channelIndex = Channels.find(c => c.uuid.toLowerCase() == searchParams.channel?.toLowerCase?.());
+            if (channelIndex > -1) {
+                setSelectedChannel(Channels[channelIndex]);
+                onChannelSelected(Channels[channelIndex]);
+            }
+        }
+    }, [searchParams.channel]);
 
     const getProfile = async () => {
         const response = await fetch(apiURL + 'api/v1/user/profile', {
@@ -686,6 +725,7 @@ function Chat(props) {
         if (response.status >= 200 && response.status < 300) {
             if (rsp.payload && typeof rsp.payload == 'object') {
                 setClanData(Object.values(rsp.payload));
+                setRandomCompletedVideos(Math.round(Math.random() * 100));
                 setIsClanDataFetch(true);
                 scrollToBottomChatContent();
             } else {
@@ -903,6 +943,14 @@ function Chat(props) {
         else if (channel?.type == ChannelType.savedProgressChannels) {
             await getSavedProgressData();
         }
+        else if (channel?.type == ChannelType.media) {
+            if (localStorage.getItem('signature') !== null) {
+                router.replace('/media');
+            } else {
+                mediaContractModel.onOpen();
+                setIsDrawing(true);
+            }
+        }
         // do not need - so code commented for now
         // else if (channel?.type == ChannelType.generalChat) {
 
@@ -1035,10 +1083,7 @@ function Chat(props) {
     }
 
     const onFeedbackVideoClick = (item) => {
-        console.log(item);
-
-        // zzz
-        // router.push(props?.params?.server + '/courses/5ff78efe-3ed2-4bc6-b64d-35cab5b3f792?cid=' + item.course + '&lid=' + item?.content?.uuid);
+        router.push(item.master_category.uuid + '/courses/' + item.category.uuid + '?cid=' + item.course.uuid + '&lid=' + item.content.uuid);
     }
 
     const purchaseIdentityBooster = async (authToken) => {
@@ -1082,7 +1127,10 @@ function Chat(props) {
                 'Authorization': 'Bearer ' + authToken
             }
         });
+        console.log(response);
+        console.log(authToken);
         const rsp = await response.json();
+        console.log(rsp);
         if (response.status >= 200 && response.status < 300) {
             if (rsp.payload) {
                 setChatBackgroundWallpapers(rsp.payload);
@@ -1400,9 +1448,6 @@ function Chat(props) {
                     {categoryUsers.map((user, index) => {
                         return (
                             <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: 15 }}>
-                                {/* <span style={{ fontSize: 14, color: 'var(--fourth-color)', marginBottom: 8 }}>{item.title}</span> */}
-                                {/* {item.users.map((user, index) => {
-                                    return ( */}
                                 <div className='user-info-3kzc3' style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
                                     <div style={{ position: 'relative' }}>
                                         <img
@@ -1429,8 +1474,6 @@ function Chat(props) {
                                         <p className='user-description-3kzc3'>{user.bio}</p>
                                     </div>
                                 </div>
-                                {/* );
-                                })} */}
                             </div>
                         );
                     })}
@@ -1507,24 +1550,6 @@ function Chat(props) {
         }
     }
 
-    const [content, setContent] = useState(null);
-
-    useEffect(() => {
-        if (selectedChannel?.type == ChannelType.media) {
-            if (localStorage.getItem('signature') !== null) {
-                router.replace('/media');
-            } else {
-                mediaContractModel.onOpen();
-                setIsDrawing(true);
-            }
-
-
-            // Alternatively, you might want to redirect here
-            // router.replace('/media');
-        } else {
-        }
-    }, [selectedChannel]);
-
     const renderMainContent = () => {
         if (selectedChannel?.type == ChannelType.checkList) {
             return renderChecklistMessage(chatData);
@@ -1558,54 +1583,6 @@ function Chat(props) {
         //     return renderChatMessage({});
         // }
     }
-
-    // do not need - so code commented for now
-    // const renderChatMessage = (course) => {
-    //     return course?.data?.map((cData, index) => {
-    //         return (
-    //             <div key={index} className='message-wrap-83nja'>
-    //                 <div className="chat-user-icon-ac2s2">
-    //                     {index == 0 ?
-    //                         <div className='user-info-3kzc3'>
-    //                             <div style={{ position: 'relative' }} >
-    //                                 <img
-    //                                     src={cData.user.image}
-    //                                     style={{ height: 40, width: 40, borderRadius: '50%', }}
-    //                                 />
-    //                                 <img
-    //                                     src={"assets/queen.svg"}
-    //                                     style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
-    //                                 />
-    //                             </div>
-    //                         </div>
-    //                         :
-    //                         null
-    //                         // <div style={{ alignItems: 'center', display: 'none' }} className='message-datetime-zkn22d'>
-    //                         //     <p style={{ color: 'var(--fourth-color)', opacity: 0.6, fontSize: 11, marginTop: 20 }}>{moment(cData.timestamp)}</p>
-    //                         // </div>
-    //                     }
-    //                 </div>
-    //                 <div className="message-ac2s2">
-    //                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-    //                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-    //                             <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{cData.user.name}</p>
-    //                             {cData.user.isVerified && <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />}
-    //                             <p className='date-text-3kzc3'>
-    //                                 {dateFormat(cData.timestamp)}
-    //                             </p>
-    //                         </div>
-    //                     </div>
-
-    //                     <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
-    //                         <p className='message-text-3kzc3'>
-    //                             {parse(cData.content)}
-    //                         </p>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         );
-    //     })
-    // }
 
     const answerPoll = async (authToken, bodyData) => {
         const response = await fetch(apiURL + 'api/v1/polls/answer-poll', {
@@ -1655,16 +1632,16 @@ function Chat(props) {
         return pollsData.map((course, index) => {
             return (
                 <div key={index} style={{}}>
-                    <div className='message-divider-date-wrap-7naj82b'>
+                    {/* <div className='message-divider-date-wrap-7naj82b'>
                         <div className='message-divider-date-7naj82b'>
                             {moment(course?.date).format('MMMM DD, YYYY')}
                         </div>
-                    </div>
+                    </div> */}
                     {course?.data?.map((cData, index) => {
                         let adminUser = typeof cData?.admin_data == 'object' && cData?.admin_data?.length > 0 ? cData.admin_data?.find(x => x.first_name != '' && x.first_name != null && x.first_name != undefined) : null;
                         return (
                             <div key={index} className='message-wrap-83nja'>
-                                <div className="message-ac2s2">
+                                <div className="message-ac2s2" style={{ width: "100%", paddingTop: 20, paddingBottom: 20 }}>
                                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                             <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{adminUser?.first_name + " " + adminUser?.last_name + " " + (adminUser?.selected_emoji ?? '')}</p>
@@ -1699,8 +1676,9 @@ function Chat(props) {
                                 </div>
                             </div>
                         );
-                    })}
-                </div>
+                    })
+                    }
+                </div >
             );
         });
     }
@@ -1774,11 +1752,10 @@ function Chat(props) {
         }
         return (<>
             <div style={{
-            < div style={{
-                    display: 'flex',
-                    justifyContent: 'center', // Center horizontally within the parent
-                    alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
-                }}>
+                display: 'flex',
+                justifyContent: 'center', // Center horizontally within the parent
+                alignItems: 'center',      // Center vertically within the parent           // Full viewport height if desired
+            }}>
                 <div style={{
                     cursor: 'pointer',
                     display: 'flex',
@@ -1789,8 +1766,6 @@ function Chat(props) {
                     color: "var(--fourth-color)",
                     marginBottom: 6
                 }}
-                    className='stream-box-ac2s2'
-                    onClick={() => { setOnLeaderboardClick(true) }}>
                     className='stream-box-ac2s2'
                     onClick={() => { setOnLeaderboardClick(true) }}>
                     Leaderboard
@@ -1818,7 +1793,7 @@ function Chat(props) {
                 >
                     {/* zzz */}
                     <ArrowLeft className="arrow-left" onClick={() => setOnLeaderboardClick(false)} />
-                    70 Lesson Completed
+                    {randomCompletedVideos} Lesson Completed
                 </div>
             </div> : null}
 
@@ -1892,10 +1867,16 @@ function Chat(props) {
                                             gave feedback for video of
                                         </span>
                                         <span style={{ marginLeft: 4 }}>
-                                            🍼┃tutorials
+                                            {item?.course?.name}
                                         </span>
                                         <span style={{ fontSize: 13, opacity: 0.5, fontWeight: '100', marginLeft: 4 }}>
-                                            course.
+                                            course from
+                                        </span>
+                                        <span style={{ marginLeft: 4 }}>
+                                            {item?.category?.name}
+                                        </span>
+                                        <span style={{ fontSize: 13, opacity: 0.5, fontWeight: '100', marginLeft: 4 }}>
+                                            category.
                                         </span>
                                     </span>
                                     <span style={{ flex: 1, color: 'var(--fourth-color)', opacity: 0.6, fontSize: 9, fontWeight: '300', marginLeft: 12 }}>
@@ -1905,7 +1886,7 @@ function Chat(props) {
                             </div>
                             <span className="f1--xs MacBaslik" style={{ marginTop: 20 }}>
                                 <span style={{ color: 'var(--fourth-color)', fontSize: 13, letterSpacing: 0.6, fontWeight: '300', marginLeft: 4 }}>
-                                    {item.description}
+                                    <strong style={{ fontSize: 13.5, fontWeight: '500' }}>Feedback:</strong> {item.description}
                                 </span>
                             </span>
                         </div>
@@ -2070,81 +2051,6 @@ function Chat(props) {
 
 
     const renderChecklistMessage = (checkListData) => {
-        // if (!isCheckListFetch) {
-        //     return (
-        //         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        //             <Spinner size='md' color='default' />
-        //         </div>
-        //     );
-        // }
-        // if (checkListData.length == 0) {
-        //     return (
-        //         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        //             <p style={{ color: 'var(--fourth-color)', opacity: 0.7, fontSize: 15, marginTop: 30 }}>No checklists available!</p>
-        //         </div>
-        //     );
-        // }
-        // return checkListData?.map((cData, index) => {
-        //     return (
-        //         <div key={index} className='message-wrap-83nja'>
-        //             <div className="chat-user-icon-ac2s2">
-        //                 {index == 0 ?
-        //                     <div className='user-info-3kzc3'>
-        //                         <div style={{ position: 'relative' }}>
-        //                             <img
-        //                                 src={cData.admin_data?.avatar ? encodeURI(apiURL.slice(0, -1) + cData.admin_data?.avatar) : "/assets/person.png"}
-        //                                 style={{ height: 40, width: 40, borderRadius: '50%', }}
-        //                             />
-        //                             <img
-        //                                 src={"/assets/queen.svg"}
-        //                                 style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
-        //                             />
-        //                         </div>
-        //                     </div>
-        //                     :
-        //                     <div style={{ alignItems: 'center' }}>
-        //                     </div>
-        //                 }
-        //             </div>
-        //             <div className="message-ac2s2">
-        //                 <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
-        //                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        //                         <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
-        //                             {cData.admin_data.first_name} {cData.admin_data.last_name}
-        //                             </p>
-        //                         <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
-        //                     </div>
-        //                 </div>
-
-        //                 <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10 }}>
-        //                     <p className='message-text-3kzc3'>
-        //                         {parse(cData.checklist)}
-        //                         <div style={{ display: 'flex', flexDirection: 'row', width: '100%', flexWrap: 'wrap', marginTop: 10, marginBottom: 10 }}>
-        //                             {cData.options.map((checklist, index) => {
-        //                                 return (
-        //                                     // <Tooltip
-        //                                     //     content={
-        //                                     //         <div style={{ width: 70, height: 100, backgroundColor: 'var(--third-color)' }}>
-        //                                     //             {cData.checked?.[checklist]?.map?.((checklist, index) => { return checklist.user; })?.join?.(', ')}
-        //                                     //         </div>
-        //                                     //     }
-        //                                     //     closeDelay={100}
-        //                                     // >
-        //                                     <div className='checklist-answer-923mas' key={index} style={{}} onClick={answerChecklistClick(checklist, cData)}>
-        //                                         {checklist}
-        //                                         <div style={{ marginLeft: 10 }}>{cData.checked?.[checklist]?.length ?? 0}</div>
-        //                                     </div>
-        //                                     // </Tooltip>
-        //                                 );
-        //                             })}
-        //                         </div>
-        //                     </p>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     );
-        // })
-
         if (!isCheckListFetch) {
             return (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -2158,8 +2064,6 @@ function Chat(props) {
                 {checkList.length === 0
                     ? null
                     : checkList?.map((cData, index) => {
-                        // Formatting the timestamp (you can customize it as per your need)
-                        const formattedDate = new Date(cData.created_at).toLocaleString();
 
                         return (
                             <div key={index} className='message-wrap-83nja' >
@@ -2167,7 +2071,8 @@ function Chat(props) {
                                     <div className='user-info-3kzc3'>
                                         <div style={{ position: 'relative' }}>
                                             <img
-                                                src="/assets/person.png"
+                                                // src="/assets/person.png"
+                                                src={cData.user.avatar ? encodeURI(apiURL.slice(0, -1) + cData.user.avatar) : "/assets/person.png"}
                                                 style={{ height: 40, width: 40, borderRadius: '50%' }}
                                                 alt="user-avatar"
                                             />
@@ -2189,7 +2094,7 @@ function Chat(props) {
                                             <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
                                         </div>
                                         <div style={{ fontSize: '12px', color: '#999', marginRight: 10, alignSelf: 'center' }}>
-                                            {formattedDate}
+                                            {moment(cData.created_at).format('DD-MM-YYYY hh:mm A')}
                                         </div>
                                     </div>
 
@@ -2210,54 +2115,6 @@ function Chat(props) {
                     })}
             </>
         );
-
-
-
-        // return <div className='message-wrap-83nja'>
-        //     {checkCompletedList.length == 0 ? null :
-        //         <div className="chat-user-icon-ac2s2">
-        //             <div className='user-info-3kzc3'>
-        //                 <div style={{ position: 'relative' }}>
-        //                     <img
-        //                         src="/assets/person.png"
-        //                         style={{ height: 40, width: 40, borderRadius: '50%' }}
-        //                     />
-        //                     <img
-        //                         src={"/assets/queen.svg"}
-        //                         style={{ position: 'absolute', bottom: 0, right: -6, height: 14, width: 14, borderRadius: '50%' }}
-        //                     />
-        //                 </div>
-        //             </div>
-        //         </div>}
-        //     {checkCompletedList.length == 0 ? null :
-        //         <div className="message-ac2s2">
-
-        //             <div style={{ display: 'flex', flexDirection: 'row', marginLeft: 10, marginBottom: 10 }}>
-        //                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        //                     <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>
-        //                         Harsh Patel
-        //                     </p>
-        //                     <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
-        //                 </div>
-        //             </div>
-        //             {checkCompletedList?.map((cData, index) => (
-        //                 <div key={index} style={{ display: 'flex', alignItems: 'center', marginLeft: 10, marginBottom: 10 }}>
-        //                     <div
-        //                         className={`custom-checkboxlist ${cData.type === 'true' ? 'yes' : cData.type === 'cross' ? 'cross' : ''}`}
-        //                         type="radio"
-        //                         style={{ marginRight: 10 }}
-        //                         disabled
-        //                     ></div>
-        //                     <p className='message-text-3kzc3' style={{ margin: 0 }}>
-        //                         {cData.item}
-        //                     </p>
-        //                 </div>
-        //             ))}
-        //         </div>}
-        // </div>
-
-
-
     }
 
     const onSelectEmoji = async (emoji) => {
@@ -2288,33 +2145,6 @@ function Chat(props) {
                     dispatch(props.actions.userLogout());
                 }
             }
-        }
-    }
-
-    const renderChatInput = () => {
-        if (selectedChannel?.type !== ChannelType.streaming && selectedChannel?.type !== ChannelType.clans && selectedChannel?.type !== ChannelType.feedback) {
-            return (
-                <div style={{ height: '10%', backgroundColor: 'var(--seventh-color)' }} className="flex flex-col">
-                    <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)' }}>
-                        <div className="border-base-300 flex flex-shrink-0 items-center gap-2 border-t px-3 pt-2">
-                            <input accept="image/*" id="add-media-9"
-                                type="file" style={{ display: 'none' }} />
-                            {selectedChannel?.type == ChannelType.polls && props.user?.user?.is_admin ?
-                                <label htmlFor="add-media" className='add-media-3ca22' onClick={(e) => onAddMedia()}>
-                                    +
-                                </label>
-                                :
-                                null}
-                            <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                            </div>
-                            {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                        <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                                    </form> */}
-                        </div>
-                    </footer>
-                </div>
-            );
         }
     }
 
@@ -2418,11 +2248,7 @@ function Chat(props) {
 
         return (
             <div id="black-hole-background">
-                {/* <div className='message-divider-date-wrap-7naj82b'>
-                    <div className='message-divider-date-7naj82b'>
-                        {moment('09/01/2024').format('MMMM DD, YYYY')}
-                    </div>
-                </div> */}
+
                 <div style={{
                     position: 'absolute',
                     top: 20,
@@ -2443,52 +2269,39 @@ function Chat(props) {
                         {formatTime(timeLeft)}
                     </div>
 
-                    {/* Fullscreen Button */}
-                    {/* {isFullscreen ? <Fullscreen style={{color:"var(--fourth-color)"}}/>:<Fullscreen style={{color:"var(--fourth-color)"}}/>} */}
                     <Fullscreen onClick={toggleFullscreen} style={{ color: "var(--fourth-color)", cursor: 'pointer' }} />
-                    {/* <button
-                    onClick={toggleFullscreen}
-                    style={{
-                        backgroundColor: isFullscreen ? '#f1c40f' : '#2980b9',
-                        color: '#fff',
-                        padding: '5px 10px',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        border: 'none',
-                    }}
-                >
-                    {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-                </button> */}
+
                 </div>
                 {blackHoleList.map((item, index) => {
                     let isSelected = item.user == props.user?.user?.id;
                     const { top, left } = positions[index] || { top: 50, left: 50 };
-                    return (<div key={index} className='message-wrap-83nja-float' style={{
-                        top: `${top}%`,
-                        left: `${left}%`,
-                        transform: 'translate(-50%, -50%)',
-                    }}>
-                        <div className="message-ac2s2" style={{ backgroundColor: isSelected ? 'var(--gold-color)' : 'var(--seventh-color)' }}>
-                            {/* <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                    <p className='user-name-3kzc3' style={{ color: '#f1c40f', fontWeight: '400' }}>{item.username}</p>
-                                    <BadgeCheckIcon color={'#f1c40f'} size={13} style={{ marginLeft: 4 }} />
+                    return (
+                        <div
+                            key={index}
+                            className='message-wrap-83nja-float'
+                            style={{
+                                top: `${top}%`,
+                                left: `${left}%`,
+                                transform: 'translate(-50%, -50%)',
+                            }}
+                        >
+                            {/* <div class="imessage">
+                                <p class="from-me">Like is this</p>
+                            </div> */}
+                            <div style={{
+                                backgroundColor: isSelected ? 'var(--gold-color)' : '#248bf5', /* backgroundColor: '#248bf5', */ color: '#fff', borderRadius: '1.15rem'
+                            }}>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 15, paddingTop: 3, paddingBottom: 3, marginRight: 15 }}>
+                                    <p className='message-text-3kzc3' style={isSelected ? { color: '#000', fontWeight: '500' } : {}}>
+                                        {item.message}
+                                        {/* <b>{item.message}</b> */}
+                                    </p>
 
                                 </div>
-
+                                <div className='message-tail' style={isSelected ? { borderLeftColor: 'var(--gold-color)', borderTopColor: 'var(--gold-color)', } : {}} />
                             </div>
-                            <p className='date-text-3kzc3'>
-                                {dateFormat('09/01/2024')}
-                            </p> */}
-                            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10, marginRight: 5 }}>
-                                <p className='message-text-3kzc3' style={isSelected ? { color: '#000', fontWeight: '500' } : {}}>
-                                    <b>{item.message}</b>
-                                </p>
-
-                            </div>
-                            <div className='message-tail' style={isSelected ? { borderLeftColor: 'var(--gold-color)', borderTopColor: 'var(--gold-color)', } : {}} />
                         </div>
-                    </div>
                     );
                 })}
             </div>
@@ -2612,6 +2425,7 @@ function Chat(props) {
     }
 
     const handleClick = async (chat_id) => {
+        setIsMessagesLoading({ chat_id });
         const response1 = await fetch(apiURL + 'api/v1/support/fetch_message?support_chat_id=' + chat_id, {
             method: 'GET',
             headers: {
@@ -2620,24 +2434,50 @@ function Chat(props) {
         });
         const rsp1 = await response1.json();
         setSelectedMessage(rsp1.payload); // Update state with the clicked message
+        setIsMessagesLoading({ chat_id: null });
     };
 
-    const sendNewMessage = () => {
+    const selectAIPicture = async (item) => {
+        let formData = new FormData();
+        formData.append('ai_pic', item.text);
+        const response1 = await fetch(apiURL + 'api/v1/user/change/ai_pic', {
+            method: 'PATCH',
+            headers: {
+                'Authorization': 'Bearer ' + props.user.authToken
+            },
+            body: formData
+        });
+        const rsp1 = await response1.json();
+        console.log("rsp1 --------------------------------");
+        console.log(rsp1);
+        let user = { ...props.user?.user };
+        user.ai_picture = item.text;
+        dispatch(props.actions.setUser({
+            user
+        }));
+        setAIPicture(item);
+    };
+
+    const sendNewMessage = async () => {
         if (sendMessage.trim() === '') return;
 
         const newMessage = {
-            user: {
-                id: "2", // Fake admin ID
-                name: "Admin",
-                image: "/assets/person.png",
-                isVerified: true
-            },
-            timestamp: new Date().getTime(),
-            content: sendMessage // The content of the new message
+            "message":
+            {
+                "content": sendMessage,
+                "timestamp": moment().utc().toString()
+            }
         };
 
-        // Add new message to the adminMessages array
-        setAdminMessages([...adminMessages, newMessage]);
+        // const response1 = await fetch(apiURL + 'api/v1/support/send_message/' +chat_id, {
+        //     method: 'GET',
+        //     headers: {
+        //         'Authorization': 'Bearer ' + props.user.authToken
+        //     }
+        // });
+        // const rsp1 = await response1.json();
+
+
 
         // Clear the input field and disable the button momentarily
         setSendMessage('');
@@ -2651,35 +2491,23 @@ function Chat(props) {
             <div className='whatsapp-chat-list'>
                 {supportList.map((chat, index) => (
                     <div key={index} className="chat-day">
-                        {/* Grouped by Day */}
-
-
                         <div
                             className="chat-item"
                             key={index}
                             onClick={() => handleClick(chat.uuid)}
                         >
                             <img
-                                src={chat.user.avatar ? chat.user.avatar : "/assets/person.png"}
+                                src={chat.user.avatar ? encodeURI(apiURL.slice(0, -1) + chat.user.avatar) : "/assets/person.png"}
                                 alt={chat.user.first_name}
                                 className="chat-avatar"
                             />
                             <div className="chat-content1">
                                 <div className="chat-header">
-                                    <strong>{chat.user.first_name} {chat.user.last_name}</strong>
-                                    {/* {message.user.isVerified && <span className="verified-icon">✔️</span>} */}
-                                    {/* <small className="timestamp">
-                                            {moment(parseInt(message.timestamp)).fromNow()}
-                                        </small> */}
+                                    {chat.user.first_name} {chat.user.last_name}
                                 </div>
-                                {/* <p className="message-preview">
-                                        {message.content.length > 20 
-                                            ? message.content.slice(0, 20) + "..." 
-                                            : message.content
-                                        }
-                                    </p> */}
+                                {isMessagesLoading.chat_id == chat.uuid && <Spinner size='sm' color='default' style={{ marginLeft: '0.8rem' }} />}
                             </div>
-                            <h4 className="chat-date">{moment(chat.created_at).format('MMMM Do, YYYY')}</h4>
+                            <h4 className="chat-date">{moment(chat.created_at).format('DD MMM, YYYY')}</h4>
                         </div>
 
                     </div>
@@ -2694,20 +2522,17 @@ function Chat(props) {
 
         return (
             <div className='chat-window' ref={supportContainerRef}>
-                <div className="message-user-info" style={{ marginTop: "-10px" }}>
-                    {props.user.user.is_admin ? (
+                {props.user.user.is_admin ? (
+                    <div className="message-user-info" style={{ marginTop: "-10px" }}>
                         <ArrowLeft className="arrow-left" onClick={() => setSelectedMessage(false)} />
-                    ) : null}
-
-                    <img
-                        src={selectedMessage.user.avatar ? selectedMessage.user.avatar : "/assets/person.png"}
-                        alt={selectedMessage.user.first_name}
-                        className="avatar"
-                    />
-                    {props.user.user.is_admin ? (
+                        <img
+                            src={selectedMessage.user.avatar ? encodeURI(apiURL.slice(0, -1) + selectedMessage.user.avatar) : "/assets/person.png"}
+                            alt={selectedMessage.user.first_name}
+                            className="avatar"
+                        />
                         <strong>{selectedMessage.user.first_name} {selectedMessage.user.last_name}</strong>
-                    ) : "Admin"}
-                </div>
+                    </div>
+                ) : null}
 
                 {/* Current User Message (Sent) */}
                 <div className='chat-area'>
@@ -2748,7 +2573,6 @@ function Chat(props) {
 
         );
     };
-
 
     return (
         <div className='container-2mda3'>
@@ -2839,8 +2663,8 @@ function Chat(props) {
                         })}
                     </div>
                     <div className="account-user-39cmaz">
-                        <div href={'/settings'} className='user-30cmzmc'>
-                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', cursor: 'pointer', }} onClick={(e) => router.push('/settings')}>
+                        <div className='user-30cmzmc'>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', cursor: 'pointer' }} onClick={(e) => popupVisible ? setPopupVisible(false) : setPopupVisible(true)}>
                                 <Image
                                     className="avatar-2mllmv4a"
                                     alt="Avatar"
@@ -2860,6 +2684,67 @@ function Chat(props) {
                             </div>
                         </div>
                     </div>
+                    {popupVisible && (
+                        <Tippy
+                            visible={popupVisible}
+                            onClickOutside={() => setPopupVisible(false)}
+                        >
+                            <div
+                                style={{
+                                    backgroundColor: 'var(--third-color)',
+                                    width: '21.8%',
+                                    position: "absolute",
+                                    bottom: '10%'
+                                }}
+                            >
+                                <div class="profile-card">
+                                    <div class="profile-header" style={{ cursor: 'pointer' }} onClick={() => { router.push('/settings'); }}>
+                                        <div class="profile-image-container">
+                                            <Image
+                                                className="avatar-2mllmv4a"
+                                                alt="Avatar"
+                                                src={props.user?.user?.avatar ? encodeURI(apiURL.slice(0, -1) + props.user?.user?.avatar) : "/assets/person.png"}
+                                                style={{ height: 64, width: 64, borderRadius: '50%' }}
+                                                width={38}
+                                                height={38}
+                                            />
+                                            {/* <img src="https://placeholder.svg" alt="Profile" class="profile-image" /> */}
+
+                                            <span class="online-status"></span>
+                                        </div>
+                                        <div class="profile-info">
+                                            <div class="name-container">
+                                                <span className="username-312c02qena" style={{ color: 'var(--sixth-color)', fontSize: 15 }}>{props.user?.user?.first_name + " " + props.user?.user?.last_name + " " + (props.user?.user?.selected_emoji ?? '')}</span>
+                                            </div>
+                                            <p class="tag-kla3mca2" style={{ color: 'var(--sixth-color)' }}>{props.user?.user?.username}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="divider"></div>
+
+                                    <div class="status-section">
+                                        {
+                                            AI_PICTURES
+                                                .map((item) => {
+                                                    let isSelected = AIPicture?.text == item.text;
+                                                    return (
+                                                        <button class={isSelected ? "status-button" : "status-button-inactive"} onClick={() => selectAIPicture(item)}>
+                                                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                                                {item.Icon()}
+                                                                {item.text}
+                                                            </div>
+                                                            {isSelected && <Check size={16} color={'green'} />}
+                                                        </button>
+                                                    );
+                                                })
+                                        }
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </Tippy>
+                    )}
                 </div>
                 {/* END - course list  */}
 
@@ -3052,14 +2937,12 @@ function Chat(props) {
                                         selectedChannel?.type == ChannelType.raffles ?
                                             <footer className="border-grey-secondary border-t duration-keyboard w-full transition-transform" style={{ paddingBottom: 0, transform: 'translateY(0px)', backgroundColor: "rgb(13 24 36" }}>
                                                 <div className="border-base-300 flex items-center justify-center border-t px-3 pb-3">
-                                                    <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }}  >
+                                                    <div style={{ position: "relative", display: "inline-block", width: "250px", height: "70px" }} onClick={raffleSent ? showToastRaffle : sendRaffle}>
                                                         <Image
                                                             src="/assets/rafflenew.png"
                                                             style={{ height: "100%" }}
                                                             width={250}
                                                             height={70}
-                                                            onMouseEnter={raffleSent ? showToastRaffle : sendRaffle}
-
                                                         />
                                                         <span style={{
                                                             position: "absolute",
@@ -3117,11 +3000,8 @@ function Chat(props) {
                                                             :
                                                             null}
                                                         <div style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                                            <textarea readOnly="" id="chat-input" className="resize-none border-none bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
+                                                            <span className="px-3" style={{ height: '32px !important', fontSize: 15, color: 'var(--fourth-color)', opacity: 0.5 }}>{"# " + selectedChannel?.name}</span>
                                                         </div>
-                                                        {/* <form style={{ display: 'block', position: 'relative', minHeight: 32, borderRadius: 20, flex: 1, height: 32, backgroundColor: 'var(--third-color)' }}>
-                                                        <textarea readOnly="" id="chat-input" className="resize-none border-none   bg-transparent  px-3 py-1 outline-none cursor-not-allowed" placeholder={"# " + selectedChannel?.name} style={{ height: '32px !important', fontSize: 15 }}></textarea>
-                                                    </form> */}
                                                     </div>
                                                 </footer>
                                 }

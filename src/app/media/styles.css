@@ -80,8 +80,8 @@
 
 .left-menu-6k2zzc {
     display: flex;
-    min-width: 240px !important;
-    max-width: 260px !important;
+    min-width: 300px !important;
+    max-width: 320px !important;
     height: 100%;
     width: 100%;
     overflow-y: auto;
@@ -97,7 +97,7 @@
     display: flex;
     padding-left: 19%;
     padding-right: 19%;
-    width: 100%;
+    width: 100% !important;
     height: 100% !important;
     overflow-y: auto;
     overflow-x: hidden;
@@ -1267,9 +1267,9 @@
     justify-content: center;
     align-items: center;
     margin: 20px 0;
-  }
-  
-  .pagination-button {
+}
+
+.pagination-button {
     padding: 10px 20px;
     margin: 0 10px;
     cursor: pointer;
@@ -1277,17 +1277,17 @@
     color: white;
     border: none;
     border-radius: 5px;
-  }
-  
-  .pagination-button:disabled {
+}
+
+.pagination-button:disabled {
     background-color: grey;
     cursor: not-allowed;
-  }
-  
-  .pagination-info {
+}
+
+.pagination-info {
     align-self: center;
-  }
-  
+}
+
 
 @media screen and (max-width: 1100px) {
     #course-content {
