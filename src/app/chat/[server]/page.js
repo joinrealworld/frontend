@@ -2725,10 +2725,10 @@ function Chat(props) {
                                     <div class="status-section">
                                         {
                                             AI_PICTURES
-                                                .map((item) => {
+                                                .map((item, index) => {
                                                     let isSelected = AIPicture?.text == item.text;
                                                     return (
-                                                        <button class={isSelected ? "status-button" : "status-button-inactive"} onClick={() => selectAIPicture(item)}>
+                                                        <button key={index} class={isSelected ? "status-button" : "status-button-inactive"} onClick={() => selectAIPicture(item)}>
                                                             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                                                 {item.Icon()}
                                                                 {item.text}

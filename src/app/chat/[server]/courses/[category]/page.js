@@ -828,7 +828,7 @@ function CoursesByCategory(props) {
           {selectedCourse.data.map((lesson, index) => {
             const isSelected = selectedLesson?.uuid == lesson.uuid;
             return (
-              <div className={`lesson-box-62nks ${isSelected ? 'active' : undefined}`} onClick={lessonClick(lesson)}>
+              <div key={index} className={`lesson-box-62nks ${isSelected ? 'active' : undefined}`} onClick={lessonClick(lesson)}>
                 <div className="lesson-text-info">
                   <div className="lesson-name-9qncq6">{selectedCourse.name} - {"Lesson " + (index + 1)}</div>
 
